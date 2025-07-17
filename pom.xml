@@ -181,12 +181,12 @@
 			<version>1.16</version>
 		</dependency>
 		
-		<dependency>
+	<!-- 	<dependency>
 		    <groupId>com.oracle</groupId>
 		    <artifactId>ojdbc6</artifactId>
 		    <version>11.2.0.3</version> <scope>system</scope>
 		    <systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/ojdbc6.jar</systemPath>
-		</dependency>
+		</dependency> -->
 		
 		<dependency>
 			<groupId>org.projectlombok</groupId>

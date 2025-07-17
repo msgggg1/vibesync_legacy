@@ -2,6 +2,7 @@ package com.vibesync.login.mapper;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import com.vibesync.login.domain.LoginDTO;
@@ -9,6 +10,7 @@ import com.vibesync.login.domain.SignUpDTO;
 import com.vibesync.login.domain.UserSummaryVO;
 import com.vibesync.login.domain.UserVO;
 
+@Mapper
 public interface UserMapper {
 
 		// 회원가입

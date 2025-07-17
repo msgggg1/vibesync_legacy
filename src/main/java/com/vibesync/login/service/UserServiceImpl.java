@@ -30,11 +30,13 @@ public class UserServiceImpl implements UserService{
 
 	@Override
 	public UserVO login(LoginDTO dto) throws Exception {
+		/*
 		UserVO userVO = this.userMapper.findByEmail(dto.getEmail());
 		if (userVO != null && passwordEncoder.matches(dto.getPassword(), userVO.get)) {
 			
 		}
-		return 
+		*/
+		return null; 
 	}
 
 	@Override
