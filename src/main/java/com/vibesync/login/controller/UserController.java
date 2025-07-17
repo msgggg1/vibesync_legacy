@@ -1,5 +1,5 @@
 package com.vibesync.login.controller;
 
-public class temp {
+public class UserController {
 
 }
