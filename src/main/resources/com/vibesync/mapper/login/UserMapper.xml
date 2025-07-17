@@ -11,11 +11,6 @@
 		VALUES (useraccount_seq.nextval, #{email}, #{pw}, #{nickname}, #{img}, #{name}, SYSTIMESTAMP, #{salt}, #{category_idx})
 	</insert>
 
-	<select id="login" resultType="com.vibesync.login.domain.UserVO">
-		SELECT ac_idx, pw, salt, nickname, img, name, category_idx
-		FROM userAccount WHERE email = #{email}
-	</select>
-
 	<select id="findByEmail"
 		resultType="com.vibesync.login.domain.UserVO">
 		SELECT ac_idx, nickname, img, name, category_idx FROM

@@ -14,9 +14,6 @@ public interface UserMapper {
 		// 회원가입
 		int insertUser(SignUpDTO dto);
 		
-		// 로그인
-		UserVO login(LoginDTO dto);
-		
 		// 이메일로 계정 정보 조회
 		UserVO findByEmail(String email);
 		
@@ -43,5 +40,5 @@ public interface UserMapper {
 	    public void deleteToken(String token);
 	    
 	    // 이메일 주소를 기준으로 사용자의 비밀번호 업데이트
-	    public void updatePasswordAndSalt(@Param("email") String email, @Param("pw") String hashedPassword , String newSalt);
+	    public void updatePassword(@Param("email") String email, @Param("pw") String hashedPassword);
 }
