@@ -120,4 +120,7 @@ local.properties
 ### VisualStudioCode ###
 .vscode/
 
+
+mail.properties
+
 # End of https://www.toptal.com/developers/gitignore
