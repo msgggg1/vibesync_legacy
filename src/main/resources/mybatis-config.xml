@@ -4,13 +4,23 @@
   "https://mybatis.org/dtd/mybatis-3-config.dtd">
 
 <configuration>
+  
   <settings>
     <setting name="mapUnderscoreToCamelCase" value="true"/>
   </settings>
+
   <typeAliases>
+    <!-- java.util -->
     <typeAlias type="java.util.Map" alias="Map" />
     <typeAlias type="java.util.HashMap" alias="HashMap" />
     <typeAlias type="java.util.List" alias="List" />
+    
+    <!-- com.vibesync.common -->
+    <typeAlias type="com.vibesync.common.domain.CategoryVO" alias="CategoryVO" />
+    
+    <!-- com.vibesync.board -->
+    <typeAlias type="com.vibesync.board.domain.NoteVO" alias="NoteVO" />
   </typeAliases>
-</configuration>   
+
+</configuration>
  
