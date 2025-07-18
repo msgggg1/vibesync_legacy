@@ -5,10 +5,10 @@
 
 <mapper namespace="com.vibesync.login.mapper.UserMapper">
 
-	<insert id="insertUser">
+	<insert id="insertUser" parameterType="com.vibesync.login.domain.SignUpDTO">
 		INSERT INTO userAccount
-		(ac_idx, email, pw, nickname, img, name, created_at, salt, category_idx)
-		VALUES (useraccount_seq.nextval, #{email}, #{pw}, #{nickname}, #{img}, #{name}, SYSTIMESTAMP, #{salt}, #{category_idx})
+		(ac_idx, email, pw, nickname, name, created_at, category_idx)
+		VALUES (useraccount_seq.nextval, #{email}, #{password}, #{nickname}, #{name}, SYSTIMESTAMP, #{category_idx})
 	</insert>
 
 	<select id="findByEmail"
