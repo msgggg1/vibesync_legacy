@@ -1,4 +1,3 @@
-// UserVO.java 전체 코드
 package com.vibesync.login.domain;
 
 import java.sql.Timestamp;
