@@ -22,12 +22,12 @@ public class CategoryServiceImpl implements CategoryService {
 	// "categoryList" 캐시에 결과값을 저장. 다음 호출부터는 DB 조회 없이 캐시에서 바로 반환.
     @Cacheable("categoryList")
     public List<CategoryVO> findAllWithCache() {
-    	log.info("DB에서 모든 카테고리 목록을 조회합니다 (캐시 저장 예정)");
+    	log.info("전체 카테고리 목록 조회 요청 (캐시 저장)");
     	
     	log.debug("CategoryMapper.selectAll() 실행");
     	List<CategoryVO> categoryList = categoryMapper.selectAll();
         
-        log.info(String.format("총 {%d}개의 카테고리를 조회했습니다.", categoryList.size()));
+        log.info("조회된 카테고리 개수: " + categoryList.size());
         
         return categoryList;
     }

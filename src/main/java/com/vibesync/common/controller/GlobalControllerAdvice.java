@@ -20,7 +20,7 @@ public class GlobalControllerAdvice { // 모든 컨트롤러의 메소드 실행
 	
 	// "categoryList" 라는 이름으로 Model에 데이터 담기
     @ModelAttribute("categoryList")
-    public List<CategoryVO> addCategoriesToModel() {
+    public List<CategoryVO> globalCategories() {
     	log.info("모든 모델에 전역 카테고리 목록 추가");
     	return categoryService.findAllWithCache(); // 캐싱이 적용된 서비스 메소드 호출
     }

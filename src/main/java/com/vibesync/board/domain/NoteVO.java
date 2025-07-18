@@ -25,6 +25,6 @@ public class NoteVO {
 	private int userPgIdx;
 	
 	// 추가
-	private String authorName;
+	private String author;
 	
 }
