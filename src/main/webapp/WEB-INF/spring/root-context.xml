@@ -11,6 +11,7 @@
 	<context:component-scan base-package="com.vibesync" />
 	<mybatis-spring:scan base-package="com.vibesync.common.mapper" />
 	<mybatis-spring:scan base-package="com.vibesync.login.mapper" />
+	<mybatis-spring:scan base-package="com.vibesync.board.mapper" />
 
 	<!-- DB 연결 -->
 	<bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
@@ -52,5 +53,4 @@
 		<property name="host" value="${mail.host}" />
 		<property name="port" value="${mail.port}" />
 	</bean>
-
 </beans>
