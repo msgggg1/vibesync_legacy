@@ -11,10 +11,16 @@
 		VALUES (useraccount_seq.nextval, #{email}, #{password}, #{nickname}, #{name}, SYSTIMESTAMP, #{category_idx})
 	</insert>
 
-	<select id="findByEmail"
+	<select id="findVOByEmail"
 		resultType="com.vibesync.login.domain.UserVO">
-		SELECT ac_idx, nickname, img, name, category_idx FROM
-		userAccount WHERE email = #{email}
+		SELECT ac_idx, nickname, img, name, category_idx
+		FROM userAccount WHERE email = #{email}
+	</select>
+	
+	<select id="findByEmail"
+		resultType="com.vibesync.login.domain.User">
+		SELECT ac_idx, pw, nickname, img, name, category_idx, created_at, kakao_auth_id, google_id 
+		FROM userAccount WHERE email = #{email}
 	</select>
 
 	<select id="duplicateTest" resultType="com.vibesync.login.domain.UserVO">

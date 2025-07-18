@@ -15,6 +15,7 @@
 	<annotation-driven />
 
 	<resources mapping="/resources/**" location="/resources/" />
+	<resources mapping="/sources/**" location="/sources/" />
 	<resources mapping="/static/**" location="/static/" />
 
 

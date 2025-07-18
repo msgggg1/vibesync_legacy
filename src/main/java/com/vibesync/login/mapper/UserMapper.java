@@ -5,8 +5,8 @@ import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import com.vibesync.login.domain.LoginDTO;
 import com.vibesync.login.domain.SignUpDTO;
+import com.vibesync.login.domain.User;
 import com.vibesync.login.domain.UserSummaryVO;
 import com.vibesync.login.domain.UserVO;
 
@@ -16,8 +16,11 @@ public interface UserMapper {
 		// 회원가입
 		int insertUser(SignUpDTO dto);
 		
-		// 이메일로 계정 정보 조회
-		UserVO findByEmail(String email);
+		// 이메일로 계정 정보 조회. 로그인 시 사용
+		User findByEmail(String email);
+		
+		// 일반 조회용: pw를 제외한 안전한 정보만 조회
+	    public UserVO findVOByEmail(String email); 
 		
 		// 회원가입 시 중복 검사 : 닉네임, 이메일 한번에
 		List<UserVO> duplicateTest(@Param("nickname") String nickname, @Param("email")String email);
