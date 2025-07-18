@@ -8,6 +8,7 @@
 	<name>vibesync</name>
 	<packaging>war</packaging>
 	<version>1.0.0-BUILD-SNAPSHOT</version>
+	
 	<properties>
 		<java-version>11</java-version>
 		<org.springframework-version>5.0.7.RELEASE</org.springframework-version>
@@ -15,7 +16,9 @@
 		<org.slf4j-version>1.7.25</org.slf4j-version>
 		<org.apache.tiles-version>3.0.8</org.apache.tiles-version>
 	</properties>
+	
 	<dependencies>
+	
 		<!-- Spring -->
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -40,12 +43,14 @@
 			<version>${org.springframework-version}</version>
 		</dependency>
 
+
 		<!-- AspectJ -->
 		<dependency>
 			<groupId>org.aspectj</groupId>
 			<artifactId>aspectjrt</artifactId>
 			<version>${org.aspectj-version}</version>
 		</dependency>
+
 
 		<!-- Logging -->
 		<dependency>
@@ -89,6 +94,17 @@
 			</exclusions>
 			<!-- <scope>runtime</scope> 주석처리 -->
 		</dependency>
+		<dependency>
+		    <groupId>org.apache.logging.log4j</groupId>
+		    <artifactId>log4j-api</artifactId>
+		    <version>2.17.2</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.logging.log4j</groupId>
+		    <artifactId>log4j-core</artifactId>
+		    <version>2.17.2</version>
+		</dependency>
+
 
 		<!-- @Inject -->
 		<dependency>
@@ -96,6 +112,7 @@
 			<artifactId>javax.inject</artifactId>
 			<version>1</version>
 		</dependency>
+
 
 		<!-- Servlet -->
 		<dependency>
@@ -118,6 +135,7 @@
 			<version>1.2</version>
 		</dependency>
 
+
 		<!-- Test -->
 		<dependency>
 			<groupId>junit</groupId>
@@ -127,12 +145,12 @@
 			<scope>test</scope>
 		</dependency>
 
-
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
 			<version>${org.springframework-version}</version>
 		</dependency>
+
 
 		<!-- https://mvnrepository.com/artifact/org.aspectj/aspectjweaver -->
 		<dependency>
@@ -153,6 +171,7 @@
 			<version>${org.springframework-version}</version>
 		</dependency>
 
+
 		<!-- https://mvnrepository.com/artifact/com.zaxxer/HikariCP p83 -->
 		<dependency>
 			<groupId>com.zaxxer</groupId>
@@ -160,12 +179,14 @@
 			<version>5.0.1</version>
 		</dependency>
 
+
 		<!-- https://mvnrepository.com/artifact/org.mybatis/mybatis p91 -->
 		<dependency>
 			<groupId>org.mybatis</groupId>
 			<artifactId>mybatis</artifactId>
 			<version>3.4.6</version>
 		</dependency>
+
 
 		<!-- https://mvnrepository.com/artifact/org.mybatis/mybatis-spring -->
 		<dependency>
@@ -177,31 +198,16 @@
 
 		<!-- https://mvnrepository.com/artifact/org.bgee.log4jdbc-log4j2/log4jdbc-log4j2-jdbc4 -->
 		<dependency>
-			<groupId>org.bgee.log4jdbc-log4j2</groupId>
-			<artifactId>log4jdbc-log4j2-jdbc4</artifactId>
-			<version>1.16</version>
+		    <groupId>org.bgee.log4jdbc-log4j2</groupId>
+		    <artifactId>log4jdbc-log4j2-jdbc4</artifactId>
+		    <version>1.16</version>
+		    <exclusions>
+		        <exclusion>
+		            <groupId>org.apache.logging.log4j</groupId>
+		            <artifactId>log4j-slf4j-impl</artifactId>
+		        </exclusion>
+		    </exclusions>
 		</dependency>
-
-		<dependency>
-			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-core</artifactId>
-			<version>2.17.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-api</artifactId>
-			<version>2.17.2</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-slf4j-impl</artifactId>
-			<version>2.17.2</version>
-		</dependency>
-
-		<!-- <dependency> <groupId>com.oracle</groupId> <artifactId>ojdbc6</artifactId> 
-			<version>11.2.0.3</version> <scope>system</scope> <systemPath>${project.basedir}/src/main/webapp/WEB-INF/lib/ojdbc6.jar</systemPath> 
-			</dependency> -->
 
 		<dependency>
 			<groupId>org.projectlombok</groupId>
@@ -209,7 +215,8 @@
 			<version>1.18.28</version>
 			<scope>provided</scope>
 		</dependency>
-
+		
+		
 		<!-- https://mvnrepository.com/artifact/net.coobird/thumbnailator -->
 		<dependency>
 			<groupId>net.coobird</groupId>
@@ -222,7 +229,6 @@
 			<artifactId>jackson-databind</artifactId>
 			<version>2.9.5</version>
 		</dependency>
-
 
 		<dependency>
 			<groupId>com.fasterxml.jackson.dataformat</groupId>
@@ -270,8 +276,9 @@
 			<artifactId>spring-security-taglibs</artifactId>
 			<version>${org.springframework-version}</version>
 		</dependency>
-
-		<!-- 3. fileupload -->
+		
+		
+		<!-- fileupload -->
 		<!-- https://mvnrepository.com/artifact/commons-fileupload/commons-fileupload -->
 		<dependency>
 			<groupId>commons-fileupload</groupId>
@@ -279,22 +286,25 @@
 			<version>1.3</version>
 		</dependency>
 
-		<!-- 4. spring io -->
+
+		<!-- spring io -->
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 			<version>1.4</version>
 		</dependency>
 
-		<!-- 5. cglib -->
+
+		<!-- cglib -->
 		<!-- https://mvnrepository.com/artifact/cglib/cglib -->
 		<dependency>
 			<groupId>cglib</groupId>
 			<artifactId>cglib</artifactId>
 			<version>2.2</version>
 		</dependency>
-
-		<!-- 6. tomcat-dbcp -->
+		
+		
+		<!-- tomcat-dbcp -->
 		<!-- https://mvnrepository.com/artifact/org.apache.tomcat/tomcat-dbcp -->
 		<dependency>
 			<groupId>org.apache.tomcat</groupId>
@@ -302,7 +312,8 @@
 			<version>9.0.93</version>
 		</dependency>
 
-		<!-- 7. Tiles -->
+
+		<!-- Tiles -->
 		<dependency>
 			<groupId>org.apache.tiles</groupId>
 			<artifactId>tiles-extras</artifactId>
@@ -323,6 +334,8 @@
 			<artifactId>tiles-jsp</artifactId>
 			<version>${org.apache.tiles-version}</version>
 		</dependency>
+		
+		
 		<!-- 자바 메일 -->
 		<dependency>
 			<groupId>jakarta.mail</groupId>
@@ -341,7 +354,9 @@
 			<version>1.4.7</version>
 		</dependency>
 
+
 	</dependencies>
+	
 	<build>
 		<plugins>
 			<plugin>

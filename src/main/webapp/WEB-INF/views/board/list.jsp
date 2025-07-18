@@ -191,7 +191,7 @@ p{margin:0;padding:0;}
 .searchBtn { background: none; border: 1px solid var(--border-color); border-radius: 5px; color:var(--font-color); padding-block: 2px; padding-inline: 8px; font-weight: bold; }
 .searchBtn:hover { background: var(--hover-color) !important; }
 .pagination { display: flex; justify-content: center; align-items: center; gap: 10px;}
-.pagination a, .pagination strong { margin: 0 5px; text-decoration: none; }
+.pagination a.active { margin: 0 5px; text-decoration: none; font-weight: bolder;}
 .pagination strong { font-weight: bold; transform: scale(1.4); }
 
 </style>
@@ -207,7 +207,7 @@ p{margin:0;padding:0;}
             <section id="content">
                 <div id="board_all">
                     <div class="board_info">
-                        <form id="filterForm" action="list.do" method="get">
+                        <form id="filterForm" action="${pageContext.request.contextPath}/board/list" method="get">
                             <select name="category_idx" class="filter_select" onchange="$('#filterForm').submit();">
                                 <%-- <option value="0" ${currentCategory == 0 ? 'selected' : ''}>전체</option> --%>
                                 <c:forEach var="category" items="${categoryList}">
@@ -225,10 +225,10 @@ p{margin:0;padding:0;}
                         <div id="note-list">
                             <c:if test="${not empty noteList}">
                                 <c:forEach var="note" items="${noteList}">
-                                    <div class="full-post" onclick="location.href='postView.do?nidx=${note.noteIdx}'">
+                                    <div class="full-post">
                                         <div class="post-index">${note.noteIdx}</div>
-                                        <div class="post-title"><c:out value="${note.title}"/></div>
-                                        <div class="post-author"><c:out value="${note.authorName}"/></div>
+                                        <div class="post-title"><a class="move" href="${note.noteIdx}"><c:out value="${note.title}"/></a></div>
+                                        <div class="post-author"><c:out value="${note.author}"/></div>
                                     </div>
                                 </c:forEach>
                             </c:if>
@@ -238,40 +238,32 @@ p{margin:0;padding:0;}
                         </div>
                         
                         <div id="search_bar">
-	                        <form id="searchForm" action="list.htm" method="get">
-	                             <%-- 
-	                             <input type="hidden" name="category_idx" value="${currentCategory}">
-	                             <select name="searchType" class="searchInput">
-	                                 <option value="title" ${searchType == 'title' ? 'selected' : ''}>제목</option>
-	                                 <option value="author" ${searchType == 'author' ? 'selected' : ''}>작성자</option>
-	                                 <option value="title_content" ${searchType == 'title_content' ? 'selected' : ''}>제목+내용</option>
+	                        <form id="searchForm" action="${pageContext.request.contextPath}/board/list" method="get">
+	                             <%-- <input type="hidden" name="category_idx" value="${currentCategory}"> --%>
+	                             <select name="type" class="searchInput">
+				       				 <option value="T">제목</option>
+				       				 <option value="C">내용</option>
+				       				 <option value="W">작성자</option>
+				       				 <option value="TC">제목+내용</option>
+				       				 <option value="TW">제목+작성자</option>
+				       				 <option value="TCW">제목+내용+작성자</option>
 	                             </select>
 	                             <input type="text" class="searchInput" name="keyword" value="<c:out value='${keyword}'/>" placeholder="검색어 입력"/>
-	                             --%>
-	                             <button type="submit" class="searchBtn">검색</button>
+	                             <button type="button" class="searchBtn">검색</button>
 	                        </form>
 	                    </div>
 
-                        <!--
                         <div class="pagination" id="pagination-container">
-                             <c:if test="${result.prev}">
-                                <a href="list.do?page=${result.startPage - 1}&size=${result.pageSize}&category_idx=${currentCategory}&searchType=${searchType}&keyword=${keyword}">&laquo;</a>
+                             <c:if test="${pageMaker.prev}">
+                                <a href="${pageMaker.startPage - 1}">&laquo;</a>
                             </c:if>
-                            <c:forEach begin="${result.startPage}" end="${result.endPage}" var="p">
-                                <c:choose>
-                                    <c:when test="${p == result.currentPage}">
-                                        <strong>${p}</strong>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <a href="list.do?page=${p}&size=${result.pageSize}&category_idx=${currentCategory}&searchType=${searchType}&keyword=${keyword}">${p}</a>
-                                    </c:otherwise>
-                                </c:choose>
+                            <c:forEach begin="${pageMaker.startPage}" end="${pageMaker.endPage}" step="1" var="num">
+                                <a href="${num}" class="${num eq pageMaker.criteria.pageNum ? 'active' : ''}">${num}</a>
                             </c:forEach>
-                            <c:if test="${result.next}">
-                                <a href="list.do?page=${result.endPage + 1}&size=${result.pageSize}&category_idx=${currentCategory}&searchType=${searchType}&keyword=${keyword}">&raquo;</a>
+                            <c:if test="${pageMaker.next}">
+                                <a href="${pageMaker.endPage+1}">&raquo;</a>
                             </c:if>
                         </div>
-                        -->
                         
                     </div>
                 </div>
@@ -279,6 +271,43 @@ p{margin:0;padding:0;}
         </div>
     </div>
 </div>
+
+<form id="actionForm" action="${pageContext.request.contextPath}/board/list" method="get">
+	<input type="hidden" name="pageNum" value="${pageMaker.criteria.pageNum}">
+	<input type="hidden" name="amount" value="${pageMaker.criteria.amount}">
+	<input type="hidden" name="type" value="${pageMaker.criteria.type}">
+	<input type="hidden" name="keyword" value="${pageMaker.criteria.keyword}">
+</form>
+
+<script>
+
+	$(function() {
+		// 페이징 블럭에서 번호를 클릭할 때 이동
+		var actionForm = $("#actionForm");
+			
+		$(".pagination a").on("click", function() {
+			event.preventDefault();
+			let pageNum = $(this).attr("href");
+			actionForm
+					  .find(":hidden[name=pageNum]")
+					  								.val(pageNum)
+					  								.end()
+					  .submit();
+		}); // $(".pagination a").on("click", function() {
+		
+		// 게시글을 클릭할 때 이동
+		$("a.move").on("click", function() {
+			event.preventDefault();
+			let noteIdx = $(this).attr("href");
+			actionForm
+			  .attr("action", "/board/note")
+			  .append(`<input type="hidden" name="noteIdx" value="\${noteIdx}">`)
+			  .submit();
+		}); // $("a.move").on("click", function() {
+		
+	});
+
+</script>
 
 </body>
 </html>
