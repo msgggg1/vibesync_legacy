@@ -18,7 +18,7 @@
     <definition name="*/*" extends="baseLayout">
         <put-attribute name="body" value="/WEB-INF/views/{1}/{2}.jsp" />
         <put-attribute name="title" value="VibeSync: {1}"/>
-        <put-attribute name="css" value="{2}.css"/>
+        <put-attribute name="css" value="resources/css/{1}/{2}.css"/>
     </definition>
 
     <!-- header, footer가 없는 독립적인 페이지를 위한 정의 (예: 로그인 페이지) -->
