@@ -22,10 +22,10 @@
 	rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
 <link rel="icon"
-	href="${pageContext.request.contextPath}/vibesync/sources/favicon.ico">
+	href="${pageContext.request.contextPath}/sources/favicon.ico">
 <title>VibeSync Login</title>
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/vibesync/css/login.css">
+	href="${pageContext.request.contextPath}/resources/css/login.css">
 <style>
 .welcome-message {
 	font-family: 'Cal Sans', sans-serif;
@@ -56,14 +56,14 @@
 	<div class="container">
 		<div id="logo">
 			<img
-				src="${pageContext.request.contextPath}/vibesync/sources/logo1.png"
+				src="${pageContext.request.contextPath}/sources/logo1.png"
 				alt="VibeSync 로고" width="30%">
 		</div>
 
 		<div id="login">
 			<div id="inner_logo">
 				<img
-					src="${pageContext.request.contextPath}/vibesync/sources/login/footer_logo.png"
+					src="${pageContext.request.contextPath}/sources/login/footer_logo.png"
 					alt="VibeSync 로고"
 					style="width: 150px; filter: drop-shadow(-1px 0px 0px #000) drop-shadow(-1px 0px 0px #000) drop-shadow(-1px 0px 0px #000) drop-shadow(1px 0px 0px #000) drop-shadow(0px 1px 0px #000);">
 			</div>
@@ -161,7 +161,7 @@
 							<a
 								href="https://kauth.kakao.com/oauth/authorize?client_id=5552b4df7e716e5ec496a4a58b2cf809&redirect_uri=http://192.168.10.183:8081/vibesync/vibesync/auth/kakao/callback.do&response_type=code&prompt=login"
 								class="kakao-login-btn"> <img id="kakao_img"
-								src="${pageContext.request.contextPath}/vibesync/sources/icons/KakaoTalk_logo.svg"
+								src="${pageContext.request.contextPath}/sources/icons/KakaoTalk_logo.svg"
 								alt="카카오 로그인" /> <span style="">KAKAO LOGIN</span>
 							</a>
 						</div>
@@ -183,7 +183,7 @@
 					<!-- <div id="signupFormContainer" style="display: none;"> -->
 					<div id="signupFormContainer"
 						style="${formToShow eq 'signUp' ? 'display:flex;' : 'display:none;'}">
-						<form action="user.do" method="post" id="signupForm">
+						<form action="user/signUp" method="post" id="signupForm">
 							<%-- POST 요청 시 login/signup 구분 --%>
 							<input type="hidden" name="accessType" value="signUp">
 								<div class="g_id_signin" data-type="standard" data-size="large"
@@ -212,32 +212,32 @@
 							</c:if>
 
 							<label for="signupName" class="sr-only">이름</label> <input
-								type="text" id="signupName" name="signupName" placeholder="Name"
+								type="text" id="signupName" name="name" placeholder="Name"
 								value="${ prevSignupName }" required> <label
 								for="signupNickname" class="sr-only">닉네임</label> <input
-								type="text" id="signupNickname" name="signupNickname"
+								type="text" id="signupNickname" name="nickname"
 								placeholder="NickName" value="${ prevSignupNickname }" required>
 
 							<label for="signupEmail" class="sr-only">이메일</label> <input
-								type="email" id="signupEmail" name="signupEmail"
+								type="email" id="signupEmail" name="email"
 								placeholder="Email" value="${ prevSignupEmail }" required>
 
 							<label for="signupPw" class="sr-only">비밀번호</label> <input
-								type="password" id="signupPw" name="signupPw"
+								type="password" id="signupPw" name="password"
 								placeholder="Password"
 								pattern="^(?=.*[A-Za-z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{8,}$"
 								title="8자 이상, 영문자, 숫자, 특수문자를 모두 포함해야 합니다." required> <label
 								for="confirmPw" class="sr-only">비밀번호 확인</label> <input
-								type="password" id="confirmPw" name="confirmPw"
+								type="password" id="confirmPw" name="confirmPassword"
 								placeholder="Confirm Password" required>
 							<p id="confirmPwError" class="error-message"
 								style="display: none; color: red; font-size: 0.8em;"></p>
 
 							<label for="category" class="sr-only">관심 카테고리</label> <select
-								id="category" name="category">
-								<c:forEach items="${applicationScope.categoryVOList}"
+								id="category" name="category_idx">
+								<c:forEach items="${categoryList}"
 									var="categoryVO">
-									<option value="${ categoryVO.category_idx }">${ categoryVO.c_name }</option>
+									<option value="${ categoryVO.categoryIdx }">${ categoryVO.categoryName }</option>
 								</c:forEach>
 							</select>
 
@@ -331,6 +331,6 @@
 			</div>
 		</div>
 
-		<script src="${pageContext.request.contextPath}/vibesync/js/login.js"></script>
+		<script src="${pageContext.request.contextPath}/resources/js/login.js"></script>
 </body>
 </html>

@@ -13,6 +13,7 @@
 
    <!-- 스프링 표현식(SpEL) 사용 여부 -->
    <security:http use-expressions="true">
+   	   <security:csrf disabled="true" />
       <!-- 접근 제어 -->
       <!-- <security:intercept-url pattern="/login/**" access="isAuthenticated()" /> -->
       <security:intercept-url pattern="/**" access="permitAll" />

@@ -9,7 +9,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.vibesync.login.domain.SignUpDTO;
+import com.vibesync.login.domain.User;
+import com.vibesync.login.domain.UserVO;
 import com.vibesync.login.mapper.UserMapper;
 
 import lombok.extern.log4j.Log4j;
@@ -26,14 +27,8 @@ public class UserMapperTest {
     @Test
     public void testUserMapper() {
         log.info("testUserMapper 실행");
-        SignUpDTO dto = new SignUpDTO();
-        dto.setEmail("test@test.com");
-        dto.setPassword("1234");
-        dto.setNickname("test");
-        dto.setName("test");
-        dto.setCategory_idx(1);
-        int rowcount = userMapper.insertUser(dto);
-        assertEquals(1, rowcount); 
-        log.info(dto.toString());
+        UserVO user = userMapper.findVOByEmail("test@test.com");
+     
+        log.info(user.toString());
     }
 }

@@ -30,26 +30,21 @@ public class UserServiceImpl implements UserService{
 
 	@Override
 	public UserVO login(LoginDTO dto) throws Exception {
-		/*
-		UserVO userVO = this.userMapper.findByEmail(dto.getEmail());
-		if (userVO != null && passwordEncoder.matches(dto.getPassword(), userVO.get)) {
-			
-		}
-		*/
+		
 		return null; 
 	}
 
 	@Override
 	public UserVO autoLogin(String email) throws Exception {
 	
-		return this.userMapper.findByEmail(email);
+		return this.userMapper.findVOByEmail(email);
 	}
 
 	// 소셜 로그인 가입 후 즉시 로그인 처리
 	@Override
 	public UserVO getUserByEmail(String email) {
 		
-		return this.userMapper.findByEmail(email);
+		return this.userMapper.findVOByEmail(email);
 	}
 
 	@Override
