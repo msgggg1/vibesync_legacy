@@ -49,7 +49,7 @@ public class BoardController {
 		}
 		model.addAttribute("pageMaker", new PageDTO(criteria, this.noteService.getTotalCount(criteria)));
 		
-		return "board.list";
+		return "board/list";
 	}
 	
 	// 게시글 작성 (/vibesync/board/write)
@@ -65,7 +65,7 @@ public class BoardController {
 		List<ContentVO> contentList = this.contentService.findAll();
 		model.addAttribute("contentList", contentList);
 		
-		return "board.write";
+		return "board/write";
 	}
 	
 	

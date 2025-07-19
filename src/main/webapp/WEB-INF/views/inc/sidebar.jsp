@@ -1,9 +1,8 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<%@ page trimDirectiveWhitespaces="true"%>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@page import="com.vibesync.member.domain.MemberVO"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
-<%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles" %>
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
 <style>
@@ -117,8 +116,8 @@ input:focus{outline:none;}
       <div class="nickname-container">
         <span class="profile" id="profile-display">
           <c:choose>
-             <c:when test="${not empty userInfo.img}">
-                <img src="${pageContext.request.contextPath}/vibesync/${userInfo.img}" alt="프로필">
+             <c:when test="${not empty memberInfo.img}">
+                <img src="${pageContext.request.contextPath}/vibesync/${memberInfo.img}" alt="프로필">
             </c:when>
             <c:otherwise>
                <img src="${pageContext.request.contextPath}/sources/default/default_user.jpg" alt="기본 프로필">
@@ -126,20 +125,20 @@ input:focus{outline:none;}
           </c:choose>
         </span>
         <span class="nickname" id="nickname-display">
-          ${userInfo.nickname}
+          ${memberInfo.nickname}
         </span>
         <div class="accountData" id="accountData-display">
-        	<button type="button" id="following-btn" class="modal-follow-message">
+           <button type="button" id="following-btn" class="modal-follow-message">
                <span class="accountDataLabel">팔로잉</span><span class="accountDataValue"></span>
             </button>
             <button type="button" id="follower-btn" class="modal-follow-message">
-				<span class="accountDataLabel">팔로워</span><span class="accountDataValue"></span>
-			</button>
+            <span class="accountDataLabel">팔로워</span><span class="accountDataValue"></span>
+         </button>
         </div>
         <div id="nickname-modal" class="modal-sidebar">
           <div id="nickname-modal-1">
-             <a href="userPage.do?acIdx=${userInfo.ac_idx}" class="modal-nickname">
-               ${userInfo.nickname}
+             <a href="/page/userPage?acIdx=${memberInfo.ac_idx}" class="modal-nickname">
+               ${memberInfo.nickname}
              </a>
              <div id="setting">
                <button type="button" id="setting-btn" class="modal-btn">
@@ -147,8 +146,8 @@ input:focus{outline:none;}
                </button>
             </div>
             <div id="logout">
-              <form action="user" method="post">
-                <input type="hidden" name="accessType" value="logout">
+              <form action="${pageContext.request.contextPath}/member/logout" method="post">
+              <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
                 <button type="submit" class="modal-btn">
                    <i class="fa-solid fa-right-from-bracket"></i> Logout
                 </button>
@@ -192,17 +191,17 @@ input:focus{outline:none;}
         <input type="text" class="search-input" placeholder="Search…">
       </div> -->
 
-      <a href="main.do" class="home icon_wrap">
+      <a href="main" class="home icon_wrap">
         <img src="${pageContext.request.contextPath}/sources/icons/home.svg" alt="home icon" class="sidebar_icon">
         <span>HOME</span>
       </a>
 
-      <a href="workspace.do" class="workspace icon_wrap">
+      <a href="workspace" class="workspace icon_wrap">
         <img src="${pageContext.request.contextPath}/sources/icons/work.svg" alt="workspace icon" class="sidebar_icon">
         <span>WORKSPACE</span>
       </a>
       
-      <a href="page.do" class="workspace icon_wrap">
+      <a href="page" class="workspace icon_wrap">
         <img src="${pageContext.request.contextPath}/sources/icons/page.svg" alt="workspace icon" class="sidebar_icon">
         <span>PAGES</span>
       </a>
@@ -296,11 +295,11 @@ $(document).ready(function() {
                     $ul.append('<li><p>No Follower</p></li>');
                 } else {
                     $.each(items, function(i, user) {
-                    	let profileImg = user.profile_img != null ? user.profile_img : '${pageContext.request.contextPath}/vibesync/sources/default/default_user.jpg';
-                    	
+                       let profileImg = user.profile_img != null ? user.profile_img : '${pageContext.request.contextPath}/vibesync/sources/default/default_user.jpg';
+                       
                         var liHtml = ''
                             + '<li class="sidebar-profile">'
-                            +   '<a href="userPage.do?acIdx=' + user.ac_idx + '">' 
+                            +   '<a href="userPage?acIdx=' + user.ac_idx + '">' 
                             +     '<img src="'+ profileImg +'" alt="profileImg">'
                             +     '<span class="sidebar-follow-span">'+ user.nickname +'</span>' 
                             +   '</a>'
@@ -406,12 +405,12 @@ $(document).ready(function() {
     });
     
     // 메시지 목록 내 클릭
-	$(document).on('click', '.message_item', function(e){
-	  e.stopPropagation();
-	  const idx      = $(this).data('sender-idx');
-	  const nickname = $(this).data('nickname');
-	  openchatRoomWithUser(idx, nickname);
-	});
+   $(document).on('click', '.message_item', function(e){
+     e.stopPropagation();
+     const idx      = $(this).data('sender-idx');
+     const nickname = $(this).data('nickname');
+     openchatRoomWithUser(idx, nickname);
+   });
     
     // 모달 닫기 버튼
     $(document).on('click', '#followListModal .close-modal', function() {
@@ -424,8 +423,8 @@ $(document).ready(function() {
 <script> /* 함수 */
 
 function updateFollowCount() {
-	updateFollowingCount();
-	updateFollowerCount();
+   updateFollowingCount();
+   updateFollowerCount();
 }
 
 function updateFollowingCount() {
@@ -462,10 +461,10 @@ function updateFollowerCount() {
 
 // 팔로잉/팔로워/메시지 모달 열기 함수
 function openFollowListModal(defaultTab = 'following') {
-    const isLoggedIn = ${sessionScope.userInfo != null};
+    const isLoggedIn = ${sessionScope.memberInfo != null};
     if (!isLoggedIn) {
         alert("로그인이 필요합니다.");
-        location.href = "${pageContext.request.contextPath}/user";
+        location.href = "${pageContext.request.contextPath}/member/login";
         return;
     }
 
@@ -488,13 +487,13 @@ function loadFollowListData(tabType) {
     let requestData;
 
     if (tabType === 'following') {
-        apiUrl = '${pageContext.request.contextPath}/follow';
+        apiUrl = '<%= request.getContextPath() %>/follow.do';
         requestData = { action: 'getFollowing' };
     } else if (tabType === 'follower') {
-        apiUrl = '${pageContext.request.contextPath}/follow';
+        apiUrl = '<%= request.getContextPath() %>/follow.do';
         requestData = { action: 'getFollower' };
     } else if (tabType === 'message') {
-        apiUrl = '${pageContext.request.contextPath}/message';
+        apiUrl = '<%= request.getContextPath() %>/message.do';
         requestData = { view: 'LISTALL' };
     } else {
         listContainer.html('<p style="text-align:center; padding: 20px;">잘못된 탭 요청입니다.</p>');
@@ -515,7 +514,7 @@ function loadFollowListData(tabType) {
                     return;
                 }
                 list.forEach(user => {
-                	const profileImg = user.profile_img ? `${pageContext.request.contextPath}/vibesync/\${user.profile_img}` : `\${basePath}sources/default/default_user.jpg`;
+                   const profileImg = user.profile_img ? `${pageContext.request.contextPath}/\${user.profile_img}` : `\${basePath}sources/default/default_user.jpg`;
                     const isFollowing = user.followedByCurrentUser;
                     const followButtonText = isFollowing ? '팔로잉' : '팔로우';
                     const followButtonClass = isFollowing ? 'follow-toggle-btn unfollow' : 'follow-toggle-btn';
@@ -524,14 +523,14 @@ function loadFollowListData(tabType) {
                         <div class="follow-list-item">
                             <img src="\${profileImg}" alt="프로필">
                             <div class="user-info">
-                                <a href="userPage.do?acIdx=\${user.ac_idx}" class="nickname">\${user.nickname}</a>
+                                <a href="userPage?acIdx=\${user.ac_idx}" class="nickname">\${user.nickname}</a>
                             </div>
                             <div class="action-buttons">
-                            	<button type="button" class="\${followButtonClass}" data-target-ac-idx="\${user.ac_idx}">
-                                	\${followButtonText}
+                               <button type="button" class="\${followButtonClass}" data-target-ac-idx="\${user.ac_idx}">
+                                   \${followButtonText}
                                 </button>
                                 <button type="button" class="message-btn message-btn-in-modal" data-target-ac-idx="\${user.ac_idx}" data-nickname="\${user.nickname}">
-                                	<i class="fa-solid fa-paper-plane"></i>
+                                   <i class="fa-solid fa-paper-plane"></i>
                                 </button>
                             </div>
                         </div>
@@ -552,8 +551,8 @@ function loadFollowListData(tabType) {
                 }
                 messageList.forEach(message => {
                     let profileImgHtml = message.other.profile_img ?
-                    	`<img src="${pageContext.request.contextPath}/vibesync/\${message.other.profile_img}" alt="profile">` :
-                    	`<img src="\${basePath}sources/default/default_user.jpg" alt="기본 프로필">`;
+                       `<img src="${pageContext.request.contextPath}/\${message.other.profile_img}" alt="profile">` :
+                       `<img src="\${basePath}sources/default/default_user.jpg" alt="기본 프로필">`;
 
                     let unreadBadgeHtml = '';
                     if (message.numOfUnreadMessages > 0) {
@@ -568,7 +567,7 @@ function loadFollowListData(tabType) {
                             <div class="message_text_area">
                                 <div class="message_sender_row">
                                     <div class="message_sender">
-                                    	<a href="userPage.do?acIdx=\${message.other.ac_idx}">\${message.other.nickname}</a>
+                                       <a href="userPage.do?acIdx=\${message.other.ac_idx}">\${message.other.nickname}</a>
                                     </div>
                                     \${unreadBadgeHtml}
                                 </div>
@@ -601,7 +600,7 @@ function closeFollowListModal() {
 }
 
 //특정 유저와의 채팅창 열기 함수
-function openchatRoomWithUser(userIdx, nickname) {	
+function openchatRoomWithUser(userIdx, nickname) {   
     currentchatRoomSenderIdx = userIdx;
     $('#chatRoomTitle').text(nickname + '님과의 대화');
     $('#chatRoomHistory').html('<p style="text-align:center; padding: 20px;">대화 내역을 불러오는 중...</p>'); // 로딩 표시
@@ -613,38 +612,38 @@ function openchatRoomWithUser(userIdx, nickname) {
         type: 'GET',
         data: { sender_idx: userIdx, view: 'CHAT' },
         dataType: 'json',
-		success: function (chatRoomList) {
-		    $('#chatRoomHistory').empty();
-		    
-		    if (!chatRoomList || !Array.isArray(chatRoomList) || chatRoomList.length === 0) {
-		        $('#chatRoomHistory').html('<p style="text-align:center; color:grey; padding: 20px;">아직 대화 내역이 없습니다.</p>');
-		    } else {
-		        const chatRoomContainer = $('<div class="chatRoom-container"></div>');
-		        let lastDate = null;
-		        chatRoomList.forEach(message => {
-		            if (message.date !== lastDate) {
-		                lastDate = message.date;
-		                const dateLabel = $('<div class="chatRoom-date-separator"></div>').text(lastDate);
-		                chatRoomContainer.append(dateLabel);
-		            }
-		            const who = message.isMine ? 'bubble-me' : 'bubble-other';
-		            const formattedText = message.text.replace(/\n/g, '<br>');
-		            const messageHtml = `
-		                <div class="chatRoom-bubble \${who}">
-		                    <div class="bubble-text">\${formattedText}</div>
-		                    <div class="bubble-time">\${message.relativeTime}</div>
-		                </div>`;
-		            chatRoomContainer.append(messageHtml);
-		        });
-		        $('#chatRoomHistory').append(chatRoomContainer);
-		    }
-		
-		    $('#chatRoomModal').css('display', 'flex');
-		    $('#chatRoomHistory').scrollTop($('#chatRoomHistory')[0].scrollHeight); // 스크롤 맨 아래로
-		},
-		error: function () {
-		    alert('채팅 내역을 불러오는 데 실패했습니다.');
-		}
+      success: function (chatRoomList) {
+          $('#chatRoomHistory').empty();
+          
+          if (!chatRoomList || !Array.isArray(chatRoomList) || chatRoomList.length === 0) {
+              $('#chatRoomHistory').html('<p style="text-align:center; color:grey; padding: 20px;">아직 대화 내역이 없습니다.</p>');
+          } else {
+              const chatRoomContainer = $('<div class="chatRoom-container"></div>');
+              let lastDate = null;
+              chatRoomList.forEach(message => {
+                  if (message.date !== lastDate) {
+                      lastDate = message.date;
+                      const dateLabel = $('<div class="chatRoom-date-separator"></div>').text(lastDate);
+                      chatRoomContainer.append(dateLabel);
+                  }
+                  const who = message.isMine ? 'bubble-me' : 'bubble-other';
+                  const formattedText = message.text.replace(/\n/g, '<br>');
+                  const messageHtml = `
+                      <div class="chatRoom-bubble \${who}">
+                          <div class="bubble-text">\${formattedText}</div>
+                          <div class="bubble-time">\${message.relativeTime}</div>
+                      </div>`;
+                  chatRoomContainer.append(messageHtml);
+              });
+              $('#chatRoomHistory').append(chatRoomContainer);
+          }
+      
+          $('#chatRoomModal').css('display', 'flex');
+          $('#chatRoomHistory').scrollTop($('#chatRoomHistory')[0].scrollHeight); // 스크롤 맨 아래로
+      },
+      error: function () {
+          alert('채팅 내역을 불러오는 데 실패했습니다.');
+      }
     });
 }
 
@@ -699,3 +698,4 @@ $(document).ready(function() {
     });
 });
 </script>
+<script src="${pageContext.request.contextPath}/resources/js/theme.js"></script>

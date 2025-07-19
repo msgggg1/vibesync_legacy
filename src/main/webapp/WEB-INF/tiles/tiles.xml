@@ -6,11 +6,11 @@
 <tiles-definitions>
 
  	<!-- 모든 페이지의 기본 layout 정의 -->
-    <definition name="baseLayout" template="/inc/layout.jsp">
-        <put-attribute name="header" value="/inc/header.jsp" />
-        <put-attribute name="sidebar" value="/inc/sidebar.jsp" />
+    <definition name="baseLayout" template="/WEB-INF/views/inc/layout.jsp">
+        <put-attribute name="header" value="/WEB-INF/views/inc/header.jsp" />
+        <put-attribute name="sidebar" value="/WEB-INF/views/inc/sidebar.jsp" />
         <put-attribute name="body" value="" /> 
-        <put-attribute name="footer" value="/inc/footer.jsp" />
+        <put-attribute name="footer" value="/WEB-INF/views/inc/footer.jsp" />
       
         <put-attribute name="title" value="VibeSync" />
     </definition>
