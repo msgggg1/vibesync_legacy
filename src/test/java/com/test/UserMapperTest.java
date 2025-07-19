@@ -1,7 +1,5 @@
 package com.test;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,9 +7,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.vibesync.login.domain.User;
-import com.vibesync.login.domain.UserVO;
-import com.vibesync.login.mapper.UserMapper;
+import com.vibesync.member.domain.MemberVO;
+import com.vibesync.member.mapper.MemberMapper;
 
 import lombok.extern.log4j.Log4j;
 
@@ -22,12 +19,12 @@ import lombok.extern.log4j.Log4j;
 public class UserMapperTest {
 
     @Autowired
-    private UserMapper userMapper;
+    private MemberMapper userMapper;
 
     @Test
     public void testUserMapper() {
         log.info("testUserMapper 실행");
-        UserVO user = userMapper.findVOByEmail("test@test.com");
+        MemberVO user = userMapper.findVOByEmail("test@test.com");
      
         log.info(user.toString());
     }
