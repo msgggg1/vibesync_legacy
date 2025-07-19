@@ -5,27 +5,24 @@
 	
 <tiles-definitions>
 
- 	<definition name="board.*" template="/WEB-INF/views/board/inc/layout.jsp">
-    	<put-attribute name="header" value="/WEB-INF/views/inc/header.jsp" />
-    	<put-attribute name="footer" value="/WEB-INF/views/inc/footer.jsp" />
-    	<put-attribute name="sidebar" value="/WEB-INF/views/inc/sidebar.jsp" />
-    	<put-attribute name="content" value="/WEB-INF/views/board/{1}.jsp"/>
-
-    	<put-attribute name="title" value="{1}"/>
-    	<put-attribute name="css" value="{1}.css"/>
+ 	<!-- 모든 페이지의 기본 layout 정의 -->
+    <definition name="baseLayout" template="/inc/layout.jsp">
+        <put-attribute name="header" value="/inc/header.jsp" />
+        <put-attribute name="sidebar" value="/inc/sidebar.jsp" />
+        <put-attribute name="body" value="" /> 
+        <put-attribute name="footer" value="/inc/footer.jsp" />
+      
+        <put-attribute name="title" value="VibeSync" />
+    </definition>
+  
+    <definition name="*/*" extends="baseLayout">
+        <put-attribute name="body" value="/WEB-INF/views/{1}/{2}.jsp" />
+        <put-attribute name="title" value="VibeSync: {1}"/>
+        <put-attribute name="css" value="{2}.css"/>
     </definition>
 
-<!--
- 	<definition name="*.*" template="/WEB-INF/views/{1}/inc/layout.jsp">
-    	<put-attribute name="header" value="/WEB-INF/views/inc/header.jsp" />
-    	<put-attribute name="footer" value="/WEB-INF/views/inc/footer.jsp" />
-    	<put-attribute name="sidebar" value="/WEB-INF/views/inc/sidebar.jsp" />
-    	<put-attribute name="content" value="/WEB-INF/views/{1}/{2}.jsp"/>
-
-    	<put-attribute name="title" value="{2}"/>
-    	<put-attribute name="css" value="{2}.css"/>
-    </definition>
--->
+    <!-- header, footer가 없는 독립적인 페이지를 위한 정의 (예: 로그인 페이지) -->
+    <definition name="login" template="/WEB-INF/views/member/login.jsp" />
 
 </tiles-definitions>
 

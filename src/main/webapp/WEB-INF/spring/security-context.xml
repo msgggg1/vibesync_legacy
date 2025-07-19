@@ -16,16 +16,19 @@
       <!-- 접근 제어 -->
       <!-- <security:intercept-url pattern="/login/**" access="isAuthenticated()" /> -->
       <security:intercept-url pattern="/**" access="permitAll" />
+      <!-- <security:intercept-url pattern="/page/**" access="isAuthenticated()" /> -->
 
       <!-- 로그인 처리 -->
       <security:form-login
-         login-page="/login/login.htm" default-target-url="/index.htm"
+         login-page="/member/login" default-target-url="/index.htm"
          username-parameter="username" password-parameter="password"
       />
 
       <!-- 로그아웃 처리 -->
-      <security:logout invalidate-session="true"
-         logout-success-url="/" logout-url="/login/logout.htm" />
+      <security:logout 
+      		invalidate-session="true" 
+			success-handler-ref="customLogoutSuccessHandler"
+         	logout-url="/member/logout" />
       <!-- 로그아웃 성공 시 다양한 처리를 하기 원한다면 클래스 선언 후 빈 등록 success-handler-ref = "logoutSuccessHandler" -->
    </security:http>
 
@@ -36,12 +39,8 @@
 
    <!-- 애플리케이션 전반의 인증 처리 -->
    <security:authentication-manager>
-      <security:authentication-provider>
-         <security:user-service>
-            <security:user name="user" password="{noop}1111"
-               authorities="ROLE_USER"
-            />
-         </security:user-service>
+      <security:authentication-provider user-service-ref="userDetailsService">
+         <security:password-encoder ref="bCryptPasswordEncoder"/>
       </security:authentication-provider>
    </security:authentication-manager>
 
