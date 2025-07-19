@@ -1,4 +1,5 @@
+-- useraccount 테이블 salt 칼럼 삭제
 ALTER TABLE UserAccount DROP COLUMN salt;
 
-- category 테이블 내부 컬럼명 변경
+-- category 테이블 내부 컬럼명 변경
 ALTER TABLE category RENAME COLUMN c_name TO category_name;
