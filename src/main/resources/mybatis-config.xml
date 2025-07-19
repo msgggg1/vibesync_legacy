@@ -17,6 +17,8 @@
     
     <!-- com.vibesync.common -->
     <typeAlias type="com.vibesync.common.domain.CategoryVO" alias="CategoryVO" />
+    <typeAlias type="com.vibesync.common.domain.GenreVO" alias="GenreVO" />
+    <typeAlias type="com.vibesync.common.domain.ContentVO" alias="ContentVO" />
     
     <!-- com.vibesync.board -->
     <typeAlias type="com.vibesync.board.domain.NoteVO" alias="NoteVO" />
