@@ -5,25 +5,25 @@
 	
 <tiles-definitions>
 
- 	<!-- 1. 모든 페이지의 기본이 되는 레이아웃(틀) 정의 -->
+ 	<!-- 모든 페이지의 기본 layout 정의 -->
     <definition name="baseLayout" template="/inc/layout.jsp">
-        <put-attribute name="title" value="VibeSync" />
         <put-attribute name="header" value="/inc/header.jsp" />
         <put-attribute name="sidebar" value="/inc/sidebar.jsp" />
         <put-attribute name="body" value="" /> 
         <put-attribute name="footer" value="/inc/footer.jsp" />
+      
+        <put-attribute name="title" value="VibeSync" />
     </definition>
-
+  
     <definition name="*/*" extends="baseLayout">
         <put-attribute name="body" value="/WEB-INF/views/{1}/{2}.jsp" />
+        <put-attribute name="title" value="VibeSync: {1}"/>
+        <put-attribute name="css" value="{2}.css"/>
     </definition>
 
-    <!-- 
-      로그인 페이지처럼 헤더, 푸터가 없는 독립적인 페이지를 위한 정의
-    -->
+    <!-- header, footer가 없는 독립적인 페이지를 위한 정의 (예: 로그인 페이지) -->
     <definition name="login" template="/WEB-INF/views/member/login.jsp" />
 
-    
 </tiles-definitions>
 
 
