@@ -6,11 +6,11 @@
 <tiles-definitions>
 
  	<!-- 모든 페이지의 기본 layout 정의 -->
-    <definition name="baseLayout" template="/inc/layout.jsp">
-        <put-attribute name="header" value="/inc/header.jsp" />
-        <put-attribute name="sidebar" value="/inc/sidebar.jsp" />
+    <definition name="baseLayout" template="/WEB-INF/views/inc/layout.jsp">
+        <put-attribute name="header" value="/WEB-INF/views/inc/header.jsp" />
+        <put-attribute name="sidebar" value="/WEB-INF/views/inc/sidebar.jsp" />
         <put-attribute name="body" value="" /> 
-        <put-attribute name="footer" value="/inc/footer.jsp" />
+        <put-attribute name="footer" value="/WEB-INF/views/inc/footer.jsp" />
       
         <put-attribute name="title" value="VibeSync" />
     </definition>
@@ -18,7 +18,7 @@
     <definition name="*/*" extends="baseLayout">
         <put-attribute name="body" value="/WEB-INF/views/{1}/{2}.jsp" />
         <put-attribute name="title" value="VibeSync: {1}"/>
-        <put-attribute name="css" value="{2}.css"/>
+        <put-attribute name="css" value="resources/css/{1}/{2}.css"/>
     </definition>
 
     <!-- header, footer가 없는 독립적인 페이지를 위한 정의 (예: 로그인 페이지) -->
