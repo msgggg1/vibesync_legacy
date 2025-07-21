@@ -8,7 +8,22 @@
 			<param name="ConversionPattern" value="%-5p: %c - %m%n" />
 		</layout>
 	</appender>
+	
+	<logger name="org.springframework.security">
+        <level value="DEBUG" />
+        <appender-ref ref="console" />
+    </logger>
 
+    <logger name="org.springframework.web.servlet">
+        <level value="DEBUG" />
+        <appender-ref ref="console" />
+    </logger>
+
+    <logger name="org.springframework.web.method">
+        <level value="DEBUG" />
+        <appender-ref ref="console" />
+    </logger>
+ 
 	<!-- Application Loggers -->
 	<logger name="com.vibesync">
 		<level value="info" />

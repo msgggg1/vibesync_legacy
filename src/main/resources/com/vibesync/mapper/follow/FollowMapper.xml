@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vibesync.follow.mapper.FollowMapper">
+
+	<resultMap id="userSummaryMap" type="com.vibesync.sidebar.domain.UserSummaryVO">
+		<id property="ac_idx" column="ac_idx" />
+		<result property="nickname" column="nickname" />
+		<result property="profile_img" column="img" />
+		<result property="category_idx" column="category_idx" />
+		<result property="followedByCurrentUser"
+			column="followedByCurrentUser" />
+	</resultMap>
+	<!-- public List<UserSummaryVO> userFollowingList(int ac_idx) ; -->
+	<select id="userFollowerList" resultMap="userSummaryMap" parameterType="int">
+        <![CDATA[
+            SELECT
+                u.ac_idx, u.nickname, u.img, u.category_idx,
+                CASE
+                    WHEN f_reverse.ac_following IS NOT NULL THEN 1
+                    ELSE 0
+                END AS followedByCurrentUser
+            FROM follows f
+            JOIN userAccount u ON u.ac_idx = f.ac_follow
+            LEFT JOIN follows f_reverse ON f_reverse.ac_follow = f.ac_following
+                                       AND f_reverse.ac_following = f.ac_follow
+            WHERE f.ac_following = #{ac_idx}
+        ]]>
+    </select>
+	
+	<!-- public List<UserSummaryVO> userFollowerList(int ac_idx) ; -->
+	<select id="userFollowingList" resultMap="userSummaryMap" parameterType="int">
+        <![CDATA[
+            SELECT
+                u.ac_idx, u.nickname, u.img, u.category_idx,
+                1 AS followedByCurrentUser
+            FROM follows f
+            JOIN userAccount u ON u.ac_idx = f.ac_following
+            WHERE f.ac_follow = #{ac_idx}
+        ]]>
+    </select>
+    
+ </mapper>

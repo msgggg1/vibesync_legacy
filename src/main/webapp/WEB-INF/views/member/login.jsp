@@ -78,7 +78,7 @@
 				<div id="loginView"
 					style="${formToShow eq 'login' ? 'display: block;' : 'display: none;'}">
 					<div id="loginFormContainer" style="display: flex;">
-						<form action="${pageContext.request.contextPath}/member/login"
+						<form action="${pageContext.request.contextPath}/login/process"
 							method="post" id="loginForm">
 							<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
 
@@ -114,7 +114,7 @@
 							</c:if>
 
 							<label for="userId" class="sr-only">이메일</label> <input
-								type="email" id="userId" name="email" placeholder="Email"
+								type="email" id="userId" name="username" placeholder="Email"
 								required value="${ rememberedEmail }"> <label
 								for="userPw" class="sr-only">비밀번호</label> <input type="password"
 								id="userPw" name="password" placeholder="Password" required>
@@ -132,7 +132,7 @@
 						            <line x1="12" y1="9" x2="12" y2="13"></line>
 						            <line x1="12" y1="17" x2="12.01" y2="17"></line>
 						        </svg>
-									<p>${ loginErrorForDisplay }</p>
+									<p>아이디 또는 비밀번호가 일치하지 않습니다.</p>
 								</div>
 							</c:if>
 

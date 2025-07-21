@@ -5,24 +5,34 @@
    xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-4.2.xsd
       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd">
 
-   <!-- 보안 설정이 필요 없는 경로 -->
-   <security:http pattern="/static/**" security="none"></security:http>
-   <security:http pattern="/design/**" security="none"></security:http>
-   <security:http pattern="/css/**" security="none"></security:http>
-   <security:http pattern="/js/**" security="none"></security:http>
-
    <!-- 스프링 표현식(SpEL) 사용 여부 -->
    <security:http use-expressions="true">
       <!-- 접근 제어 -->
-      <!-- <security:intercept-url pattern="/login/**" access="isAuthenticated()" /> -->
-      <security:intercept-url pattern="/**" access="permitAll" />
-      <!-- <security:intercept-url pattern="/page/**" access="isAuthenticated()" /> -->
+      <security:intercept-url pattern="/static/**" access="permitAll" />
+      <security:intercept-url pattern="/resources/**" access="permitAll" />
+      <security:intercept-url pattern="/sources/**" access="permitAll" />
+    
+      <security:intercept-url pattern="/member/login" access="permitAll" />
+      <security:intercept-url pattern="/member/signup" access="permitAll" />
+      <security:intercept-url pattern="/board/noteView" access="permitAll" />
+    
+      <security:intercept-url pattern="/**" access="isAuthenticated()" />
 
       <!-- 로그인 처리 -->
       <security:form-login
-         login-page="/member/login" default-target-url="/index.htm"
-         username-parameter="username" password-parameter="password"
+         login-page="/member/login"
+         login-processing-url="/login/process"
+         authentication-success-handler-ref="customLoginSuccessHandler"
+         default-target-url="/page/main"
+         authentication-failure-url="/member/login?error=true"
+         username-parameter="username" 
+         password-parameter="password"
       />
+      
+      <security:session-management>
+        <security:concurrency-control max-sessions="1" 
+                                    expired-url="/member/login?expired" />
+    </security:session-management>
 
       <!-- 로그아웃 처리 -->
       <security:logout 

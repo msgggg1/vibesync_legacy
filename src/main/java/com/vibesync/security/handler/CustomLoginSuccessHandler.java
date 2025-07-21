@@ -18,35 +18,19 @@ import lombok.extern.log4j.Log4j;
 @Log4j
 public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler{
 
-	@Override
-	public void onAuthenticationSuccess(
-			HttpServletRequest request, 
-			HttpServletResponse response,
-			Authentication authentication
-			) throws IOException, ServletException {
-		log.warn("😘😘😘 Login Success...");
-		// 인증사용자가 가지고 있는 롤(Role) == 권한
-		
-		List<String> roleNames = new ArrayList<String>();			
-		authentication.getAuthorities().forEach( auth -> {
-			roleNames.add(auth.getAuthority());
-		} );
-		
-		log.warn("👍 > ROLE NAMES : " + roleNames );
-		
-		if ( roleNames.contains("ROLE_ADMIN") ) {
-			response.sendRedirect("/");
-			return;
-		} else if ( roleNames.contains("ROLE_MANAGER") ) {
-			response.sendRedirect("/customer/notice.htm");
-			return;
-		} else if ( roleNames.contains("ROLE_USER") ) {
-			response.sendRedirect("/customer/notice.htm");
-			return;
-		}
-		
-	}
-
+	 @Override
+	    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
+	            Authentication authentication) throws IOException, ServletException {
+	        
+	        log.warn("====================================================");
+	        log.warn("로그인 성공! Authentication 객체 내용을 확인합니다.");
+	        log.warn("Principal 객체 타입: " + authentication.getPrincipal().getClass().getName());
+	        log.warn("부여된 권한(Authorities): " + authentication.getAuthorities());
+	        log.warn("====================================================");
+	        
+	        // 확인 후, 원래 목적지였던 메인 페이지로 리다이렉트
+	        response.sendRedirect(request.getContextPath() + "/page/main");
+	    }
 }
 
 
