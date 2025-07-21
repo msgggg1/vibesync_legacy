@@ -17,11 +17,29 @@
 		FROM userAccount WHERE email = #{email}
 	</select>
 	
-	<select id="findByEmail"
-		resultType="com.vibesync.member.domain.Member">
-		SELECT ac_idx, pw, nickname, img, name, category_idx, created_at, kakao_auth_id, google_id, email 
-		FROM userAccount WHERE email = #{email}
-	</select>
+	<resultMap id="memberResultMap" type="com.vibesync.member.domain.Member">
+        <id property="ac_idx" column="ac_idx"/>
+        <result property="email" column="email"/>
+        <result property="pw" column="pw"/>
+        <result property="nickname" column="nickname"/>
+        <result property="img" column="img"/>
+        <result property="name" column="name"/>
+        <result property="created_at" column="created_at"/>
+        <result property="category_idx" column="category_idx"/>
+        <result property="kakao_auth_id" column="kakao_auth_id"/>
+        <result property="google_id" column="google_id"/>
+        <result property="role" column="role"/>
+    </resultMap>
+
+    <select id="findByEmail" resultMap="memberResultMap">
+        SELECT 
+            ac_idx, pw, nickname, img, name, category_idx, created_at, 
+            kakao_auth_id, google_id, email, role
+        FROM 
+            userAccount 
+        WHERE 
+            email = #{email}
+    </select>
 
 	<select id="duplicateTest" resultType="com.vibesync.member.domain.MemberVO">
 		SELECT nickname, email

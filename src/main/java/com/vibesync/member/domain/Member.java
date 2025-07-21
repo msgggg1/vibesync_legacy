@@ -1,5 +1,6 @@
 package com.vibesync.member.domain;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 import lombok.AllArgsConstructor;
@@ -28,4 +29,6 @@ public class Member { // 비밀번호를 포함한 내부용 객체
 	
 	private Long kakao_auth_id; 
 	private Long google_id;
+	
+	private String role;
 }

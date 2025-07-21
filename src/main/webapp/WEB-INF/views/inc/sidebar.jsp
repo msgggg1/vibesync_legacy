@@ -116,8 +116,8 @@ input:focus{outline:none;}
       <div class="nickname-container">
         <span class="profile" id="profile-display">
           <c:choose>
-             <c:when test="${not empty memberInfo.img}">
-                <img src="${pageContext.request.contextPath}/vibesync/${memberInfo.img}" alt="프로필">
+             <c:when test="${not empty sidebar.userProfile.img}">
+                <img src="${pageContext.request.contextPath}/vibesync/${sidebar.userProfile.img}" alt="프로필">
             </c:when>
             <c:otherwise>
                <img src="${pageContext.request.contextPath}/sources/default/default_user.jpg" alt="기본 프로필">
@@ -125,20 +125,20 @@ input:focus{outline:none;}
           </c:choose>
         </span>
         <span class="nickname" id="nickname-display">
-          ${memberInfo.nickname}
+          ${sidebar.userProfile.nickname}
         </span>
         <div class="accountData" id="accountData-display">
            <button type="button" id="following-btn" class="modal-follow-message">
-               <span class="accountDataLabel">팔로잉</span><span class="accountDataValue"></span>
+               <span class="accountDataLabel">팔로잉</span><span class="accountDataValue">${sidebar.userProfile.followingCount}</span>
             </button>
             <button type="button" id="follower-btn" class="modal-follow-message">
-            <span class="accountDataLabel">팔로워</span><span class="accountDataValue"></span>
+            <span class="accountDataLabel">팔로워</span><span class="accountDataValue">${sidebar.userProfile.followerCount}</span>
          </button>
         </div>
         <div id="nickname-modal" class="modal-sidebar">
           <div id="nickname-modal-1">
-             <a href="/page/userPage?acIdx=${memberInfo.ac_idx}" class="modal-nickname">
-               ${memberInfo.nickname}
+             <a href="/page/userPage?acIdx=${sidebar.userProfile.ac_idx}" class="modal-nickname">
+               ${sidebar.userProfile.nickname}
              </a>
              <div id="setting">
                <button type="button" id="setting-btn" class="modal-btn">
@@ -257,9 +257,14 @@ input:focus{outline:none;}
 </nav>
 
 <script>
+<sec:authorize access="isAuthenticated()">
+const isLoggedIn = true;
+</sec:authorize>
+<sec:authorize access="isAnonymous()">
+const isLoggedIn = false;
+</sec:authorize>
+
 $(document).ready(function() {
-   // 페이지 로드될 때 팔로워 수 불러오기
-   updateFollowCount();
    
    var isExpanded = false;
 
@@ -461,7 +466,6 @@ function updateFollowerCount() {
 
 // 팔로잉/팔로워/메시지 모달 열기 함수
 function openFollowListModal(defaultTab = 'following') {
-    const isLoggedIn = ${sessionScope.memberInfo != null};
     if (!isLoggedIn) {
         alert("로그인이 필요합니다.");
         location.href = "${pageContext.request.contextPath}/member/login";

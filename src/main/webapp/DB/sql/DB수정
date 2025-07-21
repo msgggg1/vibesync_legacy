@@ -3,3 +3,13 @@ ALTER TABLE UserAccount DROP COLUMN salt;
 
 -- category 테이블 내부 컬럼명 변경
 ALTER TABLE category RENAME COLUMN c_name TO category_name;
+
+-- useraccount 테이블 권한 칼럼 추가 
+ALTER TABLE useraccount
+ADD role VARCHAR2(50);
+commit;
+UPDATE useraccount
+
+SET role = 'USER'
+WHERE email = 'test@test.com';
+commit;

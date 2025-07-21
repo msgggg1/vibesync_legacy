@@ -48,11 +48,6 @@ public class MemberController {
         response.setHeader("Pragma", "no-cache");
         response.setDateHeader("Expires", 0);
 
-        // 1. 이미 로그인된 사용자인지 확인
-        if (session.getAttribute("memberInfo") != null) {
-            return "redirect:/page/main"; // 메인 페이지로 리다이렉트
-        }
-
         // 2. 자동 로그인 쿠키 확인
         if (!"logout".equals(from)&&autoLoginEmail != null) {
             MemberVO memberInfo = null;
@@ -77,54 +72,12 @@ public class MemberController {
 
         return "login"; 
     }
-
-    @PostMapping("/login")
-    public String processLogin(@ModelAttribute LoginDTO loginDTO,
-                               @RequestParam(value = "RememEmail", required = false) boolean rememEmail,
-                               @RequestParam(value = "autoLogin", required = false) boolean autoLogin,
-                               HttpServletRequest request, HttpServletResponse response, HttpSession session,
-                               RedirectAttributes redirectAttributes) throws IOException {
-
-        MemberVO memberInfo = null;
-		try {
-			memberInfo = memberService.login(loginDTO);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-        if (memberInfo != null) {
-            // 로그인 성공
-            return processSuccessfulLogin(request, response, session, memberInfo, rememEmail, autoLogin);
-        } else {
-            // 로그인 실패
-            redirectAttributes.addFlashAttribute("loginErrorForDisplay", "아이디 또는 비밀번호가 일치하지 않습니다.");
-            return "redirect:/member/login";
-        }
-    }
     
-    /* sercurity-context.xml
-    @PostMapping("/logout")
-    public String processLogout(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
-        // 자동 로그인 쿠키 삭제
-        Cookie autoLoginCookie = new Cookie("autoLoginUserEmail", null);
-        autoLoginCookie.setMaxAge(0);
-        autoLoginCookie.setPath("/");
-        response.addCookie(autoLoginCookie);
-
-        // 사용자 인덱스 쿠키 삭제
-        Cookie userIdxCookie = new Cookie("login_user_idx", null);
-        userIdxCookie.setMaxAge(0);
-        userIdxCookie.setPath("/");
-        response.addCookie(userIdxCookie);
-        
-        // 세션 무효화
-        if (session != null) {
-            session.invalidate();
-        }
-
-        return "redirect:/user/login?from=logout";
+    
+    @PostMapping("/login")
+    public String processLogin() {
+        return null;
     }
-    */
 
     @PostMapping("/signup")
     public String processSignUp(@ModelAttribute SignUpDTO signUpDTO, RedirectAttributes redirectAttributes) {
