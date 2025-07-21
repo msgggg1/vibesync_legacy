@@ -7,8 +7,8 @@
 
 	<insert id="insertUser" parameterType="com.vibesync.member.domain.SignUpDTO">
 		INSERT INTO userAccount
-		(ac_idx, email, pw, nickname, name, created_at, category_idx)
-		VALUES (useraccount_seq.nextval, #{email}, #{password}, #{nickname}, #{name}, SYSTIMESTAMP, #{category_idx})
+		(ac_idx, email, pw, nickname, name, created_at, category_idx, ROLE)
+		VALUES (useraccount_seq.nextval, #{email}, #{password}, #{nickname}, #{name}, SYSTIMESTAMP, #{category_idx}, 'USER')
 	</insert>
 
 	<select id="findVOByEmail"
