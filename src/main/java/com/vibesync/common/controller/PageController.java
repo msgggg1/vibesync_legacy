@@ -1,8 +1,7 @@
 package com.vibesync.common.controller; 
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,7 +25,19 @@ public class PageController {
 	private MainPageService mainPageService;
 
     @GetMapping("/main")
-    public String showMainPage(Model model) {
+    public String showMainPage(Model model, @AuthenticationPrincipal CustomUser user) {
+    	System.out.println("> PageController.showMainPage() - 호출");
+    	Member member = user.getMember();
+
+
+    	MainPageDTO mainPageDTO = mainPageService.loadMainPage(member.getCategory_idx());
+
+    	model.addAttribute("mainPageDTO", mainPageDTO);
+
+    	 return "page/main";
+
+    	}
+    	/*
     	System.out.println("> PageController.showMainPage() - 호출");
     	
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -47,5 +58,7 @@ public class PageController {
         
        
         return "page/main";
+        
     }
+    */
 }
