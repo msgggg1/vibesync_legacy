@@ -16,9 +16,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @Builder
 @ToString
-public class Member implements Serializable{ // 비밀번호를 포함한 내부용 객체
-	
-	private static final long serialVersionUID = 1L;
+public class Member { // 비밀번호를 포함한 내부용 객체
 
 	private int ac_idx;
 	private String email;

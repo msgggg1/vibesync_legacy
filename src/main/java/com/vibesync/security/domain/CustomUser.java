@@ -11,9 +11,7 @@ import com.vibesync.member.domain.Member; // 비밀번호가 있는 Member 클�
 import lombok.Getter;
 
 @Getter
-public class CustomUser extends User implements Serializable{
-	
-	private static final long serialVersionUID = 1L;
+public class CustomUser extends User{
 	
 	private final Member member;
 
