@@ -10,18 +10,16 @@
   <title><tiles:getAsString name="title" /></title>
   <link rel="icon" href="${pageContext.request.contextPath}/sources/favicon.ico" />
   
-  <!-- 특정 페이지에서만 사용되는 프레임워크/라이브러리 -->
-  <c:if test="${not empty pageHead}">
-      <jsp:include page="${pageHead}" />
-  </c:if>
-  
-  <c:if test="${not empty pageCss}">
-      <link rel="stylesheet" href="${pageContext.request.contextPath}${pageCss}">
-  </c:if>
+  <!-- 특정 페이지에서만 사용되는 Framework/Library -->
+  <tiles:insertAttribute name="pageHead" ignore="true"/>
   
   <!-- css -->
   <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
   <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/sidebar.css">
+  <!-- 특정 페이지에서만 사용되는 css -->
+  <c:if test="${not empty pageCss}">
+      <link rel="stylesheet" href="${pageContext.request.contextPath}${pageCss}">
+  </c:if>
   
   <!-- js -->
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>

@@ -43,7 +43,7 @@ public class PageAssetPreparer implements ViewPreparer {
 				// head 태그 안 프레임워크/라이브러리
             	if (servletContext.getResource(headFragmentPath) != null) {
             		log.info(">>> Fragment Found!: " + headFragmentPath);
-            		tilesRequest.getContext("request").put("pageHead", headFragmentPath);
+            		attributeContext.putAttribute( "pageHead", new Attribute(headFragmentPath));
 				} else {
 					log.info(">>> Fragment Not Found: " + headFragmentPath);
 				}
