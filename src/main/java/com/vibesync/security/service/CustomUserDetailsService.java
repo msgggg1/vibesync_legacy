@@ -24,15 +24,6 @@ public class CustomUserDetailsService implements UserDetailsService {
         if (member == null) {
             throw new UsernameNotFoundException("Cannot find user with that email: " + username);
         }
-
-     // ✨ 디버깅을 위한 임시 출력 코드
-        // 이 코드를 통해 실제로 필드에 값이 들어왔는지 확인합니다.
-        System.out.println("-----------[MyBatis 조회 결과]-----------");
-        System.out.println("조회된 Member 객체: " + member);
-        System.out.println("Email 필드 값: " + member.getEmail());
-        System.out.println("Role 필드 값: " + member.getRole());
-        System.out.println("ac_idx 필드 값: " + member.getAc_idx());
-        System.out.println("----------------------------------------");
         
         // 반환 객체만 CustomUser로 변경
         return new CustomUser(member);
