@@ -5,14 +5,14 @@
 <mapper namespace="com.vibesync.follow.mapper.FollowMapper">
 
 	<resultMap id="userSummaryMap" type="com.vibesync.sidebar.domain.UserSummaryVO">
-		<id property="ac_idx" column="ac_idx" />
+		<id property="acIdx" column="ac_idx" />
 		<result property="nickname" column="nickname" />
-		<result property="profile_img" column="img" />
-		<result property="category_idx" column="category_idx" />
+		<result property="profileImg" column="img" />
+		<result property="categoryIdx" column="category_idx" />
 		<result property="followedByCurrentUser"
 			column="followedByCurrentUser" />
 	</resultMap>
-	<!-- public List<UserSummaryVO> userFollowingList(int ac_idx) ; -->
+	<!-- public List<UserSummaryVO> userFollowingList(int acIdx) ; -->
 	<select id="userFollowerList" resultMap="userSummaryMap" parameterType="int">
         <![CDATA[
             SELECT
@@ -25,7 +25,7 @@
             JOIN userAccount u ON u.ac_idx = f.ac_follow
             LEFT JOIN follows f_reverse ON f_reverse.ac_follow = f.ac_following
                                        AND f_reverse.ac_following = f.ac_follow
-            WHERE f.ac_following = #{ac_idx}
+            WHERE f.ac_following = #{acIdx}
         ]]>
     </select>
 	
@@ -37,7 +37,7 @@
                 1 AS followedByCurrentUser
             FROM follows f
             JOIN userAccount u ON u.ac_idx = f.ac_following
-            WHERE f.ac_follow = #{ac_idx}
+            WHERE f.ac_follow = #{acIdx}
         ]]>
     </select>
     

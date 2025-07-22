@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.vibesync.listener.DuplicateLoginPreventer;
-import com.vibesync.member.domain.LoginDTO;
 import com.vibesync.member.domain.MemberVO;
 import com.vibesync.member.domain.SignUpDTO;
 import com.vibesync.member.service.MemberService;
@@ -31,7 +30,7 @@ import com.vibesync.member.util.Config;
  * 사용자 관련 모든 웹 요청을 처리하는 컨트롤러.
  */
 @Controller
-@RequestMapping("/member")
+@RequestMapping("/member/*")
 public class MemberController {
 
     @Autowired
@@ -97,7 +96,7 @@ public class MemberController {
     
     @PostMapping("/complete-google-signup")
     public String processCompleteGoogleSignUp(@RequestParam("nickname") String nickname,
-                                              @RequestParam("category_idx") int categoryIdx,
+                                              @RequestParam("categoryIdx") int categoryIdx,
                                               HttpSession session, HttpServletRequest request, HttpServletResponse response,
                                               RedirectAttributes redirectAttributes) throws IOException {
         SignUpDTO newGoogleUser = (SignUpDTO) session.getAttribute("newGoogleUser");
@@ -108,7 +107,7 @@ public class MemberController {
         }
 
         newGoogleUser.setNickname(nickname);
-        newGoogleUser.setCategory_idx(categoryIdx);
+        newGoogleUser.setCategoryIdx(categoryIdx);
 
         try {
         	memberService.register(newGoogleUser);
@@ -209,7 +208,7 @@ public class MemberController {
         //session.setAttribute("theme", settingService.getTheme(memberInfo.getAc_idx()));
         
         // 4. 사용자 ac_idx 쿠키 저장 (클라이언트 측에서 활용)
-        Cookie userIdxCookie = new Cookie("login_user_idx", String.valueOf(memberInfo.getAc_idx()));
+        Cookie userIdxCookie = new Cookie("login_user_idx", String.valueOf(memberInfo.getAcIdx()));
         userIdxCookie.setMaxAge(60 * 60 * 24 * 7); // 7일
         userIdxCookie.setPath("/");
         response.addCookie(userIdxCookie);

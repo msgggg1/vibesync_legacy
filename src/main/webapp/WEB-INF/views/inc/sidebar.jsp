@@ -137,7 +137,7 @@ input:focus{outline:none;}
         </div>
         <div id="nickname-modal" class="modal-sidebar">
           <div id="nickname-modal-1">
-             <a href="/page/userPage?acIdx=${sidebar.userProfile.ac_idx}" class="modal-nickname">
+             <a href="/page/userPage?acIdx=${sidebar.userProfile.acIdx}" class="modal-nickname">
                ${sidebar.userProfile.nickname}
              </a>
              <div id="setting">
@@ -304,7 +304,7 @@ $(document).ready(function() {
                        
                         var liHtml = ''
                             + '<li class="sidebar-profile">'
-                            +   '<a href="userPage?acIdx=' + user.ac_idx + '">' 
+                            +   '<a href="userPage?acIdx=' + user.acIdx + '">' 
                             +     '<img src="'+ profileImg +'" alt="profileImg">'
                             +     '<span class="sidebar-follow-span">'+ user.nickname +'</span>' 
                             +   '</a>'
@@ -527,13 +527,13 @@ function loadFollowListData(tabType) {
                         <div class="follow-list-item">
                             <img src="\${profileImg}" alt="프로필">
                             <div class="user-info">
-                                <a href="userPage?acIdx=\${user.ac_idx}" class="nickname">\${user.nickname}</a>
+                                <a href="userPage?acIdx=\${user.acIdx}" class="nickname">\${user.nickname}</a>
                             </div>
                             <div class="action-buttons">
-                               <button type="button" class="\${followButtonClass}" data-target-ac-idx="\${user.ac_idx}">
+                               <button type="button" class="\${followButtonClass}" data-target-ac-idx="\${user.acIdx}">
                                    \${followButtonText}
                                 </button>
-                                <button type="button" class="message-btn message-btn-in-modal" data-target-ac-idx="\${user.ac_idx}" data-nickname="\${user.nickname}">
+                                <button type="button" class="message-btn message-btn-in-modal" data-target-ac-idx="\${user.acIdx}" data-nickname="\${user.nickname}">
                                    <i class="fa-solid fa-paper-plane"></i>
                                 </button>
                             </div>
@@ -564,14 +564,14 @@ function loadFollowListData(tabType) {
                     }
                     
                     const messageHtml = `
-                        <div class="message_item" data-sender-idx="\${message.other.ac_idx}" data-nickname="\${message.other.nickname}">
+                        <div class="message_item" data-sender-idx="\${message.other.acIdx}" data-nickname="\${message.other.nickname}">
                             <div class="message_profile">
                                 \${profileImgHtml}
                             </div>
                             <div class="message_text_area">
                                 <div class="message_sender_row">
                                     <div class="message_sender">
-                                       <a href="userPage.do?acIdx=\${message.other.ac_idx}">\${message.other.nickname}</a>
+                                       <a href="userPage.do?acIdx=\${message.other.acIdx}">\${message.other.nickname}</a>
                                     </div>
                                     \${unreadBadgeHtml}
                                 </div>

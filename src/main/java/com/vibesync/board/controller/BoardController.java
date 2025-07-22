@@ -7,8 +7,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
-import com.vibesync.board.domain.NoteVO;
+import com.vibesync.board.domain.NoteDetailDTO;
+import com.vibesync.board.domain.NoteListDTO;
 import com.vibesync.board.service.NoteService;
 import com.vibesync.common.domain.ContentVO;
 import com.vibesync.common.domain.Criteria;
@@ -39,11 +41,11 @@ public class BoardController {
 		log.info("게시글 목록 페이지 요청");
 		
 		// 게시글 목록
-		List<NoteVO> noteList = this.noteService.findAllNotesWithPaging(criteria);
+		List<NoteListDTO> noteList = this.noteService.findAllNotesWithPaging(criteria);
 		model.addAttribute("noteList", noteList);
 		
 		// 페이징 블럭
-		int endPage = (int) (Math.ceil(criteria.getPageNum() / (criteria.getAmount() * 1.0))) * criteria.getAmount();
+		int endPage = (int) (Math.ceil(this.noteService.getTotalCount(criteria) / (criteria.getAmount() * 1.0))) * criteria.getAmount();
 		if (criteria.getPageNum() > endPage) {
 			criteria.setPageNum(endPage == 0 ? 1 : endPage);
 		}
@@ -51,6 +53,19 @@ public class BoardController {
 		
 		return "board/list";
 	}
+
+	// 게시글 작성 (/vibesync/board/view)
+	@GetMapping(value="/view")
+	public String view(Model model, Criteria criteria, @RequestParam("note_idx") int note_idx) {
+		log.info("게시글 상세보기 페이지 요청");
+		
+		// 게시글 상세보기
+		NoteDetailDTO noteDetail = this.noteService.findNoteByNoteIdx(note_idx);
+		model.addAttribute("noteDetail", noteDetail);
+		
+		return "board/view";
+	}
+	
 	
 	// 게시글 작성 (/vibesync/board/write)
 	@GetMapping(value="/write")
@@ -67,6 +82,5 @@ public class BoardController {
 		
 		return "board/write";
 	}
-	
 	
 }

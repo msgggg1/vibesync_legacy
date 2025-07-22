@@ -30,7 +30,7 @@ public class PageController {
     	Member member = user.getMember();
 
 
-    	MainPageDTO mainPageDTO = mainPageService.loadMainPage(member.getCategory_idx());
+    	MainPageDTO mainPageDTO = mainPageService.loadMainPage(member.getCategoryIdx());
 
     	model.addAttribute("mainPageDTO", mainPageDTO);
 
