@@ -3,8 +3,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://www.springframework.org/security/tags" prefix="sec" %>
 
-<c:set var="formToShow"
-	value="${not empty formToShow ? formToShow : 'login' }"></c:set>
+<c:set var="formToShow" value="${not empty formToShow ? formToShow : 'login' }"></c:set>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -22,11 +21,9 @@
 	href="https://fonts.googleapis.com/css2?family=Cal+Sans&display=swap"
 	rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
-<link rel="icon"
-	href="${pageContext.request.contextPath}/sources/favicon.ico">
+<link rel="icon" href="${pageContext.request.contextPath}/sources/favicon.ico">
 <title>VibeSync Login</title>
-<link rel="stylesheet"
-	href="${pageContext.request.contextPath}/resources/css/login.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/login.css">
 <style>
 .welcome-message {
 	font-family: 'Cal Sans', sans-serif;
@@ -232,11 +229,10 @@
 								style="display: none; color: red; font-size: 0.8em;"></p>
 
 							<label for="category" class="sr-only">관심 카테고리</label> <select
-								id="category" name="category_idx">
-								<c:forEach items="${categoryList}"
-									var="categoryVO">
-									<option value="${ categoryVO.categoryIdx }">${ categoryVO.categoryName }</option>
-								</c:forEach>
+								id="category" name="categoryIdx">
+								<c:forEach items="${categoryList}" var="categoryVO">
+								<option value="${ categoryVO.categoryIdx }">${ categoryVO.categoryName }</option>
+							</c:forEach>
 							</select>
 
 							<button type="submit" id="signupBtn">Sign Up</button>
@@ -285,12 +281,11 @@
 								type="text" id="googleSignupNickname" name="nickname"
 								placeholder="NickName" required> <label
 								for="googleCategory" class="sr-only">관심 카테고리</label> <select
-								id="googleCategory" name="category_idx" required>
+								id="googleCategory" name="categoryIdx" required>
 								<option value="" disabled selected>Choose your favorite
 									category</option>
-								<c:forEach items="${applicationScope.categoryVOList}"
-									var="categoryVO">
-									<option value="${categoryVO.category_idx}">${categoryVO.c_name}</option>
+								<c:forEach items="${categoryList}" var="categoryVO">
+									<option value="${categoryVO.categoryIdx}">${categoryVO.categoryName}</option>
 								</c:forEach>
 							</select>
 
@@ -327,6 +322,6 @@
 			</div>
 		</div>
 
-		<script src="${pageContext.request.contextPath}/resources/js/login.js"></script>
+		<script src="${pageContext.request.contextPath}/resources/js/member/login.js"></script>
 </body>
 </html>

@@ -28,11 +28,11 @@ public interface MemberMapper {
 		//회원 활동 관련
 		int preferredCategoryIdx(int acIdx);
 	    
-	    //특정 사용자의 기본 프로필 정보 (ID, 닉네임, 프로필 이미지 경로)를 조회.
-		MemberSummaryVO getBasicUserInfoById(int acIdx);
+	    // 특정 사용자의 기본 프로필 정보 (ID, 닉네임, 프로필 이미지 경로)를 조회.
+		MemberSummaryVO getBasicUserInfoById(int ac_idx);
 
 	    //특정 사용자가 작성한 총 게시글 수를 조회
-	    int getPostCount(int acIdx);
+	    int getPostCount(int ac_idx);
 	    
 	    /*비밀번호 재설정*/
 	    //비밀번호 재설정 토큰 DB저장

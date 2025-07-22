@@ -1,6 +1,5 @@
 package com.vibesync.security.domain;
 
-import java.io.Serializable;
 import java.util.Collections;
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -16,7 +15,7 @@ public class CustomUser extends User{
 	private final Member member;
 
 	// Member 객체의 정보 중, User 클래스가 갖지 않는 추가 정보만 정의
-	private final int ac_idx;
+	private final int acIdx;
 	private final String nickname;
 	private final String img;
 
@@ -32,7 +31,7 @@ public class CustomUser extends User{
         this.member = member;
 
 		// 2. 이 클래스만의 추가 정보를 초기화
-		this.ac_idx = member.getAc_idx();
+		this.acIdx = member.getAcIdx();
 		this.nickname = member.getNickname();
 		this.img = member.getImg();
 	}

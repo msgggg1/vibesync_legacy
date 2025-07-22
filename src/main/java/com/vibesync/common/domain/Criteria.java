@@ -14,6 +14,7 @@ public class Criteria {
 	private int pageNum; // 현재 페이지 번호
 	private int amount; // 한 페이지에 출력할 게시글 수
 	
+	private Integer categoryIdx; // 카테고리 번호
 	private String type; // 검색 조건 (T, C, W, TC, TW, TCW)
 	private String keyword; // 검색어
 
@@ -29,6 +30,7 @@ public class Criteria {
 
 	public String getListLink() {
 		UriComponentsBuilder builder = UriComponentsBuilder.fromPath("")
+										.queryParam("categoryIdx", this.categoryIdx)
 										.queryParam("pageNum", this.pageNum)
 										.queryParam("amount", this.amount)
 										.queryParam("type", this.type)

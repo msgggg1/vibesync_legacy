@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vibesync.board.mapper.BoardNoteMapper">
+
+<!-- 재사용 가능한 SQL 조각 정의 -->
+<sql id="criteria">
+	<if test="categoryIdx != null and categoryIdx > 0">
+        n.category_idx = #{categoryIdx}
+    </if>
+	<trim prefix="AND (" suffix=") AND" prefixOverrides="AND | OR">
+	   <foreach collection="typeArr" item="type">
+	     <trim prefix="OR">
+	        <choose>
+	           <when test="type=='T'.toString()">REGEXP_LIKE( title , #{ keyword }, 'i') </when>
+	           <when test="type=='C'.toString()">REGEXP_LIKE( text , #{ keyword }, 'i') </when>
+	           <when test="type=='W'.toString()">REGEXP_LIKE( author , #{ keyword }, 'i') </when>
+	        </choose>
+	     </trim>
+	   </foreach>
+	</trim>
+</sql>
+
+<!-- 전체 게시글 목록 조회 (페이징 처리 O) -->
+<!-- public List<NoteListDTO> selectWithPaging(Criteria criteria); -->
+	<select id="selectWithPaging" resultType="NoteListDTO">
+	    <![CDATA[
+	    SELECT
+	        note_idx, title, author
+	    FROM (
+	        SELECT /*+ INDEX_DESC(note pk_note) */
+	            rownum rn, note_idx, title, author
+	        FROM (
+	            SELECT
+	                n.note_idx, n.title, ua.nickname AS author
+	            FROM
+	                note n
+	            JOIN
+	                userPage up ON n.userPg_idx = up.userPg_idx
+	            JOIN
+	                userAccount ua ON up.ac_idx = ua.ac_idx
+		]]>
+		<where>
+			<include refid="criteria"></include>
+		</where>
+		<![CDATA[
+	            ORDER BY
+	                n.note_idx DESC
+	            )
+	        WHERE rownum <= #{pageNum} * #{amount}
+	        )
+	    WHERE
+	        rn > (#{pageNum} - 1) * #{amount}
+	    ]]>
+	</select>
+<!-- // -->
+
+<!-- 총 게시글 수 조회 -->
+<!-- public int selectTotalCount(Criteria criteria); -->
+	<select id="selectTotalCount" resultType="int">
+		<![CDATA[
+			SELECT COUNT(*)
+			FROM note n
+			WHERE n.note_idx > 0
+		]]>
+		<trim prefix="AND" prefixOverrides="AND"><include refid="criteria"></include></trim>
+	</select>
+<!-- // -->
+
+<resultMap id="NoteDetailMap" type="NoteDetailDTO">
+    <id property="note.noteIdx" column="note_idx"/>
+    <result property="likeNum" column="like_num"/>
+    <result property="upacIdx" column="upac_idx"/>
+    
+    <association property="note" javaType="NoteVO">
+        <id property="noteIdx" column="note_idx"/>
+        <result property="title" column="title"/>
+        <result property="text" column="text"/>
+        <result property="viewCount" column="view_count"/>
+    </association>
+    
+    <association property="member" javaType="MemberVO">
+        <id property="acIdx" column="ac_idx"/>
+        <result property="nickname" column="nickname"/>
+    </association>
+</resultMap>
+
+<!-- 게시글 상세보기 -->
+<!-- public NoteVO selectByNoteIdx(int noteIdx); -->
+	<select id="selectByNoteIdx" resultMap="NoteDetailMap">
+		<![CDATA[
+			SELECT
+				n.note_idx, n.title, n.text,
+				TO_CHAR(n.create_at,'YYYY-MM-DD HH24:MI:SS') AS create_at,
+				n.view_count, n.content_idx, n.genre_idx,
+				n.category_idx AS note_category_idx, n.userPg_idx,
+				u.ac_idx, u.email, u.pw, u.nickname, u.img, u.name,
+				u.category_idx AS ac_category_idx,
+				NVL(l.cnt,0) AS like_num,
+				up.ac_idx AS upac_idx
+			FROM
+				note n
+			JOIN
+				userPage up ON n.userPg_idx = up.userPg_idx
+			JOIN
+				userAccount u ON up.ac_idx = u.ac_idx
+			LEFT JOIN (
+				SELECT
+					note_idx, COUNT(*) AS cnt
+				FROM
+					likes
+				GROUP BY
+					note_idx
+			) l ON n.note_idx = l.note_idx
+			WHERE
+				n.note_idx = #{noteIdx}
+		]]>
+	</select>
+<!-- // -->
+
+</mapper>

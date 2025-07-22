@@ -6,7 +6,7 @@
 <configuration>
   
   <settings>
-    <setting name="mapUnderscoreToCamelCase" value="true"/>
+      <setting name="mapUnderscoreToCamelCase" value="true"/>
   </settings>
 
   <typeAliases>
@@ -22,6 +22,11 @@
     
     <!-- com.vibesync.board -->
     <typeAlias type="com.vibesync.board.domain.NoteVO" alias="NoteVO" />
+    <typeAlias type="com.vibesync.board.domain.NoteListDTO" alias="NoteListDTO" />
+    <typeAlias type="com.vibesync.board.domain.NoteDetailDTO" alias="NoteDetailDTO" />
+    
+    <!-- com.vibesync.member -->
+    <typeAlias type="com.vibesync.member.domain.MemberVO" alias="MemberVO" />
   </typeAliases>
 
 </configuration>

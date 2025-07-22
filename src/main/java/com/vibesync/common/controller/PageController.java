@@ -20,6 +20,5 @@ import com.vibesync.security.domain.CustomUser;
 @RequestMapping("/page") 
 @AuthenticatedUserPages
 public class PageController {
-	
-	
+
 }

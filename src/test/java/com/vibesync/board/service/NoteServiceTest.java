@@ -12,7 +12,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.vibesync.board.domain.NoteVO;
+import com.vibesync.board.domain.NoteListDTO;
 import com.vibesync.common.domain.Criteria;
 
 import lombok.extern.log4j.Log4j;
@@ -30,13 +30,6 @@ public class NoteServiceTest {
     private NoteService noteService;
 	
 	@Test
-	public void testGetNoteList() {
-		log.info("게시글 목록 조회 서비스 테스트 시작");
-		List<NoteVO> noteList = noteService.findAllNotes();
-		log.info("조회된 게시글 목록: " + noteList);
-	}
-	
-	@Test
 	public void testFindAllNotesWithPaging() {
 	    log.info("페이징 처리된 게시글 목록 조회 서비스 테스트 시작");
 	    
@@ -44,7 +37,7 @@ public class NoteServiceTest {
 	    Criteria criteria = new Criteria(2, 10);
 	    
 	    // when
-	    List<NoteVO> noteList = noteService.findAllNotesWithPaging(criteria);
+	    List<NoteListDTO> noteList = noteService.findAllNotesWithPaging(criteria);
 	    
 	    // then
 	    log.info("조회된 페이징 목록: " + noteList);

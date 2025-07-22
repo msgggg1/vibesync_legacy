@@ -14,7 +14,8 @@
     
       <security:intercept-url pattern="/member/login" access="permitAll" />
       <security:intercept-url pattern="/member/signup" access="permitAll" />
-      <security:intercept-url pattern="/board/noteView" access="permitAll" />
+      <security:intercept-url pattern="/board/list" access="permitAll" />
+      <security:intercept-url pattern="/board/view" access="permitAll" />
     
       <security:intercept-url pattern="/**" access="isAuthenticated()" />
 

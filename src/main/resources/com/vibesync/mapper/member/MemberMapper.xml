@@ -8,26 +8,25 @@
 	<insert id="insertUser" parameterType="com.vibesync.member.domain.SignUpDTO">
 		INSERT INTO userAccount
 		(ac_idx, email, pw, nickname, name, created_at, category_idx, ROLE)
-		VALUES (useraccount_seq.nextval, #{email}, #{password}, #{nickname}, #{name}, SYSTIMESTAMP, #{category_idx}, 'USER')
+		VALUES (useraccount_seq.nextval, #{email}, #{password}, #{nickname}, #{name}, SYSTIMESTAMP, #{categoryIdx}, 'USER')
 	</insert>
 
-	<select id="findVOByEmail"
-		resultType="com.vibesync.member.domain.MemberVO">
+	<select id="findVOByEmail" resultType="com.vibesync.member.domain.MemberVO">
 		SELECT ac_idx, nickname, img, name, category_idx, email
 		FROM userAccount WHERE email = #{email}
 	</select>
 	
 	<resultMap id="memberResultMap" type="com.vibesync.member.domain.Member">
-        <id property="ac_idx" column="ac_idx"/>
+        <id property="acIdx" column="ac_idx"/>
         <result property="email" column="email"/>
         <result property="pw" column="pw"/>
         <result property="nickname" column="nickname"/>
         <result property="img" column="img"/>
         <result property="name" column="name"/>
-        <result property="created_at" column="created_at"/>
-        <result property="category_idx" column="category_idx"/>
-        <result property="kakao_auth_id" column="kakao_auth_id"/>
-        <result property="google_id" column="google_id"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="categoryIdx" column="category_idx"/>
+        <result property="kakaoAuthId" column="kakao_auth_id"/>
+        <result property="googleId" column="google_id"/>
         <result property="role" column="role"/>
     </resultMap>
 
@@ -48,19 +47,19 @@
 	</select>
 
 	<select id="preferredCategoryIdx" resultType="Integer">
-		SELECT category_idx FROM userAccount WHERE ac_idx = #{ac_idx}
+		SELECT category_idx FROM userAccount WHERE ac_idx = #{acIdx}
 	</select>
 
 	<select id="getBasicUserInfoById"
 		resultType="com.vibesync.member.domain.MemberSummaryVO">
-		SELECT ac_idx, nickname, img, name FROM userAccount WHERE ac_idx = #{ac_idx}
+		SELECT ac_idx, nickname, img, name FROM userAccount WHERE ac_idx = #{acIdx}
 	</select>
 
 	<!-- 특정 사용자가 작성한 총 게시글 수 -->
 	<select id="getPostCount" resultType="Integer">
 		SELECT COUNT(n.note_idx)
 		FROM note n JOIN userPage up ON n.userPg_idx = up.userPg_idx
-		WHERE up.ac_idx = #{ac_idx}
+		WHERE up.ac_idx = #{acIdx}
 	</select>
 
 	<!-- 비밀번호 재설정 -->
