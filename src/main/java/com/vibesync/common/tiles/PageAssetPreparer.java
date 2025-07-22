@@ -32,9 +32,7 @@ public class PageAssetPreparer implements ViewPreparer {
             String viewName = bodyPath.replace("/WEB-INF/views/", "").replace(".jsp", "");
             String headFragmentPath = "/WEB-INF/views/" + viewName + "_head.jsp";
             String cssPath = "/resources/css/" + viewName + ".css";
-
-            log.info("Generated headFragmentPath: " + headFragmentPath);
-            log.info("Generated cssPath: " + cssPath);
+            String jsPath = "/resources/js/" + viewName + ".js";
             
             // 실제로 그 경로에 파일이 존재하는지 확인
             try {
@@ -54,6 +52,13 @@ public class PageAssetPreparer implements ViewPreparer {
 					tilesRequest.getContext("request").put("pageCss", cssPath);
 				} else {
 					log.info(">>> CSS Not Found: " + cssPath); }
+
+				// js
+				if (servletContext.getResource(jsPath) != null) {
+					log.info(">>> JS Found!: " + jsPath);
+					tilesRequest.getContext("request").put("pageJs", jsPath);
+				} else {
+					log.info(">>> JS Not Found: " + jsPath); }
 			} catch (MalformedURLException e) {
 				e.printStackTrace();
 			}

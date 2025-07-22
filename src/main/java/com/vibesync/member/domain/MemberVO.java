@@ -17,13 +17,13 @@ import lombok.ToString;
 @ToString
 public class MemberVO {
 
-	private int ac_idx;
+	private int acIdx;
 	private String email;
 	private String nickname;
 	private String img;
 	private String name;
-	private Timestamp created_at;
-	private int category_idx;
+	private Timestamp createdAt;
+	private int categoryIdx;
 	
-	private Long kakao_auth_id; 
+	private Long kakaoAuthId; 
 }

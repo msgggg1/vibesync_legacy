@@ -18,13 +18,10 @@ public class NoteVO {
 	private Date createAt;
 	private Date editAt;
 	private int viewCount;
-	private String titleImg;
+	private String titleimg;
 	private int contentIdx;
 	private int genreIdx;
 	private int categoryIdx;
-	private int userPgIdx;
-	
-	// 추가
-	private String author;
+	private int userpgIdx;
 	
 }

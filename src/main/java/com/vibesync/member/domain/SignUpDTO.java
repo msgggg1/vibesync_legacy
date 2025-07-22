@@ -20,7 +20,7 @@ public class SignUpDTO {
     private String email;
     private String password;
     private String confirmPassword;
-    private int category_idx;
+    private int categoryIdx;
     private String loginType;
 	
 }

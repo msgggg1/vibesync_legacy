@@ -15,10 +15,10 @@ import lombok.ToString;
 @ToString
 public class MemberSummaryVO { // 조회에 필요한 최소한의 정보
 
-	private int ac_idx;
+	private int acIdx;
 	private String nickname;
-	private String profile_img;
-	private int category_idx;
+	private String profileImg;
+	private int categoryIdx;
 	private boolean followedByCurrentUser;
 	
 }

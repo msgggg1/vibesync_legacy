@@ -16,7 +16,7 @@ function applyTheme(theme) {
 // 문서가 준비되면 실행
 $(function() {
     $.ajax({
-      url: `${contextPath}/setting.do`,
+      url: '${pageContext.request.contextPath}/setting.do',
       type: 'GET',
       success: function() {
                 console.log('테마를 성공적으로 불러왔습니다.');
@@ -35,7 +35,7 @@ $(function() {
         applyTheme(selectedTheme);
         
         $.ajax({
-            url: `${contextPath}/setting.do`,
+            url: '${pageContext.request.contextPath}/setting.do',
             type: 'POST',
             data: {
                 theme: selectedTheme

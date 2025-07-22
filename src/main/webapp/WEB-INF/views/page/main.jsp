@@ -16,9 +16,9 @@
           <!-- category btn -->
           <div class="category_btn_group">
             <c:forEach items="${ categoryList }" var="categoryVO">
-               <c:if test="${categoryVO.categoryIdx != memberInfo.category_idx}">
+               <c:if test="${categoryVO.categoryIdx != memberInfo.categoryIdx}">
                   <button style="background-image: url( ${pageContext.request.contextPath}/${ categoryVO.img }); background-size: cover;"
-                        onclick="location.href='board/list?category_idx=${categoryVO.categoryIdx}'">
+                        onclick="location.href='board/list?categoryIdx=${categoryVO.categoryIdx}'">
                      <p>${ categoryVO.categoryName }</p>
                   </button>
                </c:if>
@@ -30,8 +30,8 @@
             <div class="grid_item" id="recent_posts_container" >
               <p class="grid_header">Recent_Posts</p>
                <c:forEach items="${mainPageDTO.latestNotes}" var="post" varStatus="status">
-                  <div class="list-entry" data-id="${post.note_idx}">
-                     <a href="postView.do?nidx=${post.note_idx}" >
+                  <div class="list-entry" data-id="${post.noteIdx}">
+                     <a href="postView.do?nidx=${post.noteIdx}" >
                          <span class="entry-number">${status.count}.</span><span class="entry-title">${post.title}</span>
                      </a>
                   </div>
@@ -40,8 +40,8 @@
             <div class="grid_item" id="popular_posts_container">
               <p class="grid_header">Popular_Posts</p>
                 <c:forEach items="${mainPageDTO.popularNotes}" var="post" varStatus="status">
-                  <div class="list-entry" data-id="${post.note_idx}">
-                      <a href="postView.do?nidx=${ post.note_idx }">
+                  <div class="list-entry" data-id="${post.noteIdx}">
+                      <a href="postView.do?nidx=${ post.noteIdx }">
                          <span class="entry-number">${status.count}.</span><span class="entry-title">${post.title}</span>
                      </a>
                   </div>
@@ -51,7 +51,7 @@
               <p class="grid_header">Top_User</p>
                  <c:forEach items="${mainPageDTO.popularUsers}" var="user" varStatus="status">
                   <div class="list-entry" data-id="${status.count}">
-                     <a href="userPage.do?acIdx=${ user.ac_idx }" >
+                     <a href="userPage.do?acIdx=${ user.acIdx }" >
                          <span class="entry-number">${status.count}</span>
                          <span class="entry-title">${user.nickname}</span>
                      </a>
@@ -70,8 +70,8 @@
                     <ul class="under_ul">
                     <c:forEach items="${ posts.value }" var="post">
                        <li>
-                       <a href="postView.do?nidx=${ post.note_idx }">
-                          <div class="post-index" style="display: inline-block; align-self: left;">${ post.note_idx }</div>
+                       <a href="postView.do?nidx=${ post.noteIdx }">
+                          <div class="post-index" style="display: inline-block; align-self: left;">${ post.noteIdx }</div>
                           <div class="post-title" style="display: inline-block; align-self: right;">${ post.title }</div>
                        </a>
                        </li>

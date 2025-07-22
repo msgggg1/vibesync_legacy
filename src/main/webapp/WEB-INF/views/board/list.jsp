@@ -9,10 +9,10 @@
 
     <div class="board_info">
         <form id="filterForm" action="${pageContext.request.contextPath}/board/list" method="get">
-            <select name="category_idx" class="filter_select" onchange="$('#filterForm').submit();">
-                <%-- <option value="0" ${currentCategory == 0 ? 'selected' : ''}>전체</option> --%>
+            <select name="categoryIdx" class="filter_select" onchange="$('#filterForm').submit();">
+                <option value="0" ${pageMaker.criteria.categoryIdx == 0 ? 'selected' : ''}>전체</option>
                 <c:forEach var="category" items="${categoryList}">
-                    <option value="${category.categoryIdx}">
+                    <option value="${category.categoryIdx}" ${pageMaker.criteria.categoryIdx == category.categoryIdx ? 'selected' : ''}>
                         <c:out value="${category.categoryName}" />
                     </option>
                 </c:forEach>
@@ -40,7 +40,6 @@
         
         <div id="search_bar">
             <form id="searchForm" action="${pageContext.request.contextPath}/board/list" method="get">
-                 <%-- <input type="hidden" name="category_idx" value="${currentCategory}"> --%>
                  <select name="type" class="searchInput">
        				 <option value="T">제목</option>
        				 <option value="C">내용</option>
@@ -73,6 +72,7 @@
 <form id="actionForm" action="${pageContext.request.contextPath}/board/list" method="get">
 	<input type="hidden" name="pageNum" value="${pageMaker.criteria.pageNum}">
 	<input type="hidden" name="amount" value="${pageMaker.criteria.amount}">
+	<input type="hidden" name="categoryIdx" value="${pageMaker.criteria.categoryIdx}">
 	<input type="hidden" name="type" value="${pageMaker.criteria.type}">
 	<input type="hidden" name="keyword" value="${pageMaker.criteria.keyword}">
 </form>
@@ -98,7 +98,7 @@
 			event.preventDefault();
 			let noteIdx = $(this).attr("href");
 			actionForm
-			  .attr("action", "/board/note")
+			  .attr("action", "/vibesync/board/view")
 			  .append(`<input type="hidden" name="noteIdx" value="\${noteIdx}">`)
 			  .submit();
 		}); // $("a.move").on("click", function() {

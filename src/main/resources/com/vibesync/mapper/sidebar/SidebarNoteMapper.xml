@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vibesync.sidebar.mapper.SidebarNoteMapper">
+
+	<!-- public List<UserSummaryVO> getNoteIdxListByUser(int ac_idx); -->	
+	<select id="getNoteIdxListByUser" resultType="int" parameterType="int">
+        <![CDATA[
+            SELECT note_idx
+            FROM note n
+            JOIN userPage u ON u.userPg_idx = n.userPg_idx
+            WHERE u.ac_idx = #{acIdx}
+        ]]>
+    </select>
+    
+	<!-- public int getViewCountsForNotesAllByUser(int ac_idx); -->
+    <select id="getViewCountsForNotesAllByUser" resultType="int" parameterType="int">
+        <![CDATA[
+            SELECT NVL(SUM(view_count),0) AS viewCnt
+            FROM note n
+            JOIN userPage u ON u.userPg_idx = n.userPg_idx
+            WHERE u.ac_idx = #{acIdx}
+        ]]>
+    </select>
+
+</mapper>

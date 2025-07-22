@@ -14,7 +14,7 @@ import lombok.ToString;
 @Builder
 @ToString
 public class UserProfileViewDTO {
-    private int ac_idx;             
+    private int acIdx;             
     private String nickname;       
     private String img;         
     private int postCount;          
