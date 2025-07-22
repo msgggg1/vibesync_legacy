@@ -41,7 +41,6 @@ CREATE TABLE userAccount (
     ac_idx INT PRIMARY KEY,
     email VARCHAR2(255) NOT NULL UNIQUE,
     pw VARCHAR2(255) NOT NULL,
-    salt varchar2(255),
     nickname VARCHAR2(50) NOT NULL,
     img VARCHAR2(255),
     name VARCHAR2(100) NOT NULL,

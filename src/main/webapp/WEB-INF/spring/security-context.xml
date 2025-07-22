@@ -4,55 +4,55 @@
    xmlns:security="http://www.springframework.org/schema/security"
    xsi:schemaLocation="http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-4.2.xsd
       http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd">
+
+   <!-- 스프링 표현식(SpEL) 사용 여부 -->
+   <security:http use-expressions="true">
+      <!-- 접근 제어 -->
+      <security:intercept-url pattern="/static/**" access="permitAll" />
+      <security:intercept-url pattern="/resources/**" access="permitAll" />
+      <security:intercept-url pattern="/sources/**" access="permitAll" />
+    
+      <security:intercept-url pattern="/member/login" access="permitAll" />
+      <security:intercept-url pattern="/member/signup" access="permitAll" />
+      <security:intercept-url pattern="/board/list" access="permitAll" />
+      <security:intercept-url pattern="/board/view" access="permitAll" />
+    
+      <security:intercept-url pattern="/**" access="isAuthenticated()" />
+
+      <!-- 로그인 처리 -->
+      <security:form-login
+         login-page="/member/login"
+         login-processing-url="/login/process"
+         authentication-success-handler-ref="customLoginSuccessHandler"
+         default-target-url="/page/main"
+         authentication-failure-url="/member/login?error=true"
+         username-parameter="username" 
+         password-parameter="password"
+      />
       
-      <!-- p.682 css, js 등 보안필터 적용 필요 X-->
-      <security:http pattern="/static/**" security="none"></security:http>   
-	  <security:http pattern="/design/**" security="none"></security:http>
-	  <security:http pattern="/css/**" security="none"></security:http>
-	  <security:http pattern="/js/**" security="none"></security:http>   
-      
-      <!-- p.681 접근 제어 태그, 식을 사용 여부 속성값 (기본값 true)-->
-      <security:http use-expressions="true">
-      	<security:intercept-url pattern="/customer/noticeReg.htm" access="isAuthenticated()"  />
-      	<security:intercept-url pattern="/customer/noticeDel.htm" access="isAuthenticated()"  /> 
-      	<!-- <security:intercept-url pattern="/customer/noticeDel.htm" access="hasRole('ROLE_USER')"  /> -->
-      	<!-- <security:intercept-url pattern="/customer/noticeDel.htm" access="hasRole('ROLE_ADMIN')"  /> -->
-      	<security:intercept-url pattern="/**" access="permitAll"  />
-      	
-      	<security:form-login
-      		login-page="/joinus/login.htm"
-      		default-target-url="/index.htm"
-      		authentication-failure-url="/joinus/login.htm?error=true"
-      		authentication-success-handler-ref="customLoginSuccessHandler"
-      		username-parameter="username"
-      		password-parameter="password"
-      	/>
-      	
-      	<!-- hong 인증 -> 삭제 버튼		403 접근 금지 오류 : 특정 URL 이동 
-      		  ㄴ /common/accessError.htm 요청을 처리하는 CommonController.java
-      	-->
-      	<!-- 
-      	<security:access-denied-handler error-page="/common/accessError.htm"/>
-      -->
-      
-      <!-- 접근제한이 발생한 경우 다양한 처리를 하고 싶다면 AccessDeniedHandler 인터페이스를 구현 
-      org.doit.ik.security.CustomAccessDeniedHandler.java-->
-      <security:access-denied-handler ref="customAccessDeniedHandler" />
-      
-      <security:logout invalidate-session="true" logout-success-url="/" logout-url="/joinus/logout.htm"/>
-      <!-- 로그아웃 성공 시 다양한 처리를 하기 원한다면 클래스 선언 후 빈 등록 
-      success-handler-ref = "logoutSuccessHandler" -->
-      
-       </security:http> 
-       
-       <!-- PasswordEncoder -->
-   	   <bean id="bCryptPasswordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"></bean>
-      <!-- p.684 -->
-      <security:authentication-manager>
-       <security:authentication-provider user-service-ref="customUserDetailsService">
-       	<security:password-encoder ref="bCryptPasswordEncoder"/>
-       </security:authentication-provider>
-      </security:authentication-manager>
-      
+      <security:session-management>
+        <security:concurrency-control max-sessions="1" 
+                                    expired-url="/member/login?expired" />
+    </security:session-management>
+
+      <!-- 로그아웃 처리 -->
+      <security:logout 
+      		invalidate-session="true" 
+			success-handler-ref="customLogoutSuccessHandler"
+         	logout-url="/member/logout" />
+      <!-- 로그아웃 성공 시 다양한 처리를 하기 원한다면 클래스 선언 후 빈 등록 success-handler-ref = "logoutSuccessHandler" -->
+   </security:http>
+
+   <!-- 비밀번호 인코딩 -->
+   <!-- PasswordEncoder -->
+   <bean id="bCryptPasswordEncoder"
+      class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" />
+
+   <!-- 애플리케이션 전반의 인증 처리 -->
+   <security:authentication-manager>
+      <security:authentication-provider user-service-ref="userDetailsService">
+         <security:password-encoder ref="bCryptPasswordEncoder"/>
+      </security:authentication-provider>
+   </security:authentication-manager>
 
 </beans>

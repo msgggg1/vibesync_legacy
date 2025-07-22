@@ -1,4 +1,4 @@
-package com.vibesync.board.controller;
+package com.vibesync.mapper.message;
 
 public class temp {
 
