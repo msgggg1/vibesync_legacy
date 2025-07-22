@@ -1,4 +1,4 @@
-package com.vibesync.common.controller; 
+package com.vibesync.mainpage.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -13,12 +13,23 @@ import com.vibesync.mainpage.service.MainPageService;
 import com.vibesync.member.domain.Member;
 import com.vibesync.security.domain.CustomUser;
 
-/**
- * 메인 페이지, 소개 페이지 등 단순 페이지 뷰로의 이동을 처리하는 컨트롤러
- */
 @Controller
-@RequestMapping("/page") 
+@RequestMapping("/page/main") 
 @AuthenticatedUserPages
-public class PageController {
+public class MainPageController {
+	
+	@Autowired 
+	private MainPageService mainPageService;
 
+    @GetMapping
+    public void showMainPage(Model model, @AuthenticationPrincipal CustomUser user) {
+    	System.out.println("> PageController.showMainPage() - 호출");
+    	Member member = user.getMember();
+
+
+    	MainPageDTO mainPageDTO = mainPageService.loadMainPage(member.getCategory_idx());
+
+    	model.addAttribute("mainPageDTO", mainPageDTO);
+
+    	}
 }

@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.vibesync.mainpage.mapper.RecommendMapper">
+
+	<resultMap id="noteSummaryDTOMap" type="com.vibesync.mainpage.domain.NoteSummaryDTO">
+		<id property="noteIdx" column="note_idx" />
+		<result property="title" column="title" />
+		<result property="thumbnailImg" column="thumbnail_img" />
+		<result property="viewCount" column="view_count" />
+		<result property="likeCount" column="like_count" />
+		<result property="authorName" column="author_name" />
+		<result property="categoryIdx" column="category_idx" />
+	</resultMap>
+
+	<resultMap id="userSummaryVOMap" type="com.vibesync.mainpage.domain.UserSummaryVO">
+		<id property="acIdx" column="ac_idx" />
+		<result property="nickname" column="nickname" />
+	</resultMap>
+
+
+	<select id="popularNoteByAllCategory" resultMap="noteSummaryDTOMap">
+	 <![CDATA[
+		SELECT n.note_idx, n.title, n.img AS thumbnail_img, n.view_count, rnk.like_count,
+			ua.nickname AS author_name, n.category_idx
+		FROM (
+		SELECT n.note_idx, n.category_idx, COUNT(l.likes_idx) AS like_count, 
+			ROW_NUMBER() OVER (PARTITION BY n.category_idx ORDER BY (COALESCE(COUNT(l.likes_idx), 0) + n.view_count) DESC
+			, n.create_at DESC) AS rn
+		FROM note n	LEFT JOIN likes l ON n.note_idx = l.note_idx
+		GROUP BY n.note_idx, n.view_count, n.create_at, n.category_idx
+		) rnk
+		JOIN note n ON rnk.note_idx = n.note_idx
+		JOIN userPage up ON n.user_pg_idx = up.user_pg_idx
+		JOIN userAccount ua ON up.ac_idx = ua.ac_idx
+		WHERE rnk.rn <= #{limit}
+		ORDER BY rnk.category_idx, rnk.rn
+		]]>
+	</select>
+
+	<select id="recentNoteByMyCategory" resultMap="noteSummaryDTOMap">
+	<![CDATA[
+		SELECT note_idx, title, thumbnail_img, view_count, like_count, author_name
+		FROM (
+			SELECT n.note_idx, n.title, n.img AS thumbnail_img, n.view_count, ua.nickname AS author_name,
+				COALESCE(lc.like_count, 0) AS like_count,
+				ROW_NUMBER() OVER (ORDER BY n.create_at DESC) as rn
+			FROM note n
+						JOIN userPage up ON n.user_pg_idx = up.user_pg_idx
+						JOIN userAccount ua ON up.ac_idx = ua.ac_idx
+						LEFT JOIN (
+								SELECT note_idx, COUNT(*) AS like_count
+								FROM likes
+								GROUP BY note_idx
+									) lc ON n.note_idx = lc.note_idx
+								WHERE n.category_idx = #{categoryIdx}
+									)
+		WHERE rn <= #{limit}
+		ORDER BY rn
+		]]>
+	</select>
+
+	<select id="popularNoteByMyCategory" resultMap="noteSummaryDTOMap">
+		<![CDATA[
+		SELECT note_idx, title, thumbnail_img, view_count, like_count, author_name
+		FROM (
+				SELECT n.note_idx, n.title, n.img AS thumbnail_img,
+						n.view_count, ua.nickname AS author_name,
+						COALESCE(lc.like_count, 0) AS like_count,
+						ROW_NUMBER() OVER (ORDER BY (COALESCE(lc.like_count, 0) + n.view_count) DESC, n.create_at DESC) as rn
+				FROM note n
+						JOIN userPage up ON n.user_pg_idx = up.user_pg_idx
+						JOIN userAccount ua ON up.ac_idx = ua.ac_idx
+						LEFT JOIN ( SELECT note_idx, COUNT(*) AS like_count
+									FROM likes
+									GROUP BY note_idx
+									) lc ON n.note_idx = lc.note_idx
+				WHERE n.category_idx = #{categoryIdx}
+			) ranked_notes
+		WHERE rn <= #{limit}
+		ORDER BY rn
+		]]>
+	</select>
+
+	<select id="findPopularUsers" resultMap="userSummaryVOMap">
+	<![CDATA[
+        SELECT ac_idx, nickname   
+        FROM (
+            SELECT ua.ac_idx, ua.nickname,COUNT(f.ac_follow) AS follower_count,
+                ROW_NUMBER() OVER (ORDER BY COUNT(f.ac_follow) DESC, ua.created_at DESC) as rn
+            FROM userAccount ua
+           	 				LEFT JOIN follows f ON ua.ac_idx = f.ac_following
+            GROUP BY ua.ac_idx, ua.nickname, ua.created_at
+        ) ranked_users
+        WHERE rn <= #{limit}
+        ORDER BY rn
+        ]]>
+    </select>
+
+    <select id="findPopularUsersByCategory" resultMap="userSummaryVOMap">
+    <![CDATA[
+        SELECT ac_idx, nickname   
+        FROM (
+            SELECT u.ac_idx, u.nickname, COUNT(f.ac_follow) AS follower_count,
+                	ROW_NUMBER() OVER (ORDER BY COUNT(f.ac_follow) DESC, u.created_at DESC) as rn
+            FROM userAccount u
+            LEFT JOIN follows f ON u.ac_idx = f.ac_following
+            WHERE u.category_idx = #{categoryIdx}
+            GROUP BY u.ac_idx, u.nickname, u.created_at, u.category_idx
+        	) ranked_users_by_category
+        WHERE rn <= #{limit}
+        ORDER BY rn
+        ]]>
+    </select>
+
+
+</mapper>  

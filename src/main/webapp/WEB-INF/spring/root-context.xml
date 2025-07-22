@@ -13,6 +13,7 @@
 	<mybatis-spring:scan base-package="com.vibesync.member.mapper" />
 	<mybatis-spring:scan base-package="com.vibesync.board.mapper" />
 	<mybatis-spring:scan base-package="com.vibesync.follow.mapper" />
+	<mybatis-spring:scan base-package="com.vibesync.mainpage.mapper" />
 	<mybatis-spring:scan base-package="com.vibesync.sidebar.mapper" />
 
 	<!-- DB 연결 -->
