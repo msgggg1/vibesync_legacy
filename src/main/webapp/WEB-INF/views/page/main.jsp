@@ -1,3 +1,4 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
          <!-- banner -->
           <div class="slider-container">
             <div class="swiper" id="swiper1">
@@ -16,7 +17,7 @@
           <!-- category btn -->
           <div class="category_btn_group">
             <c:forEach items="${ categoryList }" var="categoryVO">
-               <c:if test="${categoryVO.categoryIdx != memberInfo.categoryIdx}">
+               <c:if test="${categoryVO.categoryIdx != categoryIdx}">
                   <button style="background-image: url( ${pageContext.request.contextPath}/${ categoryVO.img }); background-size: cover;"
                         onclick="location.href='board/list?categoryIdx=${categoryVO.categoryIdx}'">
                      <p>${ categoryVO.categoryName }</p>

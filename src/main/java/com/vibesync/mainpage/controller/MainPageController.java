@@ -26,10 +26,10 @@ public class MainPageController {
     	System.out.println("> PageController.showMainPage() - 호출");
     	Member member = user.getMember();
 
-
-    	MainPageDTO mainPageDTO = mainPageService.loadMainPage(member.getCategory_idx());
+    	MainPageDTO mainPageDTO = mainPageService.loadMainPage(member.getCategoryIdx());
 
     	model.addAttribute("mainPageDTO", mainPageDTO);
+    	model.addAttribute("categoryIdx", member.getCategoryIdx());
 
     	}
 }
