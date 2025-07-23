@@ -6,7 +6,7 @@
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 <%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles"%>
 <div class="back_icon">
-	<a onclick="history.back()"><img src="${pageContext.request.contextPath}/sources/icons/arrow_back.svg" alt="arrow_back"></a>
+	<img src="${pageContext.request.contextPath}/sources/icons/arrow_back.svg" alt="arrow_back">
 </div>
 
 <div id="postview_Wrapper">
@@ -20,10 +20,11 @@
 		<form id="postForm" method="post" action="${pageContext.request.contextPath}/board/write" style="margin-bottom: 4rem;">
 			<div id="title_info">
 				<label for="title"></label>
-				<input class="title" id="title" type="text" name="title" placeholder="title..." required>
+				<input class="title" id="title" type="text" name="note.title" placeholder="title..."
+						value="<c:out value='${dto.note.title}'/>" required>
 			</div>
 
-			<textarea id="summernote" name="content"></textarea>
+			<textarea id="summernote" name="note.text"></textarea>
 			<div class="note_op">
 				<div style="margin-top: 1rem;">
 					<label for="thumbnail_input" style="font-weight: bold;">
@@ -34,7 +35,7 @@
 				<div id="select_wrapper">
 					<div class="category sel">
 						<label for="category">category</label>
-						<select id="category" name="categoryIdx">
+						<select id="category" name="note.categoryIdx">
 							<c:forEach items="${ categoryList }" var="category">
 								<option value="${ category.categoryIdx }">${ category.categoryName }</option>
 							</c:forEach>
@@ -42,16 +43,16 @@
 					</div>
 					<div class="genre sel">
 						<label for="genre">genre</label>
-						<select id="genre" name="genreIdx">
-							<c:forEach items="${ genreList }" var="genre">
+						<select id="genre" name="note.genreIdx">
+							<c:forEach items="${ formData.genreList }" var="genre">
 								<option value="${ genre.genreIdx }">${ genre.genName }</option>
 							</c:forEach>
 						</select>
 					</div>
 					<div class="contents sel">
 						<label for="contents">content</label>
-						<select id="contents" name="contentIdx">
-							<c:forEach items="${ contentList }" var="content">
+						<select id="contents" name="note.contentIdx">
+							<c:forEach items="${ formData.contentList }" var="content">
 								<option value="${ content.contentIdx }">${ content.title }</option>
 							</c:forEach>
 						</select>
@@ -61,7 +62,7 @@
 				<input type="hidden" id="images" name="images">
 				<input type="hidden" name="thumbnail_base64">
 				<input type="hidden" name="thumbnail_ext">
-				<%-- <input type="hidden" id="pageidx" name="pageidx" value="<%=pageidx%>"> --%>
+				<input type="hidden" id="pageidx" name="note.userpgIdx" value="${empty userpgIdx ? '0' : userpgIdx}">
 
 				<div id="save_btn">
 					<button type="button" id="saveBtn" class="btn btn-primary mt-3">SAVE</button>
@@ -94,6 +95,11 @@ $(function() {
             }
         }
     });
+    
+    var content = '<c:out value="${dto.note.text}" escapeXml="false" />';
+    if (content) {
+        $('#summernote').summernote('code', content);
+    }
 
     function sendFile(file) {
         const reader = new FileReader();
@@ -104,7 +110,7 @@ $(function() {
         reader.readAsDataURL(file);
     }
     
-    // [추가] 썸네일 파일 선택 시 유효성 검사 및 Base64 변환
+    // 썸네일 파일 선택 시 유효성 검사 및 Base64 변환
     $('#thumbnail_input').on('change', function() {
     	const file = this.files[0];
     	if (!file) return;
@@ -129,14 +135,7 @@ $(function() {
         reader.readAsDataURL(file);
     });
     
-    $('#saveBtn').click(function() {
-        // [추가] 썸네일이 선택되었는지 최종 확인
-        if (!$('input[name="thumbnail_base64"]').val()) {
-        	alert('대표 이미지를 선택해주세요.');
-        	$('#thumbnail_input').focus();
-        	return;
-        }
-    
+    $('#saveBtn').click(function() {    
         var markup = $('#summernote').summernote('code');
         var tempDiv = $('<div>').html(markup);
         var imgElements = tempDiv.find('img');
@@ -150,7 +149,7 @@ $(function() {
 	    });
         
 	    $('#images').val(base64SrcArray.join('|'));
-	    $('textarea[name=content]').val(tempDiv.html());
+	    $('textarea[name=note.text]').val(tempDiv.html());
 	    $('#postForm').submit();
 	});
 });
