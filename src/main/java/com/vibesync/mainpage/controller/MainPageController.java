@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.vibesync.common.annotation.AuthenticatedUserPages;
 import com.vibesync.mainpage.domain.MainPageDTO;
 import com.vibesync.mainpage.service.MainPageService;
-import com.vibesync.member.domain.Member;
 import com.vibesync.security.domain.CustomUser;
 
 @Controller
@@ -24,10 +23,7 @@ public class MainPageController {
     @GetMapping
     public void showMainPage(Model model, @AuthenticationPrincipal CustomUser user) {
     	System.out.println("> PageController.showMainPage() - 호출");
-    	Member member = user.getMember();
-
-
-    	MainPageDTO mainPageDTO = mainPageService.loadMainPage(member.getCategory_idx());
+    	MainPageDTO mainPageDTO = mainPageService.loadMainPage(user.getCategoryIdx());
 
     	model.addAttribute("mainPageDTO", mainPageDTO);
 

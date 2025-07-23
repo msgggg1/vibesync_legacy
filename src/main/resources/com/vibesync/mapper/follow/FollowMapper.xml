@@ -4,41 +4,39 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.vibesync.follow.mapper.FollowMapper">
 
-	<resultMap id="userSummaryMap" type="com.vibesync.sidebar.domain.UserSummaryVO">
-		<id property="acIdx" column="ac_idx" />
-		<result property="nickname" column="nickname" />
-		<result property="profileImg" column="img" />
-		<result property="categoryIdx" column="category_idx" />
-		<result property="followedByCurrentUser"
-			column="followedByCurrentUser" />
-	</resultMap>
-	<!-- public List<UserSummaryVO> userFollowingList(int acIdx) ; -->
-	<select id="userFollowerList" resultMap="userSummaryMap" parameterType="int">
-        <![CDATA[
-            SELECT
-                u.ac_idx, u.nickname, u.img, u.category_idx,
-                CASE
-                    WHEN f_reverse.ac_following IS NOT NULL THEN 1
-                    ELSE 0
-                END AS followedByCurrentUser
-            FROM follows f
-            JOIN userAccount u ON u.ac_idx = f.ac_follow
-            LEFT JOIN follows f_reverse ON f_reverse.ac_follow = f.ac_following
-                                       AND f_reverse.ac_following = f.ac_follow
-            WHERE f.ac_following = #{acIdx}
-        ]]>
-    </select>
-	
-	<!-- public List<UserSummaryVO> userFollowerList(int ac_idx) ; -->
-	<select id="userFollowingList" resultMap="userSummaryMap" parameterType="int">
-        <![CDATA[
-            SELECT
-                u.ac_idx, u.nickname, u.img, u.category_idx,
-                1 AS followedByCurrentUser
-            FROM follows f
-            JOIN userAccount u ON u.ac_idx = f.ac_following
-            WHERE f.ac_follow = #{acIdx}
-        ]]>
-    </select>
+<!-- 팔로우 : 팔로우 데이터 추가 -->
+<!-- public int insertFollow(FollowVO follow); -->
+	<insert id="insertFollow">
+		<selectKey keyProperty="followsIdx" resultType="int" order="BEFORE">
+			SELECT follows_seq.NEXTVAL FROM dual
+		</selectKey>
+		INSERT INTO follows (
+			follows_idx, ac_follow, ac_following
+		)
+		VALUES (
+			#{followsIdx}, #{acFollow}, #{acFollowing}
+		)
+	</insert>
+<!-- // -->
+    
+<!-- 언팔로우 : 팔로우 데이터 삭제 -->
+<!-- public int deleteFollow(FollowVO follow); -->
+	<delete id="deleteFollow">
+		DELETE FROM follows
+		WHERE ac_follow = #{acFollow} AND ac_following = #{acFollowing}
+	</delete>
+<!-- // -->
+    
+<!-- 팔로우 관계 확인 -->
+<!-- public int checkFollowStatus(FollowVO follow); -->
+	<select id="checkFollowStatus" resultType="int">
+		SELECT
+			COUNT(follows_idx)
+		FROM
+			follows
+		WHERE
+			ac_follow = #{acFollow} AND ac_following = #{acFollowing}
+	</select>
+<!-- // -->
     
  </mapper>

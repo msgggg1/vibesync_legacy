@@ -7,6 +7,9 @@
 
    <!-- 스프링 표현식(SpEL) 사용 여부 -->
    <security:http use-expressions="true">
+   	  <!-- 보안 설정 OFF -->
+   	  <security:csrf disabled="true" />
+   
       <!-- 접근 제어 -->
       <security:intercept-url pattern="/static/**" access="permitAll" />
       <security:intercept-url pattern="/resources/**" access="permitAll" />

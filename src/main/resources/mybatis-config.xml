@@ -15,15 +15,18 @@
     <typeAlias type="java.util.HashMap" alias="HashMap" />
     <typeAlias type="java.util.List" alias="List" />
     
+    <!-- com.vibesync.board -->
+    <typeAlias type="com.vibesync.board.domain.NoteVO" alias="NoteVO" />
+    <typeAlias type="com.vibesync.board.domain.NoteListDTO" alias="NoteListDTO" />
+    <typeAlias type="com.vibesync.board.domain.NoteDetailDTO" alias="NoteDetailDTO" />
+    
     <!-- com.vibesync.common -->
     <typeAlias type="com.vibesync.common.domain.CategoryVO" alias="CategoryVO" />
     <typeAlias type="com.vibesync.common.domain.GenreVO" alias="GenreVO" />
     <typeAlias type="com.vibesync.common.domain.ContentVO" alias="ContentVO" />
     
-    <!-- com.vibesync.board -->
-    <typeAlias type="com.vibesync.board.domain.NoteVO" alias="NoteVO" />
-    <typeAlias type="com.vibesync.board.domain.NoteListDTO" alias="NoteListDTO" />
-    <typeAlias type="com.vibesync.board.domain.NoteDetailDTO" alias="NoteDetailDTO" />
+    <!-- com.vibesync.follow -->
+    <typeAlias type="com.vibesync.follow.domain.FollowVO" alias="FollowVO" />
     
     <!-- com.vibesync.member -->
     <typeAlias type="com.vibesync.member.domain.MemberVO" alias="MemberVO" />

@@ -7,7 +7,7 @@ import com.vibesync.mainpage.domain.MainPageDTO;
 @Service
 public class MainPageService {
 
-	public MainPageDTO loadMainPage(int category_idx) {
+	public MainPageDTO loadMainPage(int categoryIdx) {
 			
 		return null;
 	}
