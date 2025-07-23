@@ -18,14 +18,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.vibesync.security.domain.CustomUser;
 import com.vibesync.userpage.domain.NoteSummaryDTO;
 import com.vibesync.userpage.domain.UserPageDataDTO;
-import com.vibesync.userpage.service.UserpageService;
+import com.vibesync.userpage.service.UserPageService;
 
 @Controller
 @RequestMapping("page/user")
 public class UserPageController {
 
 	@Autowired
-	private UserpageService userpageService;
+	private UserPageService userpageService;
 
 	@GetMapping
 	public String userPage(@RequestParam("acIdx") int profileUserAcIdx,

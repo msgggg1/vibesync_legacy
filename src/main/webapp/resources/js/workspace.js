@@ -64,33 +64,43 @@ function loadDailySchedules(dateString) {
     // 4. JSP에 추가한 h4 태그에 포맷된 날짜 텍스트를 삽입
     $('#tab_schedule .schedule-date-title').text(formattedDate);
 	
-    var schedules = schedulesByDate[dateString];
-    var scheduleHtml = '<ul class="schedule-list">';
-    if (schedules && schedules.length > 0) {
-        $.each(schedules, function(index, schedule) {
-            var startDate = new Date(schedule.start);
-            var endDate = new Date(schedule.end);
-            var startTime = String(startDate.getHours()).padStart(2, '0') + ":" + String(startDate.getMinutes()).padStart(2, '0');
-            var endTime = String(endDate.getHours()).padStart(2, '0') + ":" + String(endDate.getMinutes()).padStart(2, '0');
-            var descriptionHtml = (schedule.description && schedule.description.trim() !== '') ? ' <span class="schedule-desc">' + schedule.description + '</span>' : '';
-            
-            scheduleHtml += `<li data-id="${schedule.id}">
-                               <div class="schedule-item-content">
-                                   <span class="schedule-time">${startTime} - ${endTime}</span>
-                                   <div class="schedule-details">
-                                       <span class="schedule-title">${schedule.title}</span>
-                                       ${descriptionHtml}
-                                   </div>
-                               </div>
-                               <button class="schedule-delete-btn">&times;</button>
-                           </li>`;
-        });
-    } else {
-        scheduleHtml += '<li class="no-schedule">등록된 일정이 없습니다.</li>';
-    }
-    scheduleHtml += '</ul>';
-    $('#tab_schedule .schedule-date-title').html('<i class="fa-regular fa-calendar-check"></i>' + formattedDate);
-    $('#daily-schedule-list-container').html(scheduleHtml);
+    $.ajax({
+        url: `${contextPath}/api/schedules/daily`, // ✅ URL 변경: 일별 조회를 위한 명확한 API 엔드포인트
+        type: 'GET',
+        data: { date: dateString },
+        dataType: 'json',
+        success: function(schedules) {
+            let scheduleHtml = '<ul class="schedule-list">';
+            if (schedules && schedules.length > 0) {
+                // 가져온 데이터로 목록 UI를 만듭니다. (기존 로직과 유사)
+                schedules.forEach(schedule => {
+                    const startDate = new Date(schedule.startTime); // 필드명은 VO/DTO에 맞게
+                    const endDate = new Date(schedule.endTime);
+                    const startTime = String(startDate.getHours()).padStart(2, '0') + ":" + String(startDate.getMinutes()).padStart(2, '0');
+                    const endTime = String(endDate.getHours()).padStart(2, '0') + ":" + String(endDate.getMinutes()).padStart(2, '0');
+                    const descriptionHtml = (schedule.description && schedule.description.trim() !== '') ? ` <span class="schedule-desc">${schedule.description}</span>` : '';
+
+                    scheduleHtml += `<li data-id="${schedule.scheduleIdx}">
+                                         <div class="schedule-item-content">
+                                             <span class="schedule-time">${startTime} - ${endTime}</span>
+                                             <div class="schedule-details">
+                                                 <span class="schedule-title">${schedule.title}</span>
+                                                 ${descriptionHtml}
+                                             </div>
+                                         </div>
+                                         <button class="schedule-delete-btn">&times;</button>
+                                     </li>`;
+                });
+            } else {
+                scheduleHtml += '<li class="no-schedule">등록된 일정이 없습니다.</li>';
+            }
+            scheduleHtml += '</ul>';
+            $('#daily-schedule-list-container').html(scheduleHtml);
+        },
+        error: function() {
+            $('#daily-schedule-list-container').html('<p>일정을 불러오는 데 실패했습니다.</p>');
+        }
+    });
 }
 
 // [함수] 할 일 목록 로딩
@@ -392,10 +402,10 @@ $(document).ready(function() {
 
     // 3. 일정(Schedule) 관련
     $('#tab_schedule').on('click', '.schedule-item-content', function() { 
-    	const scheduleId = $(this).closest('li').data('id');
+    	const scheduleIdx = $(this).closest('li').data('id');
             let clickedSchedule = null;
             for (const date in schedulesByDate) {
-                const found = schedulesByDate[date].find(event => event.id == scheduleId);
+                const found = schedulesByDate[date].find(event => event.id == scheduleIdx);
                 if (found) {
                     clickedSchedule = found;
                     break;
@@ -426,10 +436,10 @@ $(document).ready(function() {
     $('#tab_schedule').on('click', '.schedule-delete-btn', function(e) { 
     	e.stopPropagation(); // 부모(li)의 수정 이벤트 방지
             const $li = $(this).closest('li');
-            const scheduleId = $li.data('id');
+            const scheduleIdx = $li.data('id');
             let scheduleDate = null;
             for (const date in schedulesByDate) {
-                const found = schedulesByDate[date].find(event => event.id == scheduleId);
+                const found = schedulesByDate[date].find(event => event.id == scheduleIdx);
                 if (found) {
                     const d = new Date(found.start);
                     scheduleDate = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -443,11 +453,11 @@ $(document).ready(function() {
             }
             if (confirm("정말로 이 일정을 삭제하시겠습니까?")) {
                 $.ajax({
-                    url: contextPath + '/schedules.do',
-                    type: 'POST',
+                    url: contextPath + `/api/schedules/${scheduleIdx}`,
+                    type: 'DELETE',
                     data: {
                         action: 'deleteSchedule',
-                        schedule_idx: scheduleId
+                        scheduleIdx: scheduleIdx
                     },
                     dataType: 'json',
                     success: function(response) {
@@ -510,8 +520,8 @@ $(document).ready(function() {
     $scheduleForm.on('submit', function(e) { 
 			e.preventDefault(); // 페이지 전체가 새로고침되는 브라우저의 기본 동작 막기
 								// AJAX를 이용해 폼을 제출하는 이벤트 핸들러에서는 반드시 가장 첫 줄에 e.preventDefault()를 작성
-            const scheduleId = $('#schedule-id').val();
-            const isUpdating = !!scheduleId; // boolean값으로 변환. if (scheduleId !== '' && scheduleId !== null && ...)
+            const scheduleIdx = $('#schedule-id').val();
+            const isUpdating = !!scheduleIdx; // boolean값으로 변환. if (scheduleIdx !== '' && scheduleIdx !== null && ...)
             const scheduleData = {
                 action: isUpdating ? 'updateSchedule' : 'addSchedule',
                 title: $('#schedule-title').val(),
@@ -520,7 +530,7 @@ $(document).ready(function() {
                 end_time: $('#schedule-end').val().replace('T', ' ') + ':00',
                 color: $('#schedule-color').val()
             };
-            if (isUpdating) { scheduleData.schedule_idx = scheduleId; } // update인 경우 schedule_idx 추가로 담아줌
+            if (isUpdating) { scheduleData.scheduleIdx = scheduleIdx; } 
             const alertMessage = isUpdating ? "수정" : "추가";
             $.ajax({
                 url: contextPath +'/schedules.do',
@@ -746,60 +756,15 @@ $(document).ready(function() {
                     var startIso = fetchInfo.start.toISOString();
                     var endIso = fetchInfo.end.toISOString(); 
                     $.ajax({
-                        url: contextPath +'/schedules.do',
+                        url: contextPath +'/api/schedules',
                         method: 'GET',
                         data: {
-                            action: 'getMonthlySchedules',
-                            start: startIso,
-                            end: endIso
+                            start: fetchInfo.start.toISOString(),
+                            end: fetchInfo.end.toISOString()
                         },
                         dataType: 'json',
-                        success: function(data) {
-                            // 1. 받은 데이터의 날짜 문자열을 Date 객체로 변환
-                            var processedEvents = data.map(function(event) {
-                                return {
-                                    id: event.id, // FullCalendar 표준 ID
-                                    title: event.title,
-                                    color: event.color,
-                                    description: event.description,
-                                    start: new Date(event.start), // 문자열을 Date 객체로
-                                    end: new Date(event.end), // 문자열을 Date 객체로
-                                    durationEditable: event.durationEditable,
-                                    allDay : event.allDay
-                                };
-                            });
-
-                            // 2. Date 객체로 변환된 데이터를 사용해 schedulesByDate 객체 생성
-                            schedulesByDate = {}; // 초기화
-                            processedEvents.forEach(function(event) {
-								let loopStartDate = new Date(event.start);
-								// 종료일이 없으면 시작일과 동일하게 설정
-								let loopEndDate = event.end ? new Date(event.end) : new Date(event.start);
-								
-								// FullCalendar의 '종일' 이벤트는 종료일이 다음 날 00시
-								if(event.end &&loopEndDate.getHours()===0 && loopEndDate.getMinutes() === 0){
-									loopEndDate.setDate(loopEndDate.getDate() - 1);
-								}
-								
-								// 2일 이상 일정
-								// 시작일부터 종료일까지 하루씩 반복하면서 모든 날짜에 일정 추가
-								while(loopStartDate <= loopEndDate){
-									const dateKey = loopStartDate.toISOString().substring(0,10);
-									
-									if(!schedulesByDate[dateKey]){
-										schedulesByDate[dateKey] = []
-									}
-									schedulesByDate[dateKey].push(event);
-									
-									//다음 날로 날짜 증가
-									loopStartDate.setDate(loopStartDate.getDate()+1);
-								}
-                            });
-
-                            // 3. 날짜별로 일정 정렬
-                            for (var date in schedulesByDate) {
-                                schedulesByDate[date].sort((a, b) => a.start - b.start);
-                            }
+                        success: function(events) {
+                            
                             // 최초 로딩 시 오늘 날짜 일정 로드
                             if (isInitialLoad) {
                                 const todayStr = getTodayString();
@@ -819,12 +784,9 @@ $(document).ready(function() {
 								}
                                 dateToRefreshAfterFetch = null; // 변수 초기화
                             }
-
-                            // 5. FullCalendar에게는 Date 객체가 포함된 데이터를 전달
-                            successCallback(processedEvents);
                         },
-                        error: function(xhr, status, error) {
-                            failureCallback(error);
+                        error: function(xhr) {
+                            failureCallback(new Error(xhr.statusText));
                         }
                     });
                 },
@@ -866,29 +828,21 @@ $(document).ready(function() {
 				eventDrop: function(dropInfo){
 					// 1. 서버에 전송할 데이터 객체 생성
 					const scheduleData = {
-						action: 'updateSchedule',
-						schedule_idx : dropInfo.event.id,
 						title: dropInfo.event.title,
 						description: dropInfo.event.extendedProps.description || '',
 						color : dropInfo.event.backgroundColor,
-						start_time : toLocalISOString(dropInfo.event.start).replace('T', ' ') + ':00',
-						end_time : dropInfo.event.end ? toLocalISOString(dropInfo.event.end).replace('T', ' ') + ':00' : toLocalISOString(dropInfo.event.start).replace('T', ' ') + ':00'
+						startTime : info.event.start.toISOString(),
+						endTime : info.event.end ? info.event.end.toISOString() : info.event.start.toISOString(),
 					}
 					
 					// 2. AJAX를 통해 서버에 변경 사항을 전송
 					$.ajax({
-						url : contextPath + '/schedules.do',
-						type :'POST',
-						data: scheduleData,
-						success : function(response){
-							if(response.success){
-								const newDateStr = scheduleData.start_time.substring(0,10);
-								dateToRefreshAfterFetch = newDateStr;
-								calendar.refetchEvents();
-								
-							}else{
-								dropInfo.revert();
-							}
+						url : contextPath + `/api/schedules/${info.event.id}`,
+						type :'PUT',
+						data: JSON.stringify(scheduleData),
+						success : function(){
+							console.log("일정 이동 성공");
+							loadDailySchedules(info.event.start.toISOString().substring(0, 10));
 						},
 						error: function(){
 							alert("서버와 통신 중 오류가 발생했습니다.");
@@ -898,13 +852,11 @@ $(document).ready(function() {
 				},
 				eventResize : function(resizeInfo){
 					const scheduleData = {
-						action: 'updateSchedule',
-						schedule_idx : resizeInfo.event.id,
 						title: resizeInfo.event.title,
 						description: resizeInfo.event.extendedProps.description || '',
 						color : resizeInfo.event.backgroundColor,
-						start_time : toLocalISOString(resizeInfo.event.start).replace('T', ' ') + ':00',
-						end_time : resizeInfo.event.end ? toLocalISOString(resizeInfo.event.end).replace('T', ' ') + ':00' : toLocalISOString(resizeInfo.event.start).replace('T', ' ') + ':00'
+						startTime : resizeInfo.event.start.toISOString(),
+						endTime : resizeInfo.event.end ? resizeInfo.event.end.toISOString() : resizeInfo.event.start.toISOString()
 					};
 					$.ajax({
 						url : contextPath + '/schedules.do',

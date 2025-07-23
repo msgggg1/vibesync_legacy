@@ -29,6 +29,7 @@ public class MemberServiceImpl implements MemberService{
 	private PasswordEncoder passwordEncoder;
 	
 
+	/*
 	@Override
 	public MemberVO login(LoginDTO dto) throws Exception {
 		// 1. DTO에서 받은 이메일로 사용자 정보를 조회합니다.
@@ -51,6 +52,7 @@ public class MemberServiceImpl implements MemberService{
         // 로그인 실패 시 null을 반환합니다.
         return null; 
 	}
+	*/
 
 	@Override
 	public MemberVO autoLogin(String email) throws Exception {

@@ -14,11 +14,13 @@ import com.vibesync.member.domain.Member;
 import com.vibesync.security.domain.CustomUser;
 
 /**
- * 메인 페이지, 소개 페이지 등 단순 페이지 뷰로의 이동을 처리하는 컨트롤러
+ * 단순 페이지 뷰로의 이동을 처리하는 컨트롤러
  */
-@Controller
-@RequestMapping("/page") 
+@Controller 
 @AuthenticatedUserPages
 public class PageController {
-
+	@GetMapping("/workspace")
+	public String workspace() {
+		return "workspace";	
+	}
 }
