@@ -33,32 +33,38 @@
 		GROUP BY n.note_idx, n.view_count, n.create_at, n.category_idx
 		) rnk
 		JOIN note n ON rnk.note_idx = n.note_idx
-		JOIN userPage up ON n.user_pg_idx = up.user_pg_idx
+		JOIN userPage up ON n.userPg_idx = up.userPg_idx
 		JOIN userAccount ua ON up.ac_idx = ua.ac_idx
 		WHERE rnk.rn <= #{limit}
 		ORDER BY rnk.category_idx, rnk.rn
 		]]>
 	</select>
-
-	<select id="recentNoteByMyCategory" resultMap="noteSummaryDTOMap">
-	<![CDATA[
-		SELECT note_idx, title, thumbnail_img, view_count, like_count, author_name
-		FROM (
-			SELECT n.note_idx, n.title, n.img AS thumbnail_img, n.view_count, ua.nickname AS author_name,
-				COALESCE(lc.like_count, 0) AS like_count,
-				ROW_NUMBER() OVER (ORDER BY n.create_at DESC) as rn
-			FROM note n
-						JOIN userPage up ON n.user_pg_idx = up.user_pg_idx
-						JOIN userAccount ua ON up.ac_idx = ua.ac_idx
-						LEFT JOIN (
-								SELECT note_idx, COUNT(*) AS like_count
-								FROM likes
-								GROUP BY note_idx
-									) lc ON n.note_idx = lc.note_idx
-								WHERE n.category_idx = #{categoryIdx}
-									)
-		WHERE rn <= #{limit}
-		ORDER BY rn
+	
+	<select id="recentNoteByMyCategory" resultType="com.vibesync.mainpage.domain.NoteSummaryDTO">
+		<![CDATA[
+		    SELECT
+		        note_idx        AS noteIdx,
+		        title           AS title,
+		        thumbnail_img   AS thumbnailImg,
+		        view_count      AS viewCount,
+		        like_count      AS likeCount,
+		        author_name     AS authorName
+		    FROM (
+		        SELECT n.note_idx, n.title, n.img AS thumbnail_img, n.view_count, ua.nickname AS author_name,
+		            COALESCE(lc.like_count, 0) AS like_count,
+		            ROW_NUMBER() OVER (ORDER BY n.create_at DESC) as rn
+		        FROM note n
+		            JOIN userPage up ON n.userPg_idx = up.userPg_idx
+		            JOIN userAccount ua ON up.ac_idx = ua.ac_idx
+		            LEFT JOIN (
+		                SELECT note_idx, COUNT(*) AS like_count
+		                FROM likes
+		                GROUP BY note_idx
+		            ) lc ON n.note_idx = lc.note_idx
+		        WHERE n.category_idx = #{categoryIdx}
+		    ) ranked_notes
+		    WHERE rn <= #{limit}
+		    ORDER BY rn
 		]]>
 	</select>
 
@@ -71,7 +77,7 @@
 						COALESCE(lc.like_count, 0) AS like_count,
 						ROW_NUMBER() OVER (ORDER BY (COALESCE(lc.like_count, 0) + n.view_count) DESC, n.create_at DESC) as rn
 				FROM note n
-						JOIN userPage up ON n.user_pg_idx = up.user_pg_idx
+						JOIN userPage up ON n.userPg_idx = up.userPg_idx
 						JOIN userAccount ua ON up.ac_idx = ua.ac_idx
 						LEFT JOIN ( SELECT note_idx, COUNT(*) AS like_count
 									FROM likes
