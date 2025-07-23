@@ -1,5 +1,6 @@
 package com.vibesync.member.domain;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 import lombok.AllArgsConstructor;
@@ -15,7 +16,9 @@ import lombok.ToString;
 @AllArgsConstructor
 @Builder
 @ToString
-public class Member { // 비밀번호를 포함한 내부용 객체
+public class Member implements Serializable{ // 비밀번호를 포함한 내부용 객체
+	
+	private static final long serialVersionUID = 1L;
 
 	private int acIdx;
 	private String email;

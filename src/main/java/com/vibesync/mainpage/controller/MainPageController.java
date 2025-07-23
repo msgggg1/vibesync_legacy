@@ -15,6 +15,7 @@ import com.vibesync.security.domain.CustomUser;
 @Controller
 @RequestMapping("/page/main") 
 @AuthenticatedUserPages
+// @log4j2
 public class MainPageController {
 	
 	@Autowired 
@@ -22,10 +23,12 @@ public class MainPageController {
 
     @GetMapping
     public void showMainPage(Model model, @AuthenticationPrincipal CustomUser user) {
-    	System.out.println("> PageController.showMainPage() - 호출");
+    	// log.info("> PageController.showMainPage() - 호출");
+      
     	MainPageDTO mainPageDTO = mainPageService.loadMainPage(user.getCategoryIdx());
 
     	model.addAttribute("mainPageDTO", mainPageDTO);
+    	model.addAttribute("categoryIdx", user.getCategoryIdx());
 
-    	}
+    }
 }

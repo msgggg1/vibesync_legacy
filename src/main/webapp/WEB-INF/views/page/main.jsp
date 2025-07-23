@@ -1,12 +1,13 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
          <!-- banner -->
           <div class="slider-container">
             <div class="swiper" id="swiper1">
               <div class="swiper-wrapper">
-                <div class="swiper-slide">Card 1</div>
-                <div class="swiper-slide">Card 2</div>
-                <div class="swiper-slide">Card 3</div>
-                <div class="swiper-slide">Card 4</div>
-                <div class="swiper-slide">Card 5</div>
+                <div class="swiper-slide"><img src="${pageContext.request.contextPath}/sources/banner/music.png" alt="banner"></div>
+                <div class="swiper-slide"><img src="${pageContext.request.contextPath}/sources/banner/movie.jpg" alt="banner"></div>
+                <div class="swiper-slide"><img src="${pageContext.request.contextPath}/sources/banner/drama.jpg" alt="banner"></div>
+                <div class="swiper-slide"><img src="${pageContext.request.contextPath}/sources/banner/daily.jpg" alt="banner"></div>
+                <div class="swiper-slide"><img src="${pageContext.request.contextPath}/sources/banner/ani.jpg" alt="banner"></div>
               </div>
               <div class="swiper-button-prev" id="prev" style="background-color: var(--border-color); border-radius: 6px;"></div>
               <div class="swiper-button-next" id="next" style="background-color: var(--border-color); border-radius: 6px;"></div>
@@ -16,9 +17,9 @@
           <!-- category btn -->
           <div class="category_btn_group">
             <c:forEach items="${ categoryList }" var="categoryVO">
-               <c:if test="${categoryVO.categoryIdx != memberInfo.categoryIdx}">
-                  <button style="background-image: url( ${pageContext.request.contextPath}/${ categoryVO.img }); background-size: cover;"
-                        onclick="location.href='board/list?categoryIdx=${categoryVO.categoryIdx}'">
+               <c:if test="${categoryVO.categoryIdx != categoryIdx}">
+                  <button style="background-image: url( ${pageContext.request.contextPath}${ categoryVO.img }); background-size: cover;"
+                        onclick="location.href='${pageContext.request.contextPath}/board/list?categoryIdx=${categoryVO.categoryIdx}'">
                      <p>${ categoryVO.categoryName }</p>
                   </button>
                </c:if>
@@ -31,7 +32,7 @@
               <p class="grid_header">Recent_Posts</p>
                <c:forEach items="${mainPageDTO.latestNotes}" var="post" varStatus="status">
                   <div class="list-entry" data-id="${post.noteIdx}">
-                     <a href="postView.do?nidx=${post.noteIdx}" >
+                     <a href="noteView?nidx=${post.noteIdx}" >
                          <span class="entry-number">${status.count}.</span><span class="entry-title">${post.title}</span>
                      </a>
                   </div>
@@ -41,7 +42,7 @@
               <p class="grid_header">Popular_Posts</p>
                 <c:forEach items="${mainPageDTO.popularNotes}" var="post" varStatus="status">
                   <div class="list-entry" data-id="${post.noteIdx}">
-                      <a href="postView.do?nidx=${ post.noteIdx }">
+                      <a href="noteView?nidx=${ post.noteIdx }">
                          <span class="entry-number">${status.count}.</span><span class="entry-title">${post.title}</span>
                      </a>
                   </div>
@@ -51,7 +52,7 @@
               <p class="grid_header">Top_User</p>
                  <c:forEach items="${mainPageDTO.popularUsers}" var="user" varStatus="status">
                   <div class="list-entry" data-id="${status.count}">
-                     <a href="userPage.do?acIdx=${ user.acIdx }" >
+                     <a href="userPage?acIdx=${ user.acIdx }" >
                          <span class="entry-number">${status.count}</span>
                          <span class="entry-title">${user.nickname}</span>
                      </a>
@@ -70,7 +71,7 @@
                     <ul class="under_ul">
                     <c:forEach items="${ posts.value }" var="post">
                        <li>
-                       <a href="postView.do?nidx=${ post.noteIdx }">
+                       <a href="noteView?nidx=${ post.noteIdx }">
                           <div class="post-index" style="display: inline-block; align-self: left;">${ post.noteIdx }</div>
                           <div class="post-title" style="display: inline-block; align-self: right;">${ post.title }</div>
                        </a>

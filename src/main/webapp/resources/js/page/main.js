@@ -1,3 +1,4 @@
+document.addEventListener('DOMContentLoaded', () => {
 
     const swiper1 = new Swiper('#swiper1', {
       loop: true,
@@ -94,3 +95,5 @@
         initRotatingHighlight('recent_posts_container', 2800);
         initRotatingHighlight('popular_posts_container', 2800);
         initRotatingHighlight('popular_users_container', 2800);
+        
+        });

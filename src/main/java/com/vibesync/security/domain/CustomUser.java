@@ -36,5 +36,6 @@ public class CustomUser extends User{
 		this.nickname = member.getNickname();
 		this.img = member.getImg();
 		this.categoryIdx = member.getCategoryIdx();
+    
 	}
 }
