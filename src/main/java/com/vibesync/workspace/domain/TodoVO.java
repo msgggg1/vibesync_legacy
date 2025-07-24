@@ -1,5 +1,7 @@
 package com.vibesync.workspace.domain;
 
+import java.sql.Timestamp;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,12 +12,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TodoVO {
-    private Integer todo_idx;
+    private int todoIdx;
     private String text;
-    private String todo_group;
+    private String todoGroup;
     private String color;
-    private Integer ac_idx;
-    private Boolean completed;
-    private String created_date;
-    private String updated_date;
+    private int acIdx;
+    private int status;
+    private Timestamp createdAt;
 } 

@@ -19,8 +19,8 @@ import com.vibesync.security.domain.CustomUser;
 @Controller 
 @AuthenticatedUserPages
 public class PageController {
-	@GetMapping("/workspace")
+	@GetMapping("/page/workspace")
 	public String workspace() {
-		return "workspace";	
+		return "page/workspace";	
 	}
 }

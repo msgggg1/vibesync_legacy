@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.vibesync.domain.TodoVO;
 import com.vibesync.security.domain.CustomUser;
-import com.vibesync.service.TodoService;
+import com.vibesync.workspace.domain.TodoVO;
+import com.vibesync.workspace.service.TodoService;
 
 @RestController
 @RequestMapping("/api/todos")
@@ -45,7 +45,7 @@ public class TodoApiController {
     @PutMapping("/{todoId}/status")
     public ResponseEntity<Void> updateTodoStatus(
             @PathVariable int todoId,
-            @RequestBody boolean completed) {
+            @RequestBody int completed) {
         
         todoService.updateTodoStatus(todoId, completed);
         return ResponseEntity.ok().build();

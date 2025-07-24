@@ -18,6 +18,7 @@
     <!-- 특정 ID의 블록 정보만 가져오기 : 부분 새로고침용 -->
     <select id="findBlockById" parameterType="int" resultType="com.vibesync.workspace.domain.BlockVO">
         SELECT 
+            block_id as blockId,
             ac_idx as acIdx,
             block_type as blockType,
             block_order as blockOrder,
@@ -27,9 +28,9 @@
     </select>
 
     <!-- 새로운 블록 추가 -->
-    <insert id="insertBlock" parameterType="com.vibesync.workspace.domain.BlockVO" useGeneratedKeys="true" keyProperty="blockId">
+    <insert id="insertBlock" parameterType="com.vibesync.workspace.domain.BlockVO">
         <selectKey keyProperty="blockId" resultType="int" order="BEFORE">
-            SELECT workspace_blocks_seq.NEXTVAL FROM DUAL
+            SELECT WORKSPACE_BLOCKS_SEQ.NEXTVAL FROM DUAL
         </selectKey>
         INSERT INTO workspace_blocks (
             block_id, 
@@ -41,7 +42,7 @@
             #{blockId}, 
             #{acIdx}, 
             #{blockType}, 
-            (SELECT COALESCE(MAX(block_order), 0) + 1 FROM workspace_blocks WHERE ac_idx = #{acIdx}), 
+            (SELECT NVL(MAX(block_order), 0) + 1 FROM workspace_blocks WHERE ac_idx = #{acIdx}), 
             #{config}
         )
     </insert>

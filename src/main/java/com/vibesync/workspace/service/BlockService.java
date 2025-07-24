@@ -13,16 +13,13 @@ public interface BlockService {
     BlockDTO getBlockContentAsDto(int acIdx, int blockId, String period);
     
     // 블록 추가
-    int addBlock(int acIdx, String blockType, Map<String, Object> config);
+    int addBlock(int acIdx, String blockType, String config);
     
     // 블록 삭제
     boolean removeBlock(int acIdx, int blockId);
     
     // 블록 순서 변경
     boolean changeBlockOrder(int acIdx, List<Map<String, Object>> orders);
-    
-    // 블록을 JSON으로 렌더링
-    Map<String, Object> renderBlockToJson(BlockDTO blockData, String period);
     
     // 내 노트 데이터 조회
     Map<String, Object> getMyNoteData(int acIdx);

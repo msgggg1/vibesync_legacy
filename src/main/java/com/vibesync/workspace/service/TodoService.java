@@ -6,8 +6,8 @@ import com.vibesync.workspace.domain.TodoVO;
 
 public interface TodoService {
     List<TodoVO> getTodoListByUser(int acIdx);
-    boolean addTodo(TodoVO todo);
-    boolean updateTodoStatus(int todoIdx, boolean isCompleted);
-    boolean deleteTodo(int todoIdx);
-    boolean updateTodo(TodoVO todo);
+    TodoVO addTodo(TodoVO todo);
+    void updateTodoStatus(int todoIdx, int status);
+    void deleteTodo(int todoIdx);
+    void updateTodo(TodoVO todo);
 } 
