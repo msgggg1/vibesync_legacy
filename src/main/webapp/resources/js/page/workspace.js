@@ -65,17 +65,19 @@ function loadDailySchedules(dateString) {
     const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
 
     // 3. 'YYYY년 MM월 DD일 (요일)' 형식으로 날짜 포맷팅
-    const formattedDate = `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일 (${weekdays[date.getDay()]})`;
+    const formattedDate = date.getFullYear() + '년 ' + (date.getMonth() + 1) + '월 ' + date.getDate() + '일 (' + weekdays[date.getDay()] + ')';
 
     // 4. JSP에 추가한 h4 태그에 포맷된 날짜 텍스트를 삽입
     $('#tab_schedule .schedule-date-title').text(formattedDate);
 	
+    console.log('일별 스케줄 요청:', dateString);
     $.ajax({
-        url: `${contextPath}/api/schedules/daily`, // ✅ URL 변경: 일별 조회를 위한 명확한 API 엔드포인트
+        url: contextPath + '/api/schedules/daily', // ✅ URL 변경: 일별 조회를 위한 명확한 API 엔드포인트
         type: 'GET',
         data: { date: dateString },
         dataType: 'json',
         success: function(schedules) {
+            console.log('일별 스케줄 응답:', schedules);
             let scheduleHtml = '<ul class="schedule-list">';
             if (schedules && schedules.length > 0) {
                 // 가져온 데이터로 목록 UI를 만듭니다. (기존 로직과 유사)
@@ -84,7 +86,7 @@ function loadDailySchedules(dateString) {
                     const endDate = new Date(schedule.endTime);
                     const startTime = String(startDate.getHours()).padStart(2, '0') + ":" + String(startDate.getMinutes()).padStart(2, '0');
                     const endTime = String(endDate.getHours()).padStart(2, '0') + ":" + String(endDate.getMinutes()).padStart(2, '0');
-                    const descriptionHtml = (schedule.description && schedule.description.trim() !== '') ? ` <span class="schedule-desc">${schedule.description}</span>` : '';
+                    const descriptionHtml = (schedule.description && schedule.description.trim() !== '') ? ' <span class="schedule-desc">' + schedule.description + '</span>' : '';
 
                     scheduleHtml += `<li data-id="${schedule.scheduleIdx}">
                                          <div class="schedule-item-content">
@@ -103,7 +105,8 @@ function loadDailySchedules(dateString) {
             scheduleHtml += '</ul>';
             $('#daily-schedule-list-container').html(scheduleHtml);
         },
-        error: function() {
+        error: function(xhr, status, error) {
+            console.error('일별 스케줄 요청 실패:', xhr.status, error);
             $('#daily-schedule-list-container').html('<p>일정을 불러오는 데 실패했습니다.</p>');
         }
     });
@@ -761,6 +764,7 @@ $(document).ready(function() {
                 events: function(fetchInfo, successCallback, failureCallback) {
                     var startIso = fetchInfo.start.toISOString();
                     var endIso = fetchInfo.end.toISOString(); 
+                    console.log('캘린더 이벤트 요청:', startIso, '~', endIso);
                     $.ajax({
                         url: contextPath +'/api/schedules',
                         method: 'GET',
@@ -770,6 +774,10 @@ $(document).ready(function() {
                         },
                         dataType: 'json',
                         success: function(events) {
+                            console.log('캘린더 이벤트 응답:', events);
+                            
+                            // FullCalendar에 이벤트 전달
+                            successCallback(events);
                             
                             // 최초 로딩 시 오늘 날짜 일정 로드
                             if (isInitialLoad) {
@@ -781,7 +789,7 @@ $(document).ready(function() {
 
                             // 4. 새로고침이 필요한 날짜가 있는지 확인하고, 목록을 다시 그립니다.
                             if (dateToRefreshAfterFetch) {
-								const targetCell = calendarEl.querySelector(`td[data-date="${dateToRefreshAfterFetch}"]`)
+								const targetCell = calendarEl.querySelector('td[data-date="' + dateToRefreshAfterFetch + '"]')
 								if(targetCell){
 									handleDateSelection(targetCell);
 								}else{
@@ -791,7 +799,8 @@ $(document).ready(function() {
                                 dateToRefreshAfterFetch = null; // 변수 초기화
                             }
                         },
-                        error: function(xhr) {
+                        error: function(xhr, status, error) {
+                            console.error('캘린더 이벤트 요청 실패:', xhr.status, error);
                             failureCallback(new Error(xhr.statusText));
                         }
                     });
@@ -845,7 +854,7 @@ $(document).ready(function() {
 					$.ajax({
 						url : contextPath + `/api/schedules/${info.event.id}`,
 						type :'PUT',
-						data: JSON.stringify(scheduleData),
+						data: 'application/json',
 						success : function(){
 							console.log("일정 이동 성공");
 							loadDailySchedules(info.event.start.toISOString().substring(0, 10));
@@ -854,8 +863,9 @@ $(document).ready(function() {
 							alert("서버와 통신 중 오류가 발생했습니다.");
 							dropInfo.revert();
 						}
-					})
+					});
 				},
+				
 				eventResize : function(resizeInfo){
 					const scheduleData = {
 						title: resizeInfo.event.title,
@@ -923,7 +933,8 @@ function createOrUpdateChart(blockId, chartData) {
     if (userCharts[chartId]) {
         userCharts[chartId].destroy();
     }
-    const ctx = document.getElementById(chartId)?.getContext('2d');
+    const chartElement = document.getElementById(chartId);
+    const ctx = chartElement ? chartElement.getContext('2d') : null;
     if (!ctx) return;
 
     const chart = new Chart(ctx, {
@@ -997,10 +1008,10 @@ function enterEditMode() {
 
     // 각 블록에 화살표 버튼 추가
     $('.generated_block').each(function() {
-        $(this).append(`
-            <button class="move-block-btn move-left-btn" title="왼쪽으로 이동"><i class="fa-solid fa-chevron-left"></i></button>
-            <button class="move-block-btn move-right-btn" title="오른쪽으로 이동"><i class="fa-solid fa-chevron-right"></i></button>
-        `);
+        $(this).append(
+            '<button class="move-block-btn move-left-btn" title="왼쪽으로 이동"><i class="fa-solid fa-chevron-left"></i></button>' +
+            '<button class="move-block-btn move-right-btn" title="오른쪽으로 이동"><i class="fa-solid fa-chevron-right"></i></button>'
+        );
     });
     updateArrowVisibility();
 }
@@ -1352,12 +1363,10 @@ function reloadChatHistory() {
                     const who = msg.isMine ? 'bubble-me' : 'bubble-other';
                     const formattedText = msg.text.replace(/\n/g, '<br>');
 
-                    const messageHtml = `
-                        <div class="chat-bubble ${who}">
-                            <div class="bubble-text">${formattedText}</div>
-                            <div class="bubble-time">${msg.relativeTime}</div>
-                        </div>
-                    `;
+                    const messageHtml = '<div class="chat-bubble ' + who + '">' +
+                        '<div class="bubble-text">' + formattedText + '</div>' +
+                        '<div class="bubble-time">' + msg.relativeTime + '</div>' +
+                        '</div>';
                     chatContainer.append(messageHtml);
                 });
 
@@ -1390,4 +1399,4 @@ function reloadChatHistory() {
             sendChatMessage();
         }
     });
-});
+}); // $(document).ready() 닫는 중괄호
