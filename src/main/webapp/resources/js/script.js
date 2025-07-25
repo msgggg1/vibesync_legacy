@@ -21,9 +21,15 @@
 			  targetUserAcIdx: targetUserAcIdx
 			},
 			dataType: 'json',
-	        success: function(isFollowing) {
-	        	$('#followBtn').text(isFollowing ? 'Unfollow' : 'Follow');
-	   	 		updateFollowingCount();
+	        success: function(response) {
+	        	$('#followBtn').text(response.isFollowing ? 'Unfollow' : 'Follow');
+	        	
+	            const sidebarFollowingEl = $('#sidebarFollowingCount');
+	            if (sidebarFollowingEl.length > 0) {
+	                sidebarFollowingEl.text(response.followingCount);
+	            }
+	            
+	            
 	        },
 	        error: function(xhr, status, error) {
 	       	  	console.error('[AJAX-FOLLOW] 에러 발생:', error);

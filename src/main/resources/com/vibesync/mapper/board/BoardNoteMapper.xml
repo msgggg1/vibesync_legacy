@@ -146,4 +146,23 @@
 </insert>
 <!-- // -->
 
+<!-- 게시글 수정 -->
+<!-- public int update(NoteVO note); -->
+<update id="update" parameterType="NoteVO">
+	UPDATE
+		note
+	SET
+		title = #{title}
+		text = #{text}
+		img = #{img}
+		titleimg = #{titleimg}
+		edit_at = SYSDATE
+		content_idx = #{contentIdx}
+		genre_idx = #{genreIdx}
+		category_idx = #{categoryIdx}
+	WHERE
+		note_idx = #{noteIdx}
+</update>
+<!-- // -->
+
 </mapper>

@@ -1,10 +1,6 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
-<%@ page trimDirectiveWhitespaces="true"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
-<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
-<%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles"%>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <div class="back_icon">
 	<img src="${pageContext.request.contextPath}/sources/icons/arrow_back.svg" alt="arrow_back">
 </div>
@@ -21,10 +17,12 @@
 			<div id="title_info">
 				<label for="title"></label>
 				<input class="title" id="title" type="text" name="note.title" placeholder="title..."
-						value="<c:out value='${dto.note.title}'/>" required>
+						value="<c:out value='${boardWriteDTO.note.title ne null ? boardWriteDTO.note.title : ""}'/>" required>
 			</div>
 
-			<textarea id="summernote" name="note.text"></textarea>
+			<textarea id="summernote" name="note.text">
+				<c:out value="${boardWriteDTO.note.text ne null ? boardWriteDTO.note.text : ''}" escapeXml="false" />
+			</textarea>
 			<div class="note_op">
 				<div style="margin-top: 1rem;">
 					<label for="thumbnail_input" style="font-weight: bold;">
@@ -62,7 +60,7 @@
 				<input type="hidden" id="images" name="images">
 				<input type="hidden" name="thumbnail_base64">
 				<input type="hidden" name="thumbnail_ext">
-				<input type="hidden" id="pageidx" name="note.userpgIdx" value="${empty userpgIdx ? '0' : userpgIdx}">
+				<input type="hidden" id="pageidx" name="note.userpgIdx" value="${empty formData.userpgIdx ? '0' : formData.userpgIdx}">
 
 				<div id="save_btn">
 					<button type="button" id="saveBtn" class="btn btn-primary mt-3">SAVE</button>
@@ -95,11 +93,6 @@ $(function() {
             }
         }
     });
-    
-    var content = '<c:out value="${dto.note.text}" escapeXml="false" />';
-    if (content) {
-        $('#summernote').summernote('code', content);
-    }
 
     function sendFile(file) {
         const reader = new FileReader();
@@ -149,7 +142,7 @@ $(function() {
 	    });
         
 	    $('#images').val(base64SrcArray.join('|'));
-	    $('textarea[name=note.text]').val(tempDiv.html());
+	    $('textarea[name="note.text"]').val(tempDiv.html());
 	    $('#postForm').submit();
 	});
 });

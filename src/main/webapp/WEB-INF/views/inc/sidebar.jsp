@@ -129,10 +129,10 @@ input:focus{outline:none;}
         </span>
         <div class="accountData" id="accountData-display">
            <button type="button" id="following-btn" class="modal-follow-message">
-               <span class="accountDataLabel">팔로잉</span><span class="accountDataValue">${sidebar.userProfile.followingCount}</span>
+               <span class="accountDataLabel">팔로잉</span><span id="sidebarFollowingCount" class="accountDataValue">${sidebar.userProfile.followingCount}</span>
             </button>
             <button type="button" id="follower-btn" class="modal-follow-message">
-            <span class="accountDataLabel">팔로워</span><span class="accountDataValue">${sidebar.userProfile.followerCount}</span>
+            <span class="accountDataLabel">팔로워</span><span id="sidebarFollowerCount" class="accountDataValue">${sidebar.userProfile.followerCount}</span>
          </button>
         </div>
         <div id="nickname-modal" class="modal-sidebar">
@@ -257,12 +257,6 @@ input:focus{outline:none;}
 </nav>
 
 <script>
-<sec:authorize access="isAuthenticated()">
-const isLoggedIn = true;
-</sec:authorize>
-<sec:authorize access="isAnonymous()">
-const isLoggedIn = false;
-</sec:authorize>
 
 $(document).ready(function() {
    
@@ -702,4 +696,3 @@ $(document).ready(function() {
     });
 });
 </script>
-<%-- <script src="${pageContext.request.contextPath}/resources/js/theme.js"></script> --%>

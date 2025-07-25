@@ -14,8 +14,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.vibesync.board.domain.BoardEditFormDTO;
+import com.vibesync.board.domain.BoardEditRequestDTO;
 import com.vibesync.board.domain.BoardViewDTO;
-import com.vibesync.board.domain.BoardWriteDTO;
+import com.vibesync.board.domain.BoardWriteFormDTO;
+import com.vibesync.board.domain.BoardWriteRequestDTO;
 import com.vibesync.board.domain.NoteDetailDTO;
 import com.vibesync.board.domain.NoteListDTO;
 import com.vibesync.board.service.NoteService;
@@ -27,23 +30,22 @@ import com.vibesync.common.service.GenreService;
 import com.vibesync.follow.service.FollowService;
 import com.vibesync.security.domain.CustomUser;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j;
 
 @Controller
 @Log4j
 @RequestMapping("/board/*")
 @AuthenticatedUserPages
+@RequiredArgsConstructor
 public class BoardController {
 	
 	@Autowired
 	GenreService genreService;
-	
 	@Autowired
 	ContentService contentService;
-	
 	@Autowired
 	NoteService noteService;
-	
 	@Autowired
 	FollowService followService;
 	
@@ -91,19 +93,20 @@ public class BoardController {
 		
 		log.info("게시글 상세보기 페이지 DTO : " + dto);
 		
-		model.addAttribute("dto", dto);
+		model.addAttribute("boardViewDTO", dto);
 		
 		return "board/view";
 	}
 	
 	// 게시글 작성 (/vibesync/board/write)
 	@GetMapping(value="/write")
-	public String write(Model model) {
+	public String write(Model model, @RequestParam("userpgIdx") int userpgIdx) {
 		log.info("게시글 작성 페이지 요청...GET");
 		
-		BoardWriteDTO dto = BoardWriteDTO.builder()
+		BoardWriteFormDTO dto = BoardWriteFormDTO.builder()
 											.genreList(this.genreService.findAll())
 											.contentList(this.contentService.findAll())
+											.userpgIdx(userpgIdx)
 											.build();
 		
 		model.addAttribute("formData", dto);
@@ -111,20 +114,55 @@ public class BoardController {
 		return "board/write";
 	}
 	@PostMapping(value="/write")
-	public String write(BoardWriteDTO dto, HttpServletRequest request, RedirectAttributes rttr) {
+	public String write(BoardWriteRequestDTO dto, HttpServletRequest request, RedirectAttributes rttr) {
 		log.info("게시글 작성 페이지 요청...POST");
 		
 		int result = this.noteService.save(dto, request);
 		
 		if (result > 0) {
 			rttr.addFlashAttribute("result", "success");
-			return "redirect:/board/list";
+			rttr.addFlashAttribute("userpgIdx", dto.getNote().getUserpgIdx());
+			return "redirect:/page/user";
 		} else {
-			rttr.addFlashAttribute("dto", dto);
+			rttr.addFlashAttribute("boardWriteDTO", dto);
 			rttr.addFlashAttribute("result", "fail");
 			return "redirect:/board/wirte";
 		}
-		
 	}
+	
+	// 게시글 작성 (/vibesync/board/edit)
+	@GetMapping(value="/edit")
+	public String edit(Model model, @RequestParam("noteIdx") int noteIdx) {
+		log.info("게시글 수정 페이지 요청...GET");
+		
+		NoteDetailDTO noteDetail = this.noteService.findNoteByNoteIdx(noteIdx);
+		
+		BoardEditFormDTO dto = BoardEditFormDTO.builder()
+				.noteDetail(noteDetail)
+				.genreList(this.genreService.findAll())
+				.contentList(this.contentService.findAll())
+				.build();
+		
+		model.addAttribute("formData", dto);
+		
+		return "board/edit";
+	}
+	@PostMapping(value="/edit")
+	public String edit(BoardEditRequestDTO dto, HttpServletRequest request, RedirectAttributes rttr) {
+		log.info("게시글 수정 페이지 요청...POST");
+		
+		int result = this.noteService.edit(dto, request);
+		
+		if (result > 0) {
+			rttr.addFlashAttribute("result", "success");
+			return "redirect:/board/view";
+		} else {
+			rttr.addFlashAttribute("boardEditDTO", dto);
+			rttr.addFlashAttribute("result", "fail");
+			return "redirect:/board/edit";
+		}
+	}
+	
+	
 	
 }

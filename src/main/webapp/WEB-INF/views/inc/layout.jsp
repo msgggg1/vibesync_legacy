@@ -1,6 +1,7 @@
-<%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://www.springframework.org/security/tags" prefix="sec" %>
 <%@ page import="java.net.URLEncoder" %>
 <!DOCTYPE html>
 <html lang="ko" color-theme="${sessionScope.theme != null ? sessionScope.theme : 'light'}">
@@ -23,6 +24,9 @@
   
   <!-- js -->
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  
+  <!-- 로그인 상태관리 -->
+  <sec:authentication property="principal" var="customUser" />
 
 </head>
 <body>
@@ -45,6 +49,8 @@
 <!-- js -->
 <script>
 	const ctx = "${pageContext.request.contextPath}";
+	const isLoggedIn = '<sec:authorize access="isAuthenticated()">true</sec:authorize><sec:authorize access="isAnonymous()">false</sec:authorize>' === 'true';
+	const loggedInUserAcIdx = isLoggedIn ? ${customUser.acIdx} : -1;
 </script>
 <script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
 <script defer src="${pageContext.request.contextPath}/resources/js/theme.js"></script>

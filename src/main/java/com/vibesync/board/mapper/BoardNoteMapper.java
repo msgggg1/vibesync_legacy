@@ -26,4 +26,7 @@ public interface BoardNoteMapper {
 	// 게시글 작성
 	public int insert(NoteVO note);
 	
+	// 게시글 수정
+	public int update(NoteVO note);
+	
 }

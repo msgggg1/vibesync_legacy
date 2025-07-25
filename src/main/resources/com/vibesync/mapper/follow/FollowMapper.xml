@@ -38,5 +38,29 @@
 			ac_follow = #{acFollow} AND ac_following = #{acFollowing}
 	</select>
 <!-- // -->
+
+<!-- 팔로잉 수 조회 -->
+<!-- public int selectFollowingCount(int acFollow); -->
+	<select id="selectFollowingCount" resultType="int">
+		SELECT
+			COUNT(follows_idx)
+		FROM
+			follows
+		WHERE
+			ac_follow = #{acFollow}
+	</select>
+<!-- // -->
+
+<!-- 팔로워 수 조회 -->
+<!-- public int selectFollowerCount(int acFollowing); -->
+	<select id="selectFollowerCount" resultType="int">
+		SELECT
+			COUNT(follows_idx)
+		FROM
+			follows
+		WHERE
+			acFollowing = #{acFollowing}
+	</select>
+<!-- // -->
     
  </mapper>
