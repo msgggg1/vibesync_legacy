@@ -23,6 +23,7 @@
             SELECT TODOLIST_SEQ.NEXTVAL FROM DUAL
         </selectKey>
         INSERT INTO todolist (
+        	todo_idx,
             text, 
             todo_group, 
             color, 
@@ -30,8 +31,9 @@
             status, 
             created_at
         ) VALUES (
+        	#{todoIdx},
             #{text}, 
-            #{todoGroup}, 
+            #{todoGroup , jdbcType=VARCHAR}, 
             #{color}, 
             #{acIdx}, 
             #{status}, 
@@ -56,7 +58,7 @@
     <update id="updateTodo" parameterType="com.vibesync.workspace.domain.TodoVO">
         UPDATE todolist 
         SET text = #{text}, 
-            todo_group = #{todoGroup}, 
+            todo_group = #{todoGroup , jdbcType=VARCHAR}, 
             color = #{color}
         WHERE todo_idx = #{todoIdx}
     </update>

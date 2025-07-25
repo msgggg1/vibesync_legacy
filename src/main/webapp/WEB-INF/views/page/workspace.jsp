@@ -79,24 +79,9 @@
 				</h4>
 				<button class="more-btn" data-type="my-posts">더보기</button>
 			</div>
-			<ul>
-				<c:choose>
-					<c:when test="${not empty initialData.myPosts}">
-						<c:forEach var="post" items="${initialData.myPosts}">
-							<li><a href="postView.do?nidx=${post.note_idx}"
-								title="${post.title}"> <span>${post.title}</span> <span
-									class="block-meta"> <i class="fa-regular fa-eye"></i>
-										${post.view_count}&nbsp;&nbsp; <i
-										class="fa-regular fa-thumbs-up"></i>${post.like_count}
-								</span>
-							</a></li>
-						</c:forEach>
-					</c:when>
-					<c:otherwise>
-						<li class="no-items">작성한 글이 없습니다.</li>
-					</c:otherwise>
-				</c:choose>
-			</ul>
+			<div class="fixed-block-content">
+				<div class="loading-spinner"></div>
+			</div>
 		</div>
 		<!-- 좋아요한 포스트 목록 -->
 		<div class="contents_item" id="liked-posts">
@@ -106,21 +91,9 @@
 				</h4>
 				<button class="more-btn" data-type="liked-posts">더보기</button>
 			</div>
-			<ul>
-				<c:choose>
-					<c:when test="${not empty initialData.likedPosts}">
-						<c:forEach var="post" items="${initialData.likedPosts}">
-							<li><a href="postView.do?nidx=${post.note_idx}"
-								title="${post.title}"> <span>${post.title}</span> <span
-									class="block-meta">by ${post.author_name}</span>
-							</a></li>
-						</c:forEach>
-					</c:when>
-					<c:otherwise>
-						<li class="no-items">좋아요한 글이 없습니다.</li>
-					</c:otherwise>
-				</c:choose>
-			</ul>
+			<div class="fixed-block-content">
+				<div class="loading-spinner"></div>
+			</div>
 		</div>
 
 		<!-- 안읽은 메시지 목록 -->
@@ -311,8 +284,8 @@
 
 		<div id="category" style="display: none;">
 			<select id="categorySelector" name="category">
-				<c:forEach items="${ categoryVOList }" var="categoryVO">
-					<option value="${ categoryVO.category_idx }">${ categoryVO.c_name }</option>
+				<c:forEach items="${ categoryList }" var="categoryVO">
+					<option value="${ categoryVO.categoryIdx }">${ categoryVO.categoryName }</option>
 				</c:forEach>
 			</select> <br> <select id="sortTypeSelector">
 				<option value="popular">인기순</option>

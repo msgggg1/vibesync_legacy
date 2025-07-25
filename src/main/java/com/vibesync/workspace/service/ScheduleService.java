@@ -14,7 +14,7 @@ public interface ScheduleService {
 
 	public ScheduleVO addSchedule(ScheduleVO newSchedule);
 
-	public void updateSchedule(ScheduleVO updatedSchedule);
+	public ScheduleVO updateSchedule(ScheduleVO updatedSchedule);
 
 	public void deleteSchedule(int scheduleId);
 

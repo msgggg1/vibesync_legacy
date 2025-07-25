@@ -15,4 +15,5 @@ public interface WorkspaceNoteService {
     List<NoteSummaryDTO> getPostsByCategory(int categoryIdx, String sortType);
     UserStatsBlockDTO getUserStatsForChart(int acIdx, String period);
     List<NoteSummaryDTO> getMyNotes(int acIdx);
+
 } 

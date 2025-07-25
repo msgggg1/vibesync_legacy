@@ -9,8 +9,8 @@ import com.vibesync.workspace.domain.TodoVO;
 @Mapper
 public interface TodoMapper {
     List<TodoVO> getTodoListByUser(int acIdx);
-    void addTodo(TodoVO todo);
+    int addTodo(TodoVO todo);
     void updateTodoStatus(@Param("todoIdx") int todoIdx, @Param("status") int status);
     void deleteTodo(int todoIdx);
-    void updateTodo(TodoVO todo);
+    int updateTodo(TodoVO todo);
 } 

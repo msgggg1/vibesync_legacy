@@ -23,4 +23,9 @@ public interface BlockService {
     
     // 내 노트 데이터 조회
     Map<String, Object> getMyNoteData(int acIdx);
+    
+    // 고정 블록 데이터 조회
+    Map<String, Object> getFixedBlockData(int acIdx, String blockType);
+    
+
 } 

@@ -216,4 +216,34 @@ public class BlockServiceImpl implements BlockService {
         
         return noteData;
     }
+    
+    @Override
+    @Transactional(readOnly = true)
+    public Map<String, Object> getFixedBlockData(int acIdx, String blockType) {
+        log.info("고정 블록 데이터 조회. 사용자 ID: " + acIdx + ", 블록 타입: " + blockType);
+        
+        Map<String, Object> blockData = new HashMap<>();
+        
+        switch (blockType) {
+            case "MyPosts":
+                // 내가 작성한 글 목록 조회 (인기글 순)
+                List<NoteSummaryDTO> myPosts = noteService.getMyPostsPreview(acIdx);
+                blockData.put("posts", myPosts);
+                break;
+                
+            case "LikedPosts":
+                // 좋아요한 글 목록 조회
+                List<NoteSummaryDTO> likedPosts = noteService.getLikedPostsPreview(acIdx);
+                blockData.put("posts", likedPosts);
+                break;
+                
+            default:
+                log.warn("알 수 없는 고정 블록 타입: " + blockType);
+                return null;
+        }
+        
+        return blockData;
+    }
+    
+
 } 

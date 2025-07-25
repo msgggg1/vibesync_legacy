@@ -63,14 +63,14 @@ public class ScheduleApiController {
 	}
 	
 	@PutMapping("/{scheduleId}")
-	public ResponseEntity<Void> updateSchedule(
+	public ResponseEntity<ScheduleVO> updateSchedule(
 			@PathVariable int scheduleId,
 			@RequestBody ScheduleVO updatedSchedule) {
 		
 		updatedSchedule.setScheduleIdx(scheduleId);
-		scheduleService.updateSchedule(updatedSchedule);
+		ScheduleVO resultSchedule = scheduleService.updateSchedule(updatedSchedule);
 		
-		return ResponseEntity.ok().build(); // 성공했다는 의미로 200 OK 상태만 반환
+		return ResponseEntity.ok(resultSchedule); // 성공했다는 의미로 200 OK 상태만 반환
 	}
 
 	@DeleteMapping("/{scheduleId}")
