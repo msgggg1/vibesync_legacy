@@ -1,4 +1,4 @@
-package com.vibesync.common.controller; 
+package com.vibesync.page.controller; 
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

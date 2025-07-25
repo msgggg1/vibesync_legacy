@@ -15,18 +15,21 @@
 	    <context:exclude-filter type="annotation" expression="org.springframework.web.bind.annotation.RestController"/>
 	    <context:exclude-filter type="assignable" expression="org.apache.tiles.preparer.ViewPreparer"/>
 	</context:component-scan>
-	<mybatis-spring:scan base-package="com.vibesync.common.mapper" />
-	<mybatis-spring:scan base-package="com.vibesync.member.mapper" />
 	<mybatis-spring:scan base-package="com.vibesync.board.mapper" />
+	<mybatis-spring:scan base-package="com.vibesync.category.mapper" />
+	<mybatis-spring:scan base-package="com.vibesync.common.mapper" />
 	<mybatis-spring:scan base-package="com.vibesync.follow.mapper" />
 	<mybatis-spring:scan base-package="com.vibesync.mainpage.mapper" />
+	<mybatis-spring:scan base-package="com.vibesync.member.mapper" />
 	<mybatis-spring:scan base-package="com.vibesync.sidebar.mapper" />
+	<mybatis-spring:scan base-package="com.vibesync.userpage.mapper" />
 
 	<!-- DB 연결 -->
 	<bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
 		<property name="driverClassName" value="net.sf.log4jdbc.sql.jdbcapi.DriverSpy" />
 		<property name="jdbcUrl" value="jdbc:log4jdbc:oracle:thin:@localhost:1521:xe" />
-		<property name="username" value="vibesync" />
+		<!-- <property name="username" value="vibesync" /> -->
+		<property name="username" value="vibesync_springlegacy" />
 		<property name="password" value="1234" />
 	</bean>
 
@@ -62,4 +65,7 @@
 		<property name="host" value="${mail.host}" />
 		<property name="port" value="${mail.port}" />
 	</bean>
+	
+	<bean id="passwordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" />
+	
 </beans>

@@ -19,8 +19,9 @@ import lombok.extern.log4j.Log4j;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {
-    "file:src/main/webapp/WEB-INF/spring/root-context.xml",
-    "file:src/main/webapp/WEB-INF/spring/security-context.xml"
+	"file:src/test/resources/root-context.xml"
+	// "file:src/main/webapp/WEB-INF/spring/root-context.xml",
+    // "file:src/main/webapp/WEB-INF/spring/security-context.xml"
 })
 @Transactional
 @Log4j

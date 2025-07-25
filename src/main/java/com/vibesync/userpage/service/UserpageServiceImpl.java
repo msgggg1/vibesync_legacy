@@ -1,19 +1,10 @@
 package com.vibesync.userpage.service;
 
-import java.sql.SQLException;
-import java.util.List;
-
-import javax.naming.NamingException;
-
-import org.quartz.utils.ConnectionProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.vibesync.userpage.domain.MorePostsDTO;
-import com.vibesync.userpage.domain.NoteSummaryDTO;
 import com.vibesync.userpage.domain.UserPageDataDTO;
-import com.vibesync.userpage.domain.UserPageInfoDTO;
-import com.vibesync.userpage.domain.UserSummaryVO;
 import com.vibesync.userpage.mapper.UserpageMapper;
 
 @Service

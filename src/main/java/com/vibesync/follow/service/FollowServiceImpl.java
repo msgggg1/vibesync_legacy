@@ -22,8 +22,8 @@ public class FollowServiceImpl implements FollowService {
 		log.info("팔로우 토글 요청. 팔로우/언팔로우 요청 대상: " + targetUserAcIdx);
 
 		FollowVO follow = FollowVO.builder()
-									.acFollow(followerAcIdx)
-									.acFollowing(targetUserAcIdx)
+									.followerAcIdx(followerAcIdx)
+									.followedAcIdx(targetUserAcIdx)
 									.build();
 		
 		if (this.isFollowing(followerAcIdx, targetUserAcIdx)) {
@@ -42,8 +42,8 @@ public class FollowServiceImpl implements FollowService {
 		log.info("팔로우 상태 확인 요청. 대상: " + followerAcIdx + " → " + targetUserAcIdx);
 		
 		FollowVO follow = FollowVO.builder()
-									.acFollow(followerAcIdx)
-									.acFollowing(targetUserAcIdx)
+									.followerAcIdx(followerAcIdx)
+									.followedAcIdx(targetUserAcIdx)
 									.build();
 				
 		return this.followMapper.checkFollowStatus(follow) > 0 ? true : false;

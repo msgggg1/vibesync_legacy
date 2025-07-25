@@ -57,9 +57,9 @@
 
 	<!-- 특정 사용자가 작성한 총 게시글 수 -->
 	<select id="getPostCount" resultType="Integer">
-		SELECT COUNT(n.note_idx)
-		FROM note n JOIN userPage up ON n.userPg_idx = up.userPg_idx
-		WHERE up.ac_idx = #{acIdx}
+		SELECT COUNT(note_idx)
+		FROM note
+		WHERE ac_idx = #{acIdx}
 	</select>
 
 	<!-- 비밀번호 재설정 -->

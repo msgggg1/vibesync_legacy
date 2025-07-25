@@ -120,7 +120,7 @@ input:focus{outline:none;}
                 <img src="${pageContext.request.contextPath}/vibesync/${sidebar.userProfile.img}" alt="프로필">
             </c:when>
             <c:otherwise>
-               <img src="${pageContext.request.contextPath}/sources/default/default_user.jpg" alt="기본 프로필">
+               <img src="${pageContext.request.contextPath}/resources/images/system/default_user.jpg" alt="기본 프로필">
             </c:otherwise>
           </c:choose>
         </span>
@@ -137,7 +137,7 @@ input:focus{outline:none;}
         </div>
         <div id="nickname-modal" class="modal-sidebar">
           <div id="nickname-modal-1">
-             <a href="/page/userPage?acIdx=${sidebar.userProfile.acIdx}" class="modal-nickname">
+             <a href="/page/user?acIdx=${sidebar.userProfile.acIdx}" class="modal-nickname">
                ${sidebar.userProfile.nickname}
              </a>
              <div id="setting">
@@ -294,11 +294,11 @@ $(document).ready(function() {
                     $ul.append('<li><p>No Follower</p></li>');
                 } else {
                     $.each(items, function(i, user) {
-                       let profileImg = user.profile_img != null ? user.profile_img : '${pageContext.request.contextPath}/vibesync/sources/default/default_user.jpg';
+                       let profileImg = user.profile_img != null ? user.profile_img : '${pageContext.request.contextPath}/vibesync/resources/images/system/default_user.jpg';
                        
                         var liHtml = ''
                             + '<li class="sidebar-profile">'
-                            +   '<a href="userPage?acIdx=' + user.acIdx + '">' 
+                            +   '<a href="user?acIdx=' + user.acIdx + '">' 
                             +     '<img src="'+ profileImg +'" alt="profileImg">'
                             +     '<span class="sidebar-follow-span">'+ user.nickname +'</span>' 
                             +   '</a>'
@@ -485,13 +485,13 @@ function loadFollowListData(tabType) {
     let requestData;
 
     if (tabType === 'following') {
-        apiUrl = '<%= request.getContextPath() %>/follow.do';
+        apiUrl = '<%= request.getContextPath() %>/follow';
         requestData = { action: 'getFollowing' };
     } else if (tabType === 'follower') {
-        apiUrl = '<%= request.getContextPath() %>/follow.do';
+        apiUrl = '<%= request.getContextPath() %>/follow';
         requestData = { action: 'getFollower' };
     } else if (tabType === 'message') {
-        apiUrl = '<%= request.getContextPath() %>/message.do';
+        apiUrl = '<%= request.getContextPath() %>/message';
         requestData = { view: 'LISTALL' };
     } else {
         listContainer.html('<p style="text-align:center; padding: 20px;">잘못된 탭 요청입니다.</p>');
@@ -512,7 +512,7 @@ function loadFollowListData(tabType) {
                     return;
                 }
                 list.forEach(user => {
-                   const profileImg = user.profile_img ? `${pageContext.request.contextPath}/\${user.profile_img}` : `\${basePath}sources/default/default_user.jpg`;
+                   const profileImg = user.profile_img ? `${pageContext.request.contextPath}/\${user.profile_img}` : `\${basePath}resources/images/system/default_user.jpg`;
                     const isFollowing = user.followedByCurrentUser;
                     const followButtonText = isFollowing ? '팔로잉' : '팔로우';
                     const followButtonClass = isFollowing ? 'follow-toggle-btn unfollow' : 'follow-toggle-btn';
@@ -521,7 +521,7 @@ function loadFollowListData(tabType) {
                         <div class="follow-list-item">
                             <img src="\${profileImg}" alt="프로필">
                             <div class="user-info">
-                                <a href="userPage?acIdx=\${user.acIdx}" class="nickname">\${user.nickname}</a>
+                                <a href="user?acIdx=\${user.acIdx}" class="nickname">\${user.nickname}</a>
                             </div>
                             <div class="action-buttons">
                                <button type="button" class="\${followButtonClass}" data-target-ac-idx="\${user.acIdx}">
@@ -550,7 +550,7 @@ function loadFollowListData(tabType) {
                 messageList.forEach(message => {
                     let profileImgHtml = message.other.profile_img ?
                        `<img src="${pageContext.request.contextPath}/\${message.other.profile_img}" alt="profile">` :
-                       `<img src="\${basePath}sources/default/default_user.jpg" alt="기본 프로필">`;
+                       `<img src="\${basePath}resources/images/system/default_user.jpg" alt="기본 프로필">`;
 
                     let unreadBadgeHtml = '';
                     if (message.numOfUnreadMessages > 0) {
@@ -565,7 +565,7 @@ function loadFollowListData(tabType) {
                             <div class="message_text_area">
                                 <div class="message_sender_row">
                                     <div class="message_sender">
-                                       <a href="userPage.do?acIdx=\${message.other.acIdx}">\${message.other.nickname}</a>
+                                       <a href="user?acIdx=\${message.other.acIdx}">\${message.other.nickname}</a>
                                     </div>
                                     \${unreadBadgeHtml}
                                 </div>

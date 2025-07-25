@@ -1,10 +1,5 @@
 package com.vibesync.board.domain;
 
-import java.util.List;
-
-import com.vibesync.common.domain.ContentVO;
-import com.vibesync.common.domain.GenreVO;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,7 +12,5 @@ import lombok.NoArgsConstructor;
 public class BoardEditFormDTO {
 	
 	private NoteDetailDTO noteDetail;
-	List<GenreVO> genreList;
-	List<ContentVO> contentList;
 	
 }

@@ -2,8 +2,6 @@ package com.vibesync.page.domain;
 
 import java.util.List;
 
-import com.vibesync.mainpage.domain.NoteSummaryDTO;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

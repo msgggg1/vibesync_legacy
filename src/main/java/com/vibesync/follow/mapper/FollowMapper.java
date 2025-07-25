@@ -14,9 +14,9 @@ public interface FollowMapper {
     public int checkFollowStatus(FollowVO follow);
     
     // 팔로잉 수 조회
-    public int selectFollowingCount(int acFollow);
+    public int selectFollowingCount(int followerAcIdx);
     
     // 팔로워 수 조회
-    public int selectFollowerCount(int acFollowing);
+    public int selectFollowerCount(int followedAcIdx);
 	
 }

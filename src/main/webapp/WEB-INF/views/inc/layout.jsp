@@ -3,23 +3,25 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://www.springframework.org/security/tags" prefix="sec" %>
 <%@ page import="java.net.URLEncoder" %>
+<c:set var="path" value="${pageContext.request.contextPath}" />
+
 <!DOCTYPE html>
 <html lang="ko" color-theme="${sessionScope.theme != null ? sessionScope.theme : 'light'}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><tiles:getAsString name="title" /></title>
-  <link rel="icon" href="${pageContext.request.contextPath}/sources/favicon.ico" />
+  <link rel="icon" href="${path}/sources/favicon.ico" />
   
   <!-- 특정 페이지에서만 사용되는 Framework/Library -->
   <tiles:insertAttribute name="pageHead" ignore="true"/>
   
   <!-- css -->
-  <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
-  <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/sidebar.css">
+  <link rel="stylesheet" href="${path}/resources/css/style.css">
+  <link rel="stylesheet" href="${path}/resources/css/sidebar.css">
   <!-- 특정 페이지에서만 사용되는 css -->
   <c:if test="${not empty pageCss}">
-      <link rel="stylesheet" href="${pageContext.request.contextPath}${pageCss}">
+      <link rel="stylesheet" href="${path}${pageCss}">
   </c:if>
   
   <!-- js -->
@@ -48,15 +50,15 @@
 
 <!-- js -->
 <script>
-	const ctx = "${pageContext.request.contextPath}";
+	const ctx = "${path}";
 	const isLoggedIn = '<sec:authorize access="isAuthenticated()">true</sec:authorize><sec:authorize access="isAnonymous()">false</sec:authorize>' === 'true';
 	const loggedInUserAcIdx = isLoggedIn ? ${customUser.acIdx} : -1;
 </script>
-<script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
-<script defer src="${pageContext.request.contextPath}/resources/js/theme.js"></script>
+<script src="${path}/resources/js/script.js"></script>
+<script defer src="${path}/resources/js/theme.js"></script>
 <!-- 특정 페이지에서만 사용되는 js -->
 <c:if test="${not empty pageJs}">
-    <script defer src="${pageContext.request.contextPath}${pageJs}"></script>
+    <script defer src="${path}${pageJs}"></script>
 </c:if>
 </body>
 

@@ -14,16 +14,17 @@ import lombok.NoArgsConstructor;
 public class NoteVO {
 
 	private int noteIdx;
+	private int parentNoteIdx; // 상위 노트
+	private int acIdx; // 작성자 (페이지 관리자)
 	private String title;
 	private String text;
-	private String img;
+	private int displayOrder;
+	private String shareStatus;
 	private Date createAt;
 	private Date editAt;
 	private int viewCount;
 	private String titleimg;
-	private int contentIdx;
-	private int genreIdx;
 	private int categoryIdx;
-	private int userpgIdx;
+	private int customCategoryIdx;
 	
 }

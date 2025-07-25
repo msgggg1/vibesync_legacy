@@ -71,9 +71,7 @@
 	            FROM
 	                note n
 	            JOIN
-	                userPage up ON n.userPg_idx = up.userPg_idx
-	            JOIN
-	                userAccount ua ON up.ac_idx = ua.ac_idx
+	                userAccount ua ON n.ac_idx = ua.ac_idx
 		]]>
 		<where>
 			<include refid="criteria"></include>
@@ -97,18 +95,16 @@
 			SELECT
 				n.note_idx, n.title, n.text,
 				TO_CHAR(n.create_at,'YYYY-MM-DD HH24:MI:SS') AS create_at,
-				n.view_count, n.content_idx, n.genre_idx,
+				n.view_count,
 				n.category_idx AS note_category_idx,
-				n.userPg_idx, u.ac_idx, u.email, u.pw, u.nickname, u.img, u.name,
+				u.ac_idx, u.email, u.pw, u.nickname, u.img, u.name,
 				u.category_idx AS ac_category_idx,
 				NVL(l.cnt,0) AS like_num,
-				up.ac_idx AS upac_idx
+				n.ac_idx AS upac_idx
 			FROM
 				note n
 			JOIN
-				userPage up ON n.userPg_idx = up.userPg_idx
-			JOIN
-				userAccount u ON up.ac_idx = u.ac_idx
+				userAccount u ON n.ac_idx = u.ac_idx
 			LEFT JOIN (
 				SELECT
 					note_idx, COUNT(*) AS cnt
@@ -134,14 +130,18 @@
 <!-- public int insert(NoteVO note); -->
 <insert id="insert" parameterType="NoteVO">
 	INSERT INTO note (
-		note_idx, title, text, img, titleimg,
-		create_at, edit_at, view_count,
-		content_idx, genre_idx, category_idx, userpg_idx
+		note_idx, parent_note_idx, ac_idx,
+		title, text,
+		display_order, share_status,
+		create_at, edit_at, view_count, titleimg,
+		category_idx, custom_category_idx
 	)
 	VALUES (
-		#{noteIdx}, #{title}, #{text}, #{img}, #{titleimg},
-		SYSDATE, SYSDATE, 0,
-		#{contentIdx}, #{genreIdx}, #{categoryIdx}, #{userpgIdx}
+		#{noteIdx}, #{parentNoteIdx}, #{acIdx}
+		#{title}, #{text},
+		#{displayOrder}, #{shareStatus},
+		SYSDATE, SYSDATE, 0, #{titleimg},
+		#{categoryIdx}, #{customCategoryIdx}
 	)
 </insert>
 <!-- // -->
@@ -154,11 +154,8 @@
 	SET
 		title = #{title}
 		text = #{text}
-		img = #{img}
 		titleimg = #{titleimg}
 		edit_at = SYSDATE
-		content_idx = #{contentIdx}
-		genre_idx = #{genreIdx}
 		category_idx = #{categoryIdx}
 	WHERE
 		note_idx = #{noteIdx}

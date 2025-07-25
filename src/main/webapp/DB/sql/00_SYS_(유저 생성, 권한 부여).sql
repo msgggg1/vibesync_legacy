@@ -1,4 +1,4 @@
--- vibesync_springlegacy
+-- VIBESYNC_SPRINGLEGACY
 
 CREATE USER vibesync_springlegacy IDENTIFIED BY 1234;
 GRANT CREATE SESSION TO vibesync_springlegacy;

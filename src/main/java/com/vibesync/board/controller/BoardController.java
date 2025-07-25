@@ -25,8 +25,6 @@ import com.vibesync.board.service.NoteService;
 import com.vibesync.common.annotation.AuthenticatedUserPages;
 import com.vibesync.common.domain.Criteria;
 import com.vibesync.common.domain.PageDTO;
-import com.vibesync.common.service.ContentService;
-import com.vibesync.common.service.GenreService;
 import com.vibesync.follow.service.FollowService;
 import com.vibesync.security.domain.CustomUser;
 
@@ -40,10 +38,6 @@ import lombok.extern.log4j.Log4j;
 @RequiredArgsConstructor
 public class BoardController {
 	
-	@Autowired
-	GenreService genreService;
-	@Autowired
-	ContentService contentService;
 	@Autowired
 	NoteService noteService;
 	@Autowired
@@ -100,13 +94,11 @@ public class BoardController {
 	
 	// 게시글 작성 (/vibesync/board/write)
 	@GetMapping(value="/write")
-	public String write(Model model, @RequestParam("userpgIdx") int userpgIdx) {
+	public String write(Model model, @AuthenticationPrincipal CustomUser user) {
 		log.info("게시글 작성 페이지 요청...GET");
 		
 		BoardWriteFormDTO dto = BoardWriteFormDTO.builder()
-											.genreList(this.genreService.findAll())
-											.contentList(this.contentService.findAll())
-											.userpgIdx(userpgIdx)
+											.acIdx(user.getAcIdx())
 											.build();
 		
 		model.addAttribute("formData", dto);
@@ -121,7 +113,7 @@ public class BoardController {
 		
 		if (result > 0) {
 			rttr.addFlashAttribute("result", "success");
-			rttr.addFlashAttribute("userpgIdx", dto.getNote().getUserpgIdx());
+			rttr.addFlashAttribute("acIdx", dto.getNote().getAcIdx());
 			return "redirect:/page/user";
 		} else {
 			rttr.addFlashAttribute("boardWriteDTO", dto);
@@ -139,8 +131,6 @@ public class BoardController {
 		
 		BoardEditFormDTO dto = BoardEditFormDTO.builder()
 				.noteDetail(noteDetail)
-				.genreList(this.genreService.findAll())
-				.contentList(this.contentService.findAll())
 				.build();
 		
 		model.addAttribute("formData", dto);

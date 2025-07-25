@@ -1,16 +1,17 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<c:set var="path" value="${pageContext.request.contextPath}" />
 <div id="user_wrapper">
 	<div id="userInfo">
 		<div class="user_profile_img">
 			<c:choose>
 				<c:when test="${not empty userPageData.userProfile.img}">
 					<img id="mainProfileImage"
-						src="${pageContext.request.contextPath}/${userPageData.userProfile.img}"
+						src="${path}/${userPageData.userProfile.img}"
 						alt="프로필">
 				</c:when>
 				<c:otherwise>
 					<img id="mainProfileImage"
-						src="${pageContext.request.contextPath}/sources/default/default_user.jpg"
+						src="${path}/resources/images/system/default_user.jpg"
 						alt="기본 프로필">
 				</c:otherwise>
 			</c:choose>
@@ -33,14 +34,14 @@
 					<c:if
 						test="${sessionScope.userInfo != null && sessionScope.userInfo.ac_idx == userPageData.userProfile.ac_idx}">
 						<button class="wp_btn" onclick="location.href='waList.jsp'">
-							<img src="${pageContext.request.contextPath}/sources/icons/watch.svg">Watch Party
+							<img src="${path}/sources/icons/watch.svg">Watch Party
 						</button>
 					</c:if>
 				</div>
 				<c:if
 					test="${sessionScope.userInfo != null && sessionScope.userInfo.ac_idx == userPageData.userProfile.ac_idx}">
 					<button id="settingBtn">
-						<img src="${pageContext.request.contextPath}/sources/icons/settings_gear.svg" alt="setting">
+						<img src="${path}/sources/icons/settings_gear.svg" alt="setting">
 					</button>
 				</c:if>
 			</div>
@@ -60,17 +61,17 @@
 	<div class="line"></div>
 	<div id="con_wrapper">
 		<c:forEach var="post" items="${userPageData.posts}">
-			<a href="${pageContext.request.contextPath}/board/view?noteIdx=${post.note_idx}">
+			<a href="${path}/board/view?noteIdx=${post.note_idx}">
 				<div class="con_item">
 					<c:choose>
 						<c:when test="${not empty post.thumbnail_img}">
 							<img
-								src="${pageContext.request.contextPath}/${post.thumbnail_img}"
+								src="${path}/${post.thumbnail_img}"
 								alt="${post.title} 썸네일">
 						</c:when>
 						<c:otherwise>
 							<img
-								src="${pageContext.request.contextPath}/sources/images/default_thumbnail.png"
+								src="${path}/resources/images/system/default_thumbnail.png"
 								alt="기본 썸네일">
 						</c:otherwise>
 					</c:choose>
