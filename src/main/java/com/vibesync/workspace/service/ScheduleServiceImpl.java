@@ -58,8 +58,9 @@ public class ScheduleServiceImpl implements ScheduleService{
 
 	@Override
 	@Transactional
-	public void updateSchedule(ScheduleVO updatedSchedule) {
+	public ScheduleVO updateSchedule(ScheduleVO updatedSchedule) {
 		scheduleMapper.updateSchedule(updatedSchedule);
+		return updatedSchedule;
 	}
 
 	@Override

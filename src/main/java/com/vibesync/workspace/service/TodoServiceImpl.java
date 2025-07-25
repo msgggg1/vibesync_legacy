@@ -60,9 +60,10 @@ public class TodoServiceImpl implements TodoService {
     
     @Override
     @Transactional
-    public void updateTodo(TodoVO todo) {
+    public TodoVO updateTodo(TodoVO todo) {
         log.info("할 일 수정. 할 일 ID: " + todo.getTodoIdx() + ", 내용: " + todo.getText());
         
         todoMapper.updateTodo(todo);
+		return todo;
     }
 } 

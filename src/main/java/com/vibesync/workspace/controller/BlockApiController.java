@@ -29,8 +29,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vibesync.security.domain.CustomUser;
 import com.vibesync.workspace.domain.BlockDTO;
+import com.vibesync.workspace.domain.NoteSummaryDTO;
 import com.vibesync.workspace.domain.UserStatsBlockDTO;
 import com.vibesync.workspace.service.BlockService;
+import com.vibesync.workspace.service.WorkspaceNoteService;
 
 @RestController
 @RequestMapping("/api/block")
@@ -38,6 +40,9 @@ public class BlockApiController {
 
     @Autowired
     private BlockService blockService;
+    
+    @Autowired
+    private WorkspaceNoteService workspaceNoteService;
     
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -83,6 +88,26 @@ public class BlockApiController {
         }
 
         return ResponseEntity.ok(jsonResponse);
+    }
+
+    // 고정 블록 "더보기" 기능
+    @GetMapping("/fixed/{blockType}/more")
+    public ResponseEntity<List<NoteSummaryDTO>> getFixedBlockMoreData(
+            @PathVariable String blockType,
+            @AuthenticationPrincipal CustomUser user) {
+        
+        int acIdx = user.getAcIdx();
+        List<NoteSummaryDTO> posts;
+        
+        if ("my-posts".equals(blockType)) {
+            posts = workspaceNoteService.getAllMyPosts(acIdx);
+        } else if ("liked-posts".equals(blockType)) {
+            posts = workspaceNoteService.getAllLikedPosts(acIdx);
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
+        
+        return ResponseEntity.ok(posts);
     }
 
     // POST 요청 처리 : 블록 추가
@@ -181,6 +206,38 @@ public class BlockApiController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(Map.of("success", false, "message", "서버 오류가 발생했습니다."));
         }
+    }
+
+
+    // 고정 블록 데이터 조회
+    @GetMapping("/fixed/{blockType}")
+    public ResponseEntity<Map<String, Object>> getFixedBlockData(
+            @PathVariable String blockType,
+            @AuthenticationPrincipal CustomUser user,
+            HttpServletRequest request,
+            HttpServletResponse response) throws ServletException, IOException {
+
+        int acIdx = user.getAcIdx();
+
+        // 고정 블록 데이터 조회
+        Map<String, Object> blockData = blockService.getFixedBlockData(acIdx, blockType);
+
+        if (blockData == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // JSP 프래그먼트를 HTML 문자열로 렌더링
+        request.setAttribute("blockData", blockData);
+        
+        String forwardPath = "/WEB-INF/views/page/workspace/fragments/_fixed" + blockType + "Content.jsp";
+        String htmlContent = renderJspToString(request, response, forwardPath);
+
+        // 클라이언트에 보낼 JSON 데이터 구성
+        Map<String, Object> jsonResponse = new HashMap<>();
+        jsonResponse.put("html", htmlContent);
+        jsonResponse.put("blockType", blockType);
+
+        return ResponseEntity.ok(jsonResponse);
     }
 
     // JSP 파일을 실행하여 그 결과를 HTML 문자열로 반환하는 헬퍼 메소드

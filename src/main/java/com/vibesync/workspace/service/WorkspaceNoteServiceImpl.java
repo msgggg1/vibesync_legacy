@@ -256,4 +256,6 @@ public class WorkspaceNoteServiceImpl implements WorkspaceNoteService {
         log.info("내 노트 조회. 사용자 ID: " + acIdx);
         return noteMapper.findMyPostsByPopularity(acIdx);
     }
+    
+
 } 

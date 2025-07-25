@@ -9,5 +9,5 @@ public interface TodoService {
     TodoVO addTodo(TodoVO todo);
     void updateTodoStatus(int todoIdx, int status);
     void deleteTodo(int todoIdx);
-    void updateTodo(TodoVO todo);
+    TodoVO updateTodo(TodoVO todo);
 } 

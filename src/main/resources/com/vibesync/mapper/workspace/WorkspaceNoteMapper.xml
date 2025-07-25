@@ -11,14 +11,14 @@
                     nt.title,
                     nt.view_count as viewCount,
                     ua.nickname as authorName,
-                    COUNT(lk.likes_idx) as likesCount
+                    COUNT(lk.likes_idx) as likeCount
                 FROM note nt
                 JOIN userPage up ON nt.userPg_idx = up.userPg_idx
                 JOIN userAccount ua ON up.ac_idx = ua.ac_idx
                 LEFT JOIN likes lk ON nt.note_idx = lk.note_idx
                 WHERE up.ac_idx = #{acIdx}
                 GROUP BY nt.note_idx, nt.title, nt.view_count, nt.create_at, ua.nickname
-                ORDER BY likesCount DESC, nt.view_count DESC, nt.create_at DESC
+                ORDER BY likeCount DESC, nt.view_count DESC, nt.create_at DESC
             ) n
         ) WHERE rnum &lt;= 5
     </select>
@@ -30,14 +30,14 @@
             nt.title,
             nt.view_count as viewCount,
             ua.nickname as authorName,
-            COUNT(lk.likes_idx) as likesCount
+            COUNT(lk.likes_idx) as likeCount
         FROM note nt
         JOIN userPage up ON nt.userPg_idx = up.userPg_idx
         JOIN userAccount ua ON up.ac_idx = ua.ac_idx
         LEFT JOIN likes lk ON nt.note_idx = lk.note_idx
         WHERE up.ac_idx = #{acIdx}
         GROUP BY nt.note_idx, nt.title, nt.view_count, nt.create_at, ua.nickname
-        ORDER BY likesCount DESC, nt.view_count DESC, nt.create_at DESC
+        ORDER BY likeCount DESC, nt.view_count DESC, nt.create_at DESC
     </select>
     
     <!-- 내가 좋아요한 최신 게시글 조회 (상위 5개) -->

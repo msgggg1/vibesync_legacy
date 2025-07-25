@@ -52,14 +52,14 @@ public class TodoApiController {
     }
 
     @PutMapping("/{todoId}")
-    public ResponseEntity<Void> updateTodo(
+    public ResponseEntity<TodoVO> updateTodo(
             @PathVariable int todoId,
             @RequestBody TodoVO updatedTodo) {
         
         updatedTodo.setTodoIdx(todoId);
-        todoService.updateTodo(updatedTodo);
+        TodoVO resultTodo = todoService.updateTodo(updatedTodo);
         
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(resultTodo);
     }
 
     @DeleteMapping("/{todoId}")
