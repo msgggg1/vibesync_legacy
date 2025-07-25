@@ -23,12 +23,7 @@
   
   <!-- js -->
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-  <script defer src="${pageContext.request.contextPath}/resources/js/script.js"></script>
-  <%-- <script defer src="${pageContext.request.contextPath}/resources/js/theme.js"></script> --%>
-  <!-- 특정 페이지에서만 사용되는 js -->
-  <c:if test="${not empty pageJs}">
-      <script defer src="${pageContext.request.contextPath}${pageJs}"></script>
-  </c:if>
+
 </head>
 <body>
   <div id="notion-app">
@@ -46,6 +41,17 @@
     </div>
   </div>
 <tiles:insertAttribute name="footer" flush="false"/>
+
+<!-- js -->
+<script>
+	const ctx = "${pageContext.request.contextPath}";
+</script>
+<script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
+<script defer src="${pageContext.request.contextPath}/resources/js/theme.js"></script>
+<!-- 특정 페이지에서만 사용되는 js -->
+<c:if test="${not empty pageJs}">
+    <script defer src="${pageContext.request.contextPath}${pageJs}"></script>
+</c:if>
 </body>
 
 </html>

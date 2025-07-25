@@ -1,15 +1,16 @@
 package com.vibesync.follow.mapper;
 
-import java.util.List;
-
-import org.apache.ibatis.annotations.Param;
-
-import com.vibesync.sidebar.domain.UserSummaryVO;
+import com.vibesync.follow.domain.FollowVO;
 
 public interface FollowMapper {
-
-	public List<UserSummaryVO> userFollowingList(@Param("acIdx") int acIdx) ;
-
-	public List<UserSummaryVO> userFollowerList(@Param("acIdx") int acIdx) ;
+	
+	// 팔로우 : 팔로우 데이터 추가
+	public int insertFollow(FollowVO follow);
+	
+	// 언팔로우 : 팔로우 데이터 삭제
+	public int deleteFollow(FollowVO follow);
+	
+	// 팔로우 관계 확인
+    public int checkFollowStatus(FollowVO follow);
 	
 }

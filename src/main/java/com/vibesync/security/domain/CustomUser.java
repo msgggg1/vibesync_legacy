@@ -12,7 +12,7 @@ import lombok.Getter;
 @Getter
 public class CustomUser extends User{
 	
-	//private final Member member;
+	// private final Member member;
 
 	// Member 객체의 정보 중, User 클래스가 갖지 않는 추가 정보만 정의
 	private final int acIdx;
@@ -29,12 +29,13 @@ public class CustomUser extends User{
 		);
 		
 		// 2. 주입받은 Member 객체를 필드에 저장합니다.
-        //this.member = member;
+        // this.member = member;
 
 		// 2. 이 클래스만의 추가 정보를 초기화
 		this.acIdx = member.getAcIdx();
 		this.nickname = member.getNickname();
 		this.img = member.getImg();
 		this.categoryIdx = member.getCategoryIdx();
+    
 	}
 }

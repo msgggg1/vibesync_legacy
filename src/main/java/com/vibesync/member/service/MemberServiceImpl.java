@@ -38,7 +38,7 @@ public class MemberServiceImpl implements MemberService{
         // 2. 사용자 정보가 존재하고, 입력된 비밀번호가 DB의 암호화된 비밀번호와 일치하는지 확인합니다.
         if (member != null && passwordEncoder.matches(dto.getPassword(), member.getPw())) {
             // 3. 로그인 성공 시, 사용자 정보 객체를 반환합니다.
-        	MemberVO memberVO = new MemberVO().builder().acIdx(member.getAcIdx())
+        	MemberVO memberVO = MemberVO.builder().acIdx(member.getAcIdx())
         											.categoryIdx(member.getCategoryIdx())
         											.createdAt(member.getCreatedAt())
         											.email(member.getEmail())
