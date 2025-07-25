@@ -16,4 +16,14 @@ public interface FollowService {
      */
     public boolean isFollowing(int followerAcIdx, int targetUserAcIdx);
     
+    /** 팔로잉 수 조회
+     * @param followerAcIdx 팔로우를 하는 사용자 ID
+     */
+    public int getFollowingCount(int followerAcIdx);
+
+    /** 팔로워 수 조회
+     * @param targetUserAcIdx 팔로우를 당하는 사용자 ID
+     */
+    public int getFollowerCount(int targetUserAcIdx);
+    
 }

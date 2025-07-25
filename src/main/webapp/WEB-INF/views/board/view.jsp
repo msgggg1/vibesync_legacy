@@ -1,22 +1,24 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ page trimDirectiveWhitespaces="true"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
 <%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles"%>
+
 <div class="back_icon">
-	<a href="javascript:void(0);" onclick="goBackSmartly()"><img src="${pageContext.request.contextPath}/sources/icons/arrow_back.svg" alt="arrow_back"></a>
+	<a href="javascript:void(0);" onclick="goBackSmartly()">
+		<img src="${pageContext.request.contextPath}/sources/icons/arrow_back.svg" alt="arrow_back">
+	</a>
 </div>
 <div id="postview_Wrapper">
 	<div class="title">
-		<p>${dto.noteDetail.note.title}</p>
-		<c:if test="${dto.userAcIdx == dto.noteDetail.upacIdx}">
+		<p>${boardViewDTO.noteDetail.note.title}</p>
+		<c:if test="${boardViewDTO.userAcIdx == boardViewDTO.noteDetail.upacIdx}">
 			<div>
-				<button class="postview_ed_btn" onclick="location.href='edit?noteIdx=${dto.noteDetail.note.noteIdx}'">
+				<button class="postview_ed_btn" onclick="location.href='edit?noteIdx=${boardViewDTO.noteDetail.note.noteIdx}'">
 					edit
 				</button>
-				<button class="postview_de_btn" onclick="confirm('정말로 삭제하시겠습니까?'); location.href='edit?noteIdx=${dto.noteDetail.note.noteIdx}'">
+				<button class="postview_de_btn" onclick="confirm('정말로 삭제하시겠습니까?'); location.href='edit?noteIdx=${boardViewDTO.noteDetail.note.noteIdx}'">
 					delete
 				</button>
 			</div>
@@ -24,17 +26,17 @@
 	</div>
 	<div class="writer_info">
 		<div class="writer">
-			<c:url var="profileImgUrl" value="${pageContext.request.contextPath}/sources/default/default_user.jpg" />
-		    <c:if test="${not empty dto.noteDetail.member.img}">
-		        <c:url var="profileImgUrl" value="${pageContext.request.contextPath}/sources/member/profileImg/${noteDetail.member.img}" />
+			<c:set var="profileImgUrl" value="${pageContext.request.contextPath}/sources/default/default_user.jpg" />
+		    <c:if test="${not empty boardViewDTO.noteDetail.member.img}">
+		        <c:set var="profileImgUrl" value="${pageContext.request.contextPath}/sources/member/profileImg/${noteDetail.member.img}" />
 		    </c:if>
 			<img src="${profileImgUrl}" alt="writer_profile">
-			<a href="userPage?acIdx=${dto.noteDetail.member.acIdx}">${dto.noteDetail.member.nickname}</a>
-			<c:if test="${dto.userAcIdx != dto.noteDetail.upacIdx}">
+			<a href="userPage?acIdx=${boardViewDTO.noteDetail.member.acIdx}">${boardViewDTO.noteDetail.member.nickname}</a>
+			<c:if test="${boardViewDTO.userAcIdx != boardViewDTO.noteDetail.upacIdx}">
 				<form id="followForm" style="display: inline; margin: 0; padding: 0;">
 					<button id="followBtn" type="button"
 							style="background: #99bc85; border-radius: 5px; border: none; cursor: pointer; padding: 5px 10px;">
-						${dto.following ? "Unfollow" : "Follow"}
+						${boardViewDTO.following ? "Unfollow" : "Follow"}
 					</button>
 				</form>
 			</c:if>
@@ -42,34 +44,36 @@
 		<div class="like_share">
 			<div>
 				<p>
-					<span>view : </span><span>${dto.noteDetail.note.viewCount}</span>
+					<span>view : </span><span>${boardViewDTO.noteDetail.note.viewCount}</span>
 				</p>
 			</div>
 			<form id="likeForm" style="display: inline; margin: 0; padding: 0;">
-				<button id="likeBtn" type="submit" data-user-idx="${dto.userAcIdx}"
-					data-note-idx="${dto.noteDetail.note.noteIdx}"
+				<button id="likeBtn" type="submit" data-user-idx="${boardViewDTO.userAcIdx}"
+					data-note-idx="${boardViewDTO.noteDetail.note.noteIdx}"
 					style="border: none; background: none; cursor: pointer; filter: var(- -icon-filter);">
-					<img id="likeImg"
-						src="${dto.liking ? '${pageContext.request.contextPath}/sources/icons/fill_heart.png' : '${pageContext.request.contextPath}/sources/icons/heart.svg'}"
-						alt="heart"
-						style="vertical-align: middle; width: 2rem; height: 2rem;"><span
-						id="likeCount" style="vertical-align: middle;">${dto.noteDetail.likeNum}</span>
+					<c:set var="fillHeartIcon" value="${pageContext.request.contextPath}/sources/icons/fill_heart.png" />
+					<c:set var="emptyHeartIcon" value="${pageContext.request.contextPath}/sources/icons/heart.svg" />
+					<img id="likeImg" src="${boardViewDTO.liking ? fillHeartIcon : emptyHeartIcon}" alt="heart"
+						style="vertical-align: middle; width: 2rem; height: 2rem;">
+						<span id="likeCount" style="vertical-align: middle;">
+							${boardViewDTO.noteDetail.likeNum}
+						</span>
 				</button>
 			</form>
 		</div>
 	</div>
 	<div class="line"></div>
 	<div class="text_content">
-		<c:out value="${dto.noteDetail.note.text}" escapeXml="false" />
+		<c:out value="${boardViewDTO.noteDetail.note.text}" escapeXml="false" />
 	</div>
 	<div class="line" style="margin-top: 2rem; margin-bottom: 0px"></div>
 	<div id="comment-section">
 		<h4>Comments</h4>
 		<c:choose>
 			<%-- 1. 로그인한 경우: 기존의 댓글 입력창을 보여줌 --%>
-			<c:when test="${dto.userAcIdx > 0}">
+			<c:when test="${boardViewDTO.userAcIdx > 0}">
 				<form id="comment-form" style="margin-bottom: 1.864rem;">
-					<input type="hidden" name="noteIdx" value="${dto.noteDetail.note.noteIdx}">
+					<input type="hidden" name="noteIdx" value="${boardViewDTO.noteDetail.note.noteIdx}">
 					<div class="textarea-div"
 						style="display: flex; align-items: center;">
 						<textarea name="text" rows="3" placeholder="댓글을 입력하세요..." required
@@ -111,7 +115,12 @@
 
 <script>
       
-    $(document).ready(function() {
+      $(document).ready(function() {
+      	$('.text_content img').each(function() {
+	        const src = $(this).attr('src');
+	        $(this).attr('src', '${pageContext.request.contextPath}' + src);
+	    });
+    	
       // Follow/Unfollow 버튼 처리
       $('#followBtn').on('click', function(e) {
         if (!isLoggedIn) {
@@ -119,7 +128,8 @@
             return;
         }
         
-        followToggle(${dto.noteDetail.member.acIdx});
+        followToggle(${boardViewDTO.noteDetail.member.acIdx});
+        updateFollowingCount(); // sidebar에 선언된 함수
       });
       
       // Like 버튼 처리
@@ -143,10 +153,10 @@
           dataType: 'json',
           success: function(data) {
             if (data.liked) {
-            	$('#likeImg').attr('src', './sources/icons/fill_heart.png');
+            	$('#likeImg').attr('src', '\${fillHeartIcon}' );
             	$('#likeCount').text(currentCount + 1);
             } else {
-            	$('#likeImg').attr('src', './sources/icons/heart.svg');
+            	$('#likeImg').attr('src', '\${emptyHeartIcon}');
             	$('#likeCount').text(currentCount - 1);
             }
           },
@@ -158,8 +168,8 @@
       
       // =================== 대댓글 기능이 포함된 스크립트 ===================
       const commentUrl = ctx + '/comment';
-      const loggedInUserIdx = ${not empty memberInfo ? dto.userAcIdx : -1};
-      const noteIdxForComment = ${dto.noteDetail.note.noteIdx};
+      const loggedInUserIdx = ${not empty memberInfo ? boardViewDTO.userAcIdx : -1};
+      const noteIdxForComment = ${boardViewDTO.noteDetail.note.noteIdx};
 
       function loadComments() {
         $.ajax({
