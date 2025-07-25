@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vibesync.workspace.mapper.WorkspaceNoteMapper">
+
+    <!-- 내가 작성한 인기 게시글 조회 (상위 5개) -->
+    <select id="findMyPostsByPopularity" resultType="com.vibesync.workspace.domain.NoteSummaryDTO">
+        SELECT * FROM (
+            SELECT ROWNUM AS rnum, n.* FROM (
+                SELECT 
+                    nt.note_idx as noteIdx,
+                    nt.title,
+                    nt.view_count as viewCount,
+                    ua.nickname as authorName,
+                    COUNT(lk.likes_idx) as likeCount
+                FROM note nt
+                JOIN userPage up ON nt.userPg_idx = up.userPg_idx
+                JOIN userAccount ua ON up.ac_idx = ua.ac_idx
+                LEFT JOIN likes lk ON nt.note_idx = lk.note_idx
+                WHERE up.ac_idx = #{acIdx}
+                GROUP BY nt.note_idx, nt.title, nt.view_count, nt.create_at, ua.nickname
+                ORDER BY likeCount DESC, nt.view_count DESC, nt.create_at DESC
+            ) n
+        ) WHERE rnum &lt;= 5
+    </select>
+    
+    <!-- 내가 작성한 모든 인기 게시글 조회 -->
+    <select id="findAllMyPostsByPopularity" resultType="com.vibesync.workspace.domain.NoteSummaryDTO">
+        SELECT 
+            nt.note_idx as noteIdx,
+            nt.title,
+            nt.view_count as viewCount,
+            ua.nickname as authorName,
+            COUNT(lk.likes_idx) as likeCount
+        FROM note nt
+        JOIN userPage up ON nt.userPg_idx = up.userPg_idx
+        JOIN userAccount ua ON up.ac_idx = ua.ac_idx
+        LEFT JOIN likes lk ON nt.note_idx = lk.note_idx
+        WHERE up.ac_idx = #{acIdx}
+        GROUP BY nt.note_idx, nt.title, nt.view_count, nt.create_at, ua.nickname
+        ORDER BY likeCount DESC, nt.view_count DESC, nt.create_at DESC
+    </select>
+    
+    <!-- 내가 좋아요한 최신 게시글 조회 (상위 5개) -->
+    <select id="findLikedPostsByRecent" resultType="com.vibesync.workspace.domain.NoteSummaryDTO">
+        SELECT * FROM (
+            SELECT ROWNUM AS rnum, n.noteIdx, n.title, n.authorName
+            FROM (
+                SELECT 
+                    nt.note_idx as noteIdx,
+                    nt.title,
+                    ua.nickname as authorName
+                FROM likes lk
+                JOIN note nt ON lk.note_idx = nt.note_idx
+                JOIN userPage up ON nt.userPg_idx = up.userPg_idx
+                JOIN userAccount ua ON up.ac_idx = ua.ac_idx
+                WHERE lk.ac_idx = #{acIdx}
+                ORDER BY lk.created_at DESC
+            ) n
+        ) WHERE rnum &lt;= 5
+    </select>
+    
+    <!-- 내가 좋아요한 모든 최신 게시글 조회 -->
+    <select id="findAllLikedPostsByRecent" resultType="com.vibesync.workspace.domain.NoteSummaryDTO">
+        SELECT 
+            nt.note_idx as noteIdx,
+            nt.title,
+            ua.nickname as authorName
+        FROM likes lk
+        JOIN note nt ON lk.note_idx = nt.note_idx
+        JOIN userPage up ON nt.userPg_idx = up.userPg_idx
+        JOIN userAccount ua ON up.ac_idx = ua.ac_idx
+        WHERE lk.ac_idx = #{acIdx}
+        ORDER BY lk.created_at DESC
+    </select>
+    
+    <!-- 내 카테고리의 인기 게시글 조회 -->
+    <select id="popularNoteByMyCategory" resultType="com.vibesync.workspace.domain.NoteSummaryDTO">
+        SELECT 
+            note_idx as noteIdx,
+            title,
+            thumbnail_img as thumbnailImg,
+            view_count as viewCount,
+            like_count as likeCount,
+            author_name as authorName
+        FROM (
+            SELECT 
+                n.note_idx,
+                n.title,
+                n.img AS thumbnail_img,
+                n.view_count,
+                ua.nickname AS author_name,
+                NVL(lc.like_count, 0) AS like_count,
+                ROW_NUMBER() OVER (ORDER BY (NVL(lc.like_count, 0) + n.view_count) DESC, n.create_at DESC) as rn
+            FROM note n
+            JOIN userPage up ON n.userPg_idx = up.userPg_idx
+            JOIN userAccount ua ON up.ac_idx = ua.ac_idx
+            LEFT JOIN (
+                SELECT 
+                    note_idx,
+                    COUNT(*) AS like_count
+                FROM likes
+                GROUP BY note_idx
+            ) lc ON n.note_idx = lc.note_idx
+            WHERE n.category_idx = #{categoryIdx}
+        ) ranked_notes
+        WHERE rn &lt;= #{limit}
+        ORDER BY rn
+    </select>
+    
+    <!-- 내 카테고리의 최신 게시글 조회 -->
+    <select id="recentNoteByMyCategory" resultType="com.vibesync.workspace.domain.NoteSummaryDTO">
+        SELECT 
+            note_idx as noteIdx,
+            title,
+            thumbnail_img as thumbnailImg,
+            view_count as viewCount,
+            like_count as likeCount,
+            author_name as authorName
+        FROM (
+            SELECT 
+                n.note_idx,
+                n.title,
+                n.img AS thumbnail_img,
+                n.view_count,
+                ua.nickname AS author_name,
+                NVL(lc.like_count, 0) AS like_count,
+                ROW_NUMBER() OVER (ORDER BY n.create_at DESC) as rn
+            FROM note n
+            JOIN userPage up ON n.userPg_idx = up.userPg_idx
+            JOIN userAccount ua ON up.ac_idx = ua.ac_idx
+            LEFT JOIN (
+                SELECT 
+                    note_idx,
+                    COUNT(*) AS like_count
+                FROM likes
+                GROUP BY note_idx
+            ) lc ON n.note_idx = lc.note_idx
+            WHERE n.category_idx = #{categoryIdx}
+        )
+        WHERE rn &lt;= #{limit}
+        ORDER BY rn
+    </select>
+    
+    <!-- 노트 통계 관련 쿼리들 -->
+    
+    <!-- 일별 게시글 수 조회 -->
+    <select id="getDailyPostCounts" resultType="com.vibesync.workspace.domain.DailyStatsDTO">
+        SELECT 
+            TO_CHAR(TRUNC(create_at),'YYYY-MM-DD') as date,
+            COUNT(*) as count
+        FROM note n
+        JOIN userPage u ON u.userPg_idx = n.userPg_idx
+        WHERE u.ac_idx = #{acIdx}
+        <if test="days != -1">
+            AND create_at >= TRUNC(SYSDATE) - #{days}
+        </if>
+        GROUP BY TRUNC(create_at)
+        ORDER BY TRUNC(create_at)
+    </select>
+    
+    <!-- 일별 조회수 조회 -->
+    <select id="getDailyViewCounts" resultType="com.vibesync.workspace.domain.DailyStatsDTO">
+        SELECT 
+            TO_CHAR(TRUNC(create_at),'YYYY-MM-DD') as date,
+            SUM(view_count) as count
+        FROM note n
+        JOIN userPage u ON u.userPg_idx = n.userPg_idx
+        WHERE u.ac_idx = #{acIdx}
+        AND create_at >= TRUNC(SYSDATE) - #{days}
+        GROUP BY TRUNC(create_at)
+        ORDER BY TRUNC(create_at)
+    </select>
+    
+    <!-- 주별 게시글 수 조회 -->
+    <select id="getWeeklyPostCounts" resultType="com.vibesync.workspace.domain.DailyStatsDTO">
+        SELECT 
+            TO_CHAR(TRUNC(create_at, 'IW'), 'YYYY-MM-DD') as date,
+            COUNT(*) as count
+        FROM note n 
+        JOIN userPage u ON n.userPg_idx = u.userPg_idx
+        WHERE u.ac_idx = #{acIdx} 
+        AND create_at >= TRUNC(SYSDATE, 'IW') - (#{weeks} * 7)
+        GROUP BY TRUNC(create_at, 'IW')
+        ORDER BY date
+    </select>
+    
+    <!-- 주별 조회수 조회 -->
+    <select id="getWeeklyViewCounts" resultType="com.vibesync.workspace.domain.DailyStatsDTO">
+        SELECT 
+            TO_CHAR(TRUNC(create_at, 'IW'), 'YYYY-MM-DD') as date,
+            SUM(view_count) as count
+        FROM note n 
+        JOIN userPage u ON n.userPg_idx = u.userPg_idx
+        WHERE u.ac_idx = #{acIdx} 
+        AND create_at >= TRUNC(SYSDATE, 'IW') - (#{weeks} * 7)
+        GROUP BY TRUNC(create_at, 'IW')
+        ORDER BY date
+    </select>
+    
+    <!-- 월별 게시글 수 조회 -->
+    <select id="getMonthlyPostCounts" resultType="com.vibesync.workspace.domain.DailyStatsDTO">
+        SELECT 
+            TO_CHAR(create_at, 'YYYY-MM') as date,
+            COUNT(*) as count
+        FROM note n 
+        JOIN userPage u ON n.userPg_idx = u.userPg_idx
+        WHERE u.ac_idx = #{acIdx}
+        <if test="months != -1">
+            AND create_at >= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -#{months})
+        </if>
+        GROUP BY TO_CHAR(create_at, 'YYYY-MM')
+        ORDER BY date
+    </select>
+    
+    <!-- 월별 조회수 조회 -->
+    <select id="getMonthlyViewCounts" resultType="com.vibesync.workspace.domain.DailyStatsDTO">
+        SELECT 
+            TO_CHAR(create_at, 'YYYY-MM') as date,
+            SUM(view_count) as count
+        FROM note n 
+        JOIN userPage u ON n.userPg_idx = u.userPg_idx
+        WHERE u.ac_idx = #{acIdx}
+        AND create_at >= ADD_MONTHS(TRUNC(SYSDATE, 'MM'), -#{months})
+        GROUP BY TO_CHAR(create_at, 'YYYY-MM')
+        ORDER BY date
+    </select>
+    
+    <!-- 연별 게시글 수 조회 -->
+    <select id="getYearlyPostCounts" resultType="com.vibesync.workspace.domain.DailyStatsDTO">
+        SELECT 
+            TO_CHAR(create_at, 'YYYY') as date,
+            COUNT(*) as count
+        FROM note n 
+        JOIN userPage u ON n.userPg_idx = u.userPg_idx
+        WHERE u.ac_idx = #{acIdx} 
+        AND create_at >= ADD_MONTHS(TRUNC(SYSDATE, 'YYYY'), -((#{years}-1)*12))
+        GROUP BY TO_CHAR(create_at, 'YYYY')
+        ORDER BY date
+    </select>
+    
+    <!-- 연별 조회수 조회 -->
+    <select id="getYearlyViewCounts" resultType="com.vibesync.workspace.domain.DailyStatsDTO">
+        SELECT 
+            TO_CHAR(create_at, 'YYYY') as date,
+            SUM(view_count) as count
+        FROM note n 
+        JOIN userPage u ON n.userPg_idx = u.userPg_idx
+        WHERE u.ac_idx = #{acIdx} 
+        AND create_at >= ADD_MONTHS(TRUNC(SYSDATE, 'YYYY'), -((#{years}-1)*12))
+        GROUP BY TO_CHAR(create_at, 'YYYY')
+        ORDER BY date
+    </select>
+
+</mapper> 

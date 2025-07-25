@@ -17,7 +17,7 @@ import com.vibesync.userpage.domain.UserSummaryVO;
 import com.vibesync.userpage.mapper.UserpageMapper;
 
 @Service
-public class UserpageServiceImpl implements UserpageService{
+public class UserPageServiceImpl implements UserPageService{
 
 	private static final int PAGE_SIZE = 9; // 한 번에 로드할 게시글 수
 

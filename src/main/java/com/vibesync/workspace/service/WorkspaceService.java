@@ -1,5 +1,5 @@
 package com.vibesync.workspace.service;
 
-public class temp {
+public class WorkspaceService {
 
 }

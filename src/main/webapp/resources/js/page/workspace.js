@@ -6,6 +6,35 @@ var todosById = {};
 let dateToRefreshAfterFetch = null;
 let isInitialLoad = true;
 
+// 블록 관련 전역 변수
+const userCharts = {};
+let isEditMode = false;
+let initialBlockOrder = null;
+let currentChatSenderIdx = null;
+
+
+// 고정 블록 AJAX 로드 함수
+function loadFixedBlock(blockType, containerSelector) {
+    console.log('고정 블록 로드 요청:', blockType);
+    
+    $.ajax({
+        url: contextPath + '/api/block/fixed/' + blockType,
+        type: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            console.log('고정 블록 로드 응답:', response);
+            
+            if (response.html) {
+                $(containerSelector).html(response.html);
+            }
+        },
+        error: function(xhr, status, error) {
+            console.error('고정 블록 로드 실패:', error);
+            $(containerSelector).html('<p style="color:red;">데이터 로드에 실패했습니다.</p>');
+        }
+    });
+}
+
 //  함수 
 // 최근 색상 관리를 위한 함수
 // [함수] localStorage에서 최근 색상 배열 가져오기
@@ -59,44 +88,57 @@ function loadDailySchedules(dateString) {
     const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
 
     // 3. 'YYYY년 MM월 DD일 (요일)' 형식으로 날짜 포맷팅
-    const formattedDate = `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일 (${weekdays[date.getDay()]})`;
+    const formattedDate = date.getFullYear() + '년 ' + (date.getMonth() + 1) + '월 ' + date.getDate() + '일 (' + weekdays[date.getDay()] + ')';
 
     // 4. JSP에 추가한 h4 태그에 포맷된 날짜 텍스트를 삽입
     $('#tab_schedule .schedule-date-title').text(formattedDate);
 	
-    var schedules = schedulesByDate[dateString];
-    var scheduleHtml = '<ul class="schedule-list">';
-    if (schedules && schedules.length > 0) {
-        $.each(schedules, function(index, schedule) {
-            var startDate = new Date(schedule.start);
-            var endDate = new Date(schedule.end);
-            var startTime = String(startDate.getHours()).padStart(2, '0') + ":" + String(startDate.getMinutes()).padStart(2, '0');
-            var endTime = String(endDate.getHours()).padStart(2, '0') + ":" + String(endDate.getMinutes()).padStart(2, '0');
-            var descriptionHtml = (schedule.description && schedule.description.trim() !== '') ? ' <span class="schedule-desc">' + schedule.description + '</span>' : '';
-            
-            scheduleHtml += `<li data-id="${schedule.id}">
-                               <div class="schedule-item-content">
-                                   <span class="schedule-time">${startTime} - ${endTime}</span>
-                                   <div class="schedule-details">
-                                       <span class="schedule-title">${schedule.title}</span>
-                                       ${descriptionHtml}
-                                   </div>
-                               </div>
-                               <button class="schedule-delete-btn">&times;</button>
-                           </li>`;
-        });
-    } else {
-        scheduleHtml += '<li class="no-schedule">등록된 일정이 없습니다.</li>';
-    }
-    scheduleHtml += '</ul>';
-    $('#tab_schedule .schedule-date-title').html('<i class="fa-regular fa-calendar-check"></i>' + formattedDate);
-    $('#daily-schedule-list-container').html(scheduleHtml);
+    console.log('일별 스케줄 요청:', dateString);
+    $.ajax({
+        url: contextPath + '/api/schedules/daily',
+        type: 'GET',
+        data: { date: dateString },
+        dataType: 'json',
+        success: function(schedules) {
+            console.log('일별 스케줄 응답:', schedules);
+            let scheduleHtml = '<ul class="schedule-list">';
+            if (schedules && schedules.length > 0) {
+                // 가져온 데이터로 목록 UI를 만듭니다. (기존 로직과 유사)
+                schedules.forEach(schedule => {
+                    const startDate = new Date(schedule.startTime); // 필드명은 VO/DTO에 맞게
+                    const endDate = new Date(schedule.endTime);
+                    const startTime = String(startDate.getHours()).padStart(2, '0') + ":" + String(startDate.getMinutes()).padStart(2, '0');
+                    const endTime = String(endDate.getHours()).padStart(2, '0') + ":" + String(endDate.getMinutes()).padStart(2, '0');
+                    const descriptionHtml = (schedule.description && schedule.description.trim() !== '') ? ' <span class="schedule-desc">' + schedule.description + '</span>' : '';
+
+                    scheduleHtml += `<li data-id="${schedule.scheduleIdx}">
+                                         <div class="schedule-item-content">
+                                             <span class="schedule-time">${startTime} - ${endTime}</span>
+                                             <div class="schedule-details">
+                                                 <span class="schedule-title">${schedule.title}</span>
+                                                 ${descriptionHtml}
+                                             </div>
+                                         </div>
+                                         <button class="schedule-delete-btn">&times;</button>
+                                     </li>`;
+                });
+            } else {
+                scheduleHtml += '<li class="no-schedule">등록된 일정이 없습니다.</li>';
+            }
+            scheduleHtml += '</ul>';
+            $('#daily-schedule-list-container').html(scheduleHtml);
+        },
+        error: function(xhr, status, error) {
+            console.error('일별 스케줄 요청 실패:', xhr.status, error);
+            $('#daily-schedule-list-container').html('<p>일정을 불러오는 데 실패했습니다.</p>');
+        }
+    });
 }
 
 // [함수] 할 일 목록 로딩
 function loadTodoList() { 
     $.ajax({
-        url: contextPath + '/todoList.do', 
+        url: contextPath + '/api/todos', 
         type: 'GET',
         dataType: 'json',
         success: function(todos) {
@@ -111,7 +153,7 @@ function loadTodoList() {
 				    let rgb = hexToRgb(todo.color);
 				
 				    // 2. li 태그에 CSS 변수로 RGB 값을 전달하고, 체크박스 구조 변경
-				    todoListHtml += `<li data-id="${todo.todo_idx}" style="--todo-r: ${rgb.r}; --todo-g: ${rgb.g}; --todo-b: ${rgb.b};">
+				    todoListHtml += `<li data-id="${todo.todoIdx}" style="--todo-r: ${rgb.r}; --todo-g: ${rgb.g}; --todo-b: ${rgb.b};">
                             			<label class="custom-checkbox-label">
                                 		<input type="checkbox" class="todo-checkbox" ${isChecked}>
                                 		<span class="custom-checkbox-span"></span>
@@ -119,7 +161,7 @@ function loadTodoList() {
                            				 <span class="todo-text ${textClass}">${todo.text}</span>
                             			<button class="todo-delete-btn">&times;</button>
                         			</li>`;
-				    todosById[todo.todo_idx] = todo;
+				    todosById[todo.todoIdx] = todo;
                 });
             } else {
                 todoListHtml += '<li style="justify-content:center; color:#888;">등록된 할 일이 없습니다.</li>';
@@ -222,14 +264,14 @@ $(document).ready(function() {
     const $monthSelect = $('#month-select');
     
     // 함수
-    const toLocalISOString = (date)=>{
+    const toLocalISOString = (date) => {
 		const y = date.getFullYear(),
 			  m = String(date.getMonth()+1).padStart(2, '0'),
 			  d = String(date.getDate()).padStart(2,'0'),
 			  h = String(date.getHours()).padStart(2, '0'),
 			  min = String(date.getMinutes()).padStart(2,'0');
 		return y + "-" + m + "-" + d + "T" + h + ":" + min;
-	}
+	};
     
     // [함수] 스케줄생성 모달 열기 
 	 const openNewScheduleModal = (options) => {
@@ -269,7 +311,7 @@ $(document).ready(function() {
 		$todoForm.hide();
     	$scheduleForm.show();
     	$unifiedModal.show();
-	}
+	};
 	
 	// [함수]날짜 칸 선택
 	const handleDateSelection = (dayCell) => {
@@ -321,13 +363,10 @@ $(document).ready(function() {
             $li.find('.todo-text').toggleClass('completed', isChecked);
             
             $.ajax({
-                url: contextPath + '/todoList.do',
-                type: 'POST',
-                data: {
-                    action: 'updateStatus',
-                    todoIdx: todoIdx,
-                    status: isChecked ? 1 : 0
-                },
+                url: contextPath + '/api/todos/' + todoIdx + '/status',
+                type: 'PUT',
+                data: JSON.stringify(isChecked ? 1 : 0),
+                contentType: 'application/json',
                 success: function(response) {
                     console.log("Todo [ID:" + todoIdx + "] 상태 변경 완료:", response);
                 },
@@ -345,12 +384,8 @@ $(document).ready(function() {
 
             if (confirm("정말로 이 할 일을 삭제하시겠습니까?")) {
                 $.ajax({
-                    url: contextPath + '/todoList.do',
-                    type: 'POST',
-                    data: {
-                        action: 'delete',
-                        todoIdx: todoIdx
-                    },
+                    url: contextPath + '/api/todos/' + todoIdx,
+                    type: 'DELETE',
                     success: function(response) {
                         console.log("Todo [ID:" + todoIdx + "] 삭제 완료:", response);
                         $li.fadeOut(300, function() { $(this).remove(); }); // 애니메이션 끝나고 실행
@@ -377,9 +412,9 @@ $(document).ready(function() {
             $todoForm[0].reset(); // $todoForm: jquery객체 -> reset() 없음, $todoForm[0](jquery에서 꺼내기): 순수 DOM 요소 -> reset 가능 
             $scheduleForm.hide(); // 스케줄 수정 숨기기
             
-            $('#todo-id').val(clickedTodo.todo_idx);
+            $('#todo-id').val(clickedTodo.todoIdx);
             $('#todo-text').val(clickedTodo.text);
-            $('#todo-group').val(clickedTodo.todo_group || '');
+            $('#todo-group').val(clickedTodo.todoGroup || '');
             $('#todo-color').val(clickedTodo.color || '#3788d8');
             
             displayRecentColors('#todo-recent-colors', '#todo-color');
@@ -392,10 +427,10 @@ $(document).ready(function() {
 
     // 3. 일정(Schedule) 관련
     $('#tab_schedule').on('click', '.schedule-item-content', function() { 
-    	const scheduleId = $(this).closest('li').data('id');
+    	const scheduleIdx = $(this).closest('li').data('id');
             let clickedSchedule = null;
             for (const date in schedulesByDate) {
-                const found = schedulesByDate[date].find(event => event.id == scheduleId);
+                const found = schedulesByDate[date].find(event => event.id == scheduleIdx);
                 if (found) {
                     clickedSchedule = found;
                     break;
@@ -426,10 +461,10 @@ $(document).ready(function() {
     $('#tab_schedule').on('click', '.schedule-delete-btn', function(e) { 
     	e.stopPropagation(); // 부모(li)의 수정 이벤트 방지
             const $li = $(this).closest('li');
-            const scheduleId = $li.data('id');
+            const scheduleIdx = $li.data('id');
             let scheduleDate = null;
             for (const date in schedulesByDate) {
-                const found = schedulesByDate[date].find(event => event.id == scheduleId);
+                const found = schedulesByDate[date].find(event => event.id == scheduleIdx);
                 if (found) {
                     const d = new Date(found.start);
                     scheduleDate = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -443,21 +478,14 @@ $(document).ready(function() {
             }
             if (confirm("정말로 이 일정을 삭제하시겠습니까?")) {
                 $.ajax({
-                    url: contextPath + '/schedules.do',
-                    type: 'POST',
-                    data: {
-                        action: 'deleteSchedule',
-                        schedule_idx: scheduleId
-                    },
-                    dataType: 'json',
+                    url: contextPath + `/api/schedules/${scheduleIdx}`,
+                    type: 'DELETE',
                     success: function(response) {
-                        if (response.success) {
-                            alert("일정이 삭제되었습니다.");
-                            dateToRefreshAfterFetch = scheduleDate;
-                            calendar.refetchEvents();
-                        } else {
-                            alert("삭제에 실패했습니다: " + (response.message || ""));
-                        }
+                        console.log('일정 삭제 응답:', response);
+                        // ResponseEntity<Void>는 성공 시 빈 응답을 반환
+                        alert("일정이 삭제되었습니다.");
+                        dateToRefreshAfterFetch = scheduleDate;
+                        calendar.refetchEvents();
                     },
                     error: function() {
                         alert("삭제 중 오류가 발생했습니다.");
@@ -510,30 +538,35 @@ $(document).ready(function() {
     $scheduleForm.on('submit', function(e) { 
 			e.preventDefault(); // 페이지 전체가 새로고침되는 브라우저의 기본 동작 막기
 								// AJAX를 이용해 폼을 제출하는 이벤트 핸들러에서는 반드시 가장 첫 줄에 e.preventDefault()를 작성
-            const scheduleId = $('#schedule-id').val();
-            const isUpdating = !!scheduleId; // boolean값으로 변환. if (scheduleId !== '' && scheduleId !== null && ...)
+            const scheduleIdx = $('#schedule-id').val();
+            const isUpdating = !!scheduleIdx; // boolean값으로 변환. if (scheduleIdx !== '' && scheduleIdx !== null && ...)
             const scheduleData = {
-                action: isUpdating ? 'updateSchedule' : 'addSchedule',
                 title: $('#schedule-title').val(),
                 description: $('#schedule-description').val(),
-                start_time: $('#schedule-start').val().replace('T', ' ') + ':00', //YYYY-MM-DD HH:MM:SS. DB TIMESTAMP 형식
-                end_time: $('#schedule-end').val().replace('T', ' ') + ':00',
+                startTime: new Date($('#schedule-start').val()).toISOString(), // ISO 8601 형식
+                endTime: new Date($('#schedule-end').val()).toISOString(), // ISO 8601 형식
                 color: $('#schedule-color').val()
             };
-            if (isUpdating) { scheduleData.schedule_idx = scheduleId; } // update인 경우 schedule_idx 추가로 담아줌
+            if (isUpdating) { scheduleData.scheduleIdx = scheduleIdx; } 
             const alertMessage = isUpdating ? "수정" : "추가";
             $.ajax({
-                url: contextPath +'/schedules.do',
-                type: 'POST',
-                data: scheduleData,
+                url: contextPath + (isUpdating ? '/api/schedules/' + scheduleIdx : '/api/schedules'),
+                type: isUpdating ? 'PUT' : 'POST',
+                data: JSON.stringify(scheduleData),
+                contentType: 'application/json',
                 success: function(response) {
-                    if (response.success) {
+                    console.log('스케줄 응답:', response);
+                    // ScheduleVO 객체가 반환되면 성공 (scheduleIdx가 있으면 성공)
+                    if (response && response.scheduleIdx) {
                         alert('일정이 성공적으로 ' + alertMessage + '되었습니다.');
                         saveRecentColor(scheduleData.color);
                         $unifiedModal.hide();
-                        dateToRefreshAfterFetch = scheduleData.start_time.substring(0, 10);
+                        dateToRefreshAfterFetch = scheduleData.startTime.substring(0, 10);
                         calendar.refetchEvents();
-                    } else { alert('일정 ' + alertMessage + '에 실패했습니다.'); }
+                    } else { 
+                        console.error('스케줄 실패 응답:', response);
+                        alert('일정 ' + alertMessage + '에 실패했습니다.');
+                    }
                 },
                 error: function() { alert('서버와 통신 중 오류가 발생했습니다.'); }
             });
@@ -545,24 +578,28 @@ $(document).ready(function() {
             const todoId = $('#todo-id').val();
             const isUpdating = !!todoId;
             const todoData = {
-                action: isUpdating ? 'updateTodo' : 'addTodo',
                 text: $('#todo-text').val(),
-                todo_group: $('#todo-group').val(),
+                todoGroup: $('#todo-group').val(),
                 color: $('#todo-color').val()
             };
             if (isUpdating) { todoData.todoIdx = todoId; }
             const alertMessage = isUpdating ? "수정" : "추가";
             $.ajax({
-                url: contextPath +'/todoList.do',
-                type: 'POST',
-                data: todoData,
+                url: contextPath + (isUpdating ? '/api/todos/' + todoId : '/api/todos'),
+                type: isUpdating ? 'PUT' : 'POST',
+                data: JSON.stringify(todoData),
+                contentType: 'application/json',
                 success: function(response) {
-                    if (response.success) {
+                    // TodoVO 객체가 반환되면 성공 (todoIdx가 있으면 성공)
+                    if (response && response.todoIdx) {
                         alert('할 일이 성공적으로 ' + alertMessage + '되었습니다.');
                         saveRecentColor(todoData.color);
                         $unifiedModal.hide();
                         loadTodoList();
-                    } else { alert('할 일 ' + alertMessage + '에 실패했습니다.'); }
+                    } else { 
+                        console.error('할 일 실패 응답:', response);
+                        alert('할 일 ' + alertMessage + '에 실패했습니다.');
+                    }
                 },
                 error: function() { alert('서버와 통신 중 오류가 발생했습니다.'); }
             }); 
@@ -597,9 +634,8 @@ $(document).ready(function() {
             else { return; }
 
             $.ajax({
-                url: contextPath + '/note.do',
+                url: contextPath + '/api/block/fixed/' + type + '/more',
                 type: 'GET',
-                data: { action: action },
                 dataType: 'json',
                 success: function(posts) {
                     const $listModal = $('#list-modal');
@@ -608,13 +644,13 @@ $(document).ready(function() {
                     if (posts && posts.length > 0) {
                         posts.forEach(function(post) {
                             listHtml += `<li>
-                                        <a href="postView.do?nidx=${post.note_idx}">
+                                        <a href="postView.do?nidx=${post.noteIdx}">
                                             <div class="post-main-info">
                                                 <span class="widget-post-title">${post.title}</span>
-                                                <span>조회수 ${post.view_count} | 좋아요 ${post.like_count}</span>
+                                                <span>조회수 ${post.viewCount} | 좋아요 ${post.likeCount}</span>
                                             </div>
                                             <div class="widget-post-author">
-                                                <span class="widget-post-meta">BY ${post.author_name}</span>
+                                                <span class="widget-post-meta">BY ${post.authorName}</span>
                                             </div>
                                         </a>
                                     </li>`;
@@ -745,20 +781,21 @@ $(document).ready(function() {
                 events: function(fetchInfo, successCallback, failureCallback) {
                     var startIso = fetchInfo.start.toISOString();
                     var endIso = fetchInfo.end.toISOString(); 
+                    console.log('캘린더 이벤트 요청:', startIso, '~', endIso);
                     $.ajax({
-                        url: contextPath +'/schedules.do',
+                        url: contextPath +'/api/schedules',
                         method: 'GET',
                         data: {
-                            action: 'getMonthlySchedules',
-                            start: startIso,
-                            end: endIso
+                            start: fetchInfo.start.toISOString(),
+                            end: fetchInfo.end.toISOString()
                         },
                         dataType: 'json',
-                        success: function(data) {
+                        success: function(events) {
+                            console.log('캘린더 이벤트 응답:', events);
                             // 1. 받은 데이터의 날짜 문자열을 Date 객체로 변환
-                            var processedEvents = data.map(function(event) {
+                            var processedEvents = events.map(function(event) {
                                 return {
-                                    id: event.id, // FullCalendar 표준 ID
+                                    id: event.scheduleIdx, // FullCalendar 표준 ID
                                     title: event.title,
                                     color: event.color,
                                     description: event.description,
@@ -768,7 +805,7 @@ $(document).ready(function() {
                                     allDay : event.allDay
                                 };
                             });
-
+                            
                             // 2. Date 객체로 변환된 데이터를 사용해 schedulesByDate 객체 생성
                             schedulesByDate = {}; // 초기화
                             processedEvents.forEach(function(event) {
@@ -795,7 +832,7 @@ $(document).ready(function() {
 									loopStartDate.setDate(loopStartDate.getDate()+1);
 								}
                             });
-
+                            
                             // 3. 날짜별로 일정 정렬
                             for (var date in schedulesByDate) {
                                 schedulesByDate[date].sort((a, b) => a.start - b.start);
@@ -828,14 +865,86 @@ $(document).ready(function() {
                         }
                     });
                 },
+							/*
+                            // 1. 캐시 초기화 (매번 새로 채우기 위함)
+				            schedulesByDate = {}; 
+				
+				            // 2. 받아온 일정으로 캐시 데이터 생성
+				            events.forEach(event => {
+				                // event.start는 'YYYY-MM-DDTHH:mm:ss.sssZ' 형식이므로 날짜 부분만 추출
+				                const dateKey = event.start.substring(0, 10); 
+				                if (!schedulesByDate[dateKey]) {
+				                    schedulesByDate[dateKey] = []; // 해당 날짜의 배열이 없으면 새로 생성
+				                }
+				                // FullCalendar 이벤트 객체와 우측 탭에서 사용하는 데이터 형식이 다를 수 있으므로
+				                // 필요한 속성을 맞춰서 push합니다. (id, title, start, end, description, color 등)
+				                schedulesByDate[dateKey].push({
+				                    id: event.scheduleIdx,
+				                    title: event.title,
+				                    description: event.description, // extendedProps 확인
+				                    start: event.start,
+				                    end: event.end,
+				                    color: event.color
+				                });
+				            });
+				
+				            console.log('업데이트된 schedulesByDate 캐시:', schedulesByDate);
+				
+				            // FullCalendar에 이벤트 전달
+				            successCallback(events);
+                            
+                            // 최초 로딩 시 오늘 날짜 일정 로드
+                            if (isInitialLoad) {
+                                const todayStr = getTodayString();
+                                loadDailySchedules(todayStr);
+                              
+                                isInitialLoad = false; // 플래그를 꺼서 다시는 실행되지 않게 함
+                            }
+
+                            // 4. 새로고침이 필요한 날짜가 있는지 확인하고, 목록을 다시 그립니다.
+                            if (dateToRefreshAfterFetch) {
+								const targetCell = calendarEl.querySelector('td[data-date="' + dateToRefreshAfterFetch + '"]')
+								if(targetCell){
+									handleDateSelection(targetCell);
+								}else{
+									// 현재 캘린더 뷰에 해당 날짜가 없으면 목록만 새로고침
+									loadDailySchedules(dateToRefreshAfterFetch);
+								}
+                                dateToRefreshAfterFetch = null; // 변수 초기화
+                            }
+                        },
+                        
+                        error: function(xhr, status, error) {
+                            console.error('캘린더 이벤트 요청 실패:', xhr.status, error);
+                            failureCallback(new Error(xhr.statusText));
+                        }
+                    });
+                },
+                */
                 // --- 날짜 클릭 이벤트 ---
                 dateClick: function(info) {
 					handleDateSelection(info.dayEl);
                 },
                 eventClick: function(info) {
-					// 클릭된 지점에서 가장 가까운 날짜 칸(.fc-daygrid-day) 찾기
-					const dayCell = info.jsEvent.target.closest('.fc-daygrid-day');
-					handleDateSelection(dayCell);	
+					// 1. 클릭된 이벤트의 시작 날짜를 가져옵니다.
+				    const eventDate = info.event.start;
+				    if (!eventDate) {
+				        console.error("이벤트에 날짜 정보가 없습니다.");
+				        return;
+				    }
+				
+				    // 2. 날짜를 'YYYY-MM-DD' 형식의 문자열로 변환합니다.
+				    const year = eventDate.getFullYear();
+				    const month = String(eventDate.getMonth() + 1).padStart(2, '0');
+				    const day = String(eventDate.getDate()).padStart(2, '0');
+				    const dateStr = `${year}-${month}-${day}`;
+				
+				    // 3. 변환된 날짜 문자열을 사용해 캘린더 그리드에서 해당 날짜 칸(cell)을 직접 찾습니다.
+				    const dayCell = calendarEl.querySelector(`td[data-date="${dateStr}"]`);
+				
+				    // 4. 찾은 날짜 칸으로 handleDateSelection 함수를 호출합니다.
+				    //    이제 팝업에서 이벤트를 클릭해도 해당 날짜가 정상적으로 선택됩니다.
+				    handleDateSelection(dayCell);
                 },
                 select: function(selectInfo){
 					const addButton = $('#add-event-button');
@@ -864,55 +973,58 @@ $(document).ready(function() {
 					$('#add-event-button').hide();
 				}, 
 				eventDrop: function(dropInfo){
+				console.log("전달되는 이벤트 ID:", dropInfo.event.id);
+    			console.log("ID의 타입:", typeof dropInfo.event.id);
 					// 1. 서버에 전송할 데이터 객체 생성
 					const scheduleData = {
-						action: 'updateSchedule',
-						schedule_idx : dropInfo.event.id,
 						title: dropInfo.event.title,
-						description: dropInfo.event.extendedProps.description || '',
+						description: dropInfo.event.description || '',
 						color : dropInfo.event.backgroundColor,
-						start_time : toLocalISOString(dropInfo.event.start).replace('T', ' ') + ':00',
-						end_time : dropInfo.event.end ? toLocalISOString(dropInfo.event.end).replace('T', ' ') + ':00' : toLocalISOString(dropInfo.event.start).replace('T', ' ') + ':00'
+						startTime : dropInfo.event.start.toISOString(),
+						endTime : dropInfo.event.end ? dropInfo.event.end.toISOString() : dropInfo.event.start.toISOString(),
 					}
 					
 					// 2. AJAX를 통해 서버에 변경 사항을 전송
 					$.ajax({
-						url : contextPath + '/schedules.do',
-						type :'POST',
-						data: scheduleData,
-						success : function(response){
-							if(response.success){
-								const newDateStr = scheduleData.start_time.substring(0,10);
-								dateToRefreshAfterFetch = newDateStr;
-								calendar.refetchEvents();
-								
-							}else{
-								dropInfo.revert();
-							}
+						url : contextPath + '/api/schedules/' + dropInfo.event.id,
+						type :'PUT',
+						data: JSON.stringify({
+							title: dropInfo.event.title,
+							description: dropInfo.event.description || '',
+							color: dropInfo.event.backgroundColor,
+							startTime: dropInfo.event.start.toISOString(),
+							endTime: dropInfo.event.end ? dropInfo.event.end.toISOString() : dropInfo.event.start.toISOString()
+						}),
+						contentType: 'application/json',
+						success : function(){
+							console.log("일정 이동 성공");
+							loadDailySchedules(dropInfo.event.start.toISOString().substring(0, 10));
 						},
 						error: function(){
 							alert("서버와 통신 중 오류가 발생했습니다.");
 							dropInfo.revert();
 						}
-					})
+					});
 				},
+				
 				eventResize : function(resizeInfo){
 					const scheduleData = {
-						action: 'updateSchedule',
-						schedule_idx : resizeInfo.event.id,
 						title: resizeInfo.event.title,
-						description: resizeInfo.event.extendedProps.description || '',
+						description: resizeInfo.event.description || '',
 						color : resizeInfo.event.backgroundColor,
-						start_time : toLocalISOString(resizeInfo.event.start).replace('T', ' ') + ':00',
-						end_time : resizeInfo.event.end ? toLocalISOString(resizeInfo.event.end).replace('T', ' ') + ':00' : toLocalISOString(resizeInfo.event.start).replace('T', ' ') + ':00'
+						startTime : resizeInfo.event.start.toISOString(),
+						endTime : resizeInfo.event.end ? resizeInfo.event.end.toISOString() : resizeInfo.event.start.toISOString()
 					};
 					$.ajax({
-						url : contextPath + '/schedules.do',
-						type :'POST',
-						data: scheduleData,
+						url : contextPath + '/api/schedules/' + resizeInfo.event.id,
+						type :'PUT',
+						data: JSON.stringify(scheduleData),
+						contentType: 'application/json',
 						success : function(response){
-							if(response.success){
-								dataToRefreshAfterFetch = scheduleData.start_time.substring(0,10);
+							if(response && response.scheduleIdx){
+								// 캐시 초기화하여 최신 데이터로 업데이트
+								schedulesByDate = {};
+								dateToRefreshAfterFetch = scheduleData.startTime.substring(0,10);
 								calendar.refetchEvents();
 							}else{
 								resizeInfo.revert();
@@ -931,4 +1043,512 @@ $(document).ready(function() {
     // --- 초기 데이터 로딩 함수 호출 ---
     loadTodoList();
     populateDatePicker();
+    
+    // --- 블록 관련 초기화 ---
+    // 초기 페이지 로드 - 차트 데이터 설정
+    $('.generated_block').each(function() {
+        const blockId = $(this).attr('id').split('-')[1];
+        const chartDataJson = $(this).find('.block-content').attr('data-chart-data');
+        if (chartDataJson) {
+            try {
+                createOrUpdateChart(blockId, JSON.parse(chartDataJson));
+            } catch (e) {
+                console.error('차트 데이터 파싱 오류:', e);
+                    }
+    }
 });
+
+// ========================================
+// 블록 관련 함수들
+// ========================================
+
+// '+' 버튼 표시 여부를 업데이트하는 함수
+function updateAddBlockButtonVisibility() {
+    if ($('.generated_block').length >= 5) {
+        $("#content_plus").hide();
+    } else {
+        $("#content_plus").show();
+    }
+}
+
+// 차트 생성 함수
+function createOrUpdateChart(blockId, chartData) {
+    const chartId = 'userStatsChart_' + blockId;
+    if (userCharts[chartId]) {
+        userCharts[chartId].destroy();
+    }
+    const chartElement = document.getElementById(chartId);
+    const ctx = chartElement ? chartElement.getContext('2d') : null;
+    if (!ctx) return;
+
+    const chart = new Chart(ctx, {
+        type: 'line',
+        data: chartData,
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: { y: { beginAtZero: true } },
+            plugins: { legend: { position: 'top' }, tooltip: { mode: 'index', intersect: false } },
+            hover: { mode: 'index', intersect: false }
+        }
+    });
+    userCharts[chartId] = chart;
+}
+
+// 블록 추가 함수
+function addBlockToServer(blockType, config, period) {
+    $.ajax({
+        url: contextPath + '/api/block?blockType=' + blockType + '&period=' + (period || 'weekly'),
+        type: 'POST',
+        data: JSON.stringify(config),
+        contentType: 'application/json',
+        dataType: 'json',
+        success: function(res) {
+            // 1. 새로운 HTML을 화면에 추가
+            $('#content_plus').before(res.html);
+            
+            // 2. 만약 추가된 블록이 차트 블록이라면, 차트를 그려줌
+            if (res.block_type === 'UserStats' && res.chart_data) {
+                createOrUpdateChart(res.block_id, res.chart_data);
+            }
+            
+            // 3. '+' 버튼 표시 여부 업데이트
+            updateAddBlockButtonVisibility();
+        },
+        error: function() { alert('블록을 추가하는 데 실패했습니다.'); }
+    });
+}
+
+// 블록 삭제 함수
+function deleteBlock(blockId) {
+    if (!confirm("블록을 정말 삭제하시겠습니까?")) return;
+    $.ajax({
+        url: contextPath + '/api/block/' + blockId,
+        type: 'DELETE',
+        dataType: 'json',
+        success: function(res) {
+            if (res.success) {
+                $('#block-' + blockId).fadeOut(function() {
+                    $(this).remove();
+                    
+                    updateAddBlockButtonVisibility();
+                });
+            } else { alert(res.message); }
+        },
+        error: function() { alert('블록 삭제 중 오류가 발생했습니다.'); }
+    });
+}
+
+// --- 워크스페이스 순서 편집 관련 함수 ---
+
+// 편집 모드로 진입하는 함수
+function enterEditMode() {
+    isEditMode = true;
+    initialBlockOrder = $('.generated_block').clone(true, true); // 초기 상태 저장
+
+    $('#contents_grid').addClass('edit-mode');
+    $('#edit-order-btn').hide();
+    $('#save-order-btn, #cancel-order-btn').show();
+
+    // 각 블록에 화살표 버튼 추가
+    $('.generated_block').each(function() {
+        $(this).append(
+            '<button class="move-block-btn move-left-btn" title="왼쪽으로 이동"><i class="fa-solid fa-chevron-left"></i></button>' +
+            '<button class="move-block-btn move-right-btn" title="오른쪽으로 이동"><i class="fa-solid fa-chevron-right"></i></button>'
+        );
+    });
+    updateArrowVisibility();
+}
+
+// 편집 모드를 종료하는 함수
+function exitEditMode() {
+    isEditMode = false;
+    initialBlockOrder = null; // 초기 상태 리셋
+
+    $('#contents_grid').removeClass('edit-mode');
+    $('#edit-order-btn').show();
+    $('#save-order-btn, #cancel-order-btn').hide();
+
+    // 모든 화살표 버튼 제거
+    $('.move-block-btn').remove();
+}
+
+// 화살표 버튼의 표시 여부를 업데이트하는 함수
+function updateArrowVisibility() {
+    const movableBlocks = $('.generated_block');
+    const totalMovable = movableBlocks.length;
+
+    movableBlocks.each(function(index) {
+        const $leftArrow = $(this).find('.move-left-btn');
+        const $rightArrow = $(this).find('.move-right-btn');
+
+        // 첫 번째 블록이면 왼쪽 화살표 숨김
+        if (index === 0) {
+            $leftArrow.hide();
+        } else {
+            $leftArrow.show();
+        }
+
+        // 마지막 블록이면 오른쪽 화살표 숨김
+        if (index === totalMovable - 1) {
+            $rightArrow.hide();
+        } else {
+            $rightArrow.show();
+        }
+    });
+}
+
+// 변경된 블록 순서를 서버에 저장하는 함수
+function saveBlockOrder() {
+    const orderData = [];
+    $('.generated_block').each(function(index) {
+        const blockId = $(this).attr('id').split('-')[1];
+        // block_order는 1부터 시작하도록 index + 1
+        orderData.push({ blockId: parseInt(blockId), block_order: index + 1 });
+    });
+
+    $.ajax({
+        url: contextPath + '/api/block/order',
+        type: 'POST',
+        data: JSON.stringify(orderData),
+        contentType: 'application/json',
+        dataType: 'json',
+        success: function(res) {
+            if (res.success) {
+                alert('블록 순서가 저장되었습니다.');
+                exitEditMode();
+            } else {
+                alert(res.message || '순서 저장에 실패했습니다.');
+            }
+        },
+        error: function() {
+            alert('서버와 통신 중 오류가 발생했습니다.');
+        }
+    });
+}
+
+// ========================================
+// 채팅방 관련 함수들
+// ========================================
+
+// 채팅 내역 닫기
+function closeChatModal() {
+    $('#chatModal').hide();
+    location.reload();
+}
+
+// 채팅방에서 메시지 전송
+function sendChatMessage() {
+    const message = $("#chatInput").val().trim();
+    if (!message || !currentChatSenderIdx) return;
+
+    $.ajax({
+        url: contextPath + '/message.do',
+        type: 'POST',
+        data: JSON.stringify({
+            receiver_idx: currentChatSenderIdx,
+            text: message
+        }),
+        contentType: "application/json; charset=utf-8",
+        success: function(res) {
+            $("#chatInput").val(""); // 입력창 비우기
+
+            // 메시지 전송 성공시 채팅 내역 갱신
+            // 서버에서 새 메시지 저장 후, 최신 내역 반환
+            // 채팅내역 새로 불러오기
+            reloadChatHistory();
+        },
+        error: function() {
+            alert('메시지 전송 실패!');
+        }
+    });
+}
+
+// 채팅내역 새로 불러오기
+function reloadChatHistory() {
+    if (currentChatSenderIdx) {
+        $('.message_item[data-sender-idx="'+currentChatSenderIdx+'"]').click();
+    }
+}
+    
+    // + 버튼 표시여부 결정
+    updateAddBlockButtonVisibility();
+
+    // 고정 블록 AJAX 로드
+    loadFixedBlock('MyPosts', '#my-posts .fixed-block-content');
+    loadFixedBlock('LikedPosts', '#liked-posts .fixed-block-content');
+    
+    // 이벤트 관련
+    const grid = $('#contents_grid');
+
+    // 이벤트 위임을 사용하여 새로고침 및 삭제 버튼 이벤트 한 번에 처리
+    grid.on('click', '.block-actions button', function() {
+        const button = $(this);
+        const blockId = button.data('block-id');
+
+        if (button.hasClass('refresh-block-btn')) {
+            const blockContentDiv = $('#block-' + blockId + ' .block-content');
+            blockContentDiv.html('<div class="loading-spinner"></div>');
+            
+            // 현재 활성화된 기간 버튼에서 period 가져오기
+            const period = $('#block-' + blockId).find('.period-btn.active').data('period') || 'weekly';
+            
+            $.ajax({
+                url: contextPath + '/api/block/' + blockId,
+                type: 'GET',
+                data: { period: period },
+                dataType: 'json',
+                success: function(res) {
+                    // 1. 새로운 HTML로 내용을 교체
+                    blockContentDiv.html(res.html);
+
+                    // 2. 만약 블록 타입이 'UserStats'이고 차트 데이터가 있다면 차트를 다시 그림
+                    if (res.block_type === 'UserStats' && res.chart_data) {
+                        $('#block-' + blockId).find('.block-header h4').html('<i class="fa-solid fa-chart-simple"></i>&nbsp;' + res.title);
+                        createOrUpdateChart(blockId, res.chart_data);
+                    }
+                },
+                error: function() {
+                    blockContentDiv.html('<p style="color:red;">새로고침 실패</p>');
+                }
+            });
+        } else if (button.hasClass('delete-block-btn')) {
+            deleteBlock(blockId);
+        }
+    });
+
+    // 차트 데이터셋 토글
+    grid.on('change', '.dataset-toggle-cb', function() {
+        const checkbox = $(this);
+        const chartId = checkbox.closest('.chart-toggles').data('chart-id');
+        const datasetIndex = checkbox.data('dataset-index');
+        const chart = userCharts[chartId];
+        if (chart) {
+            chart.setDatasetVisibility(datasetIndex, checkbox.prop('checked'));
+            chart.update();
+        }
+    });
+    
+    // 통계 블록의 기간 변경 버튼 이벤트 핸들러
+    grid.on('click', '.period-btn', function() {
+        const $button = $(this);
+        const blockId = $button.data('block-id');
+        const period = $button.data('period');
+
+        // 이미 활성화된 버튼을 누르면 아무것도 하지 않음
+        if ($button.hasClass('active')) {
+            return;
+        }
+        
+        // 버튼 활성 상태 UI 업데이트
+        $button.siblings().removeClass('active');
+        $button.addClass('active');
+
+        // 로딩 스피너 표시
+        const blockContentDiv = $('#block-' + blockId + ' .block-content');
+        blockContentDiv.html('<div class="loading-spinner"></div>');
+
+        // 해당 블록을 새로운 기간으로 새로고침
+        $.ajax({
+            url: contextPath + '/api/block/' + blockId,
+            type: 'GET',
+            data: { period: period },
+            dataType: 'json',
+            success: function(res) {
+                // 새 HTML로 교체
+                blockContentDiv.html(res.html);
+                // 차트 다시 그리기
+                if (res.block_type === 'UserStats' && res.chart_data) {
+                    const $headerTitle = $('#block-' + blockId).find('.block-header h4');
+                    $headerTitle.html('<i class="fa-solid fa-chart-simple"></i>&nbsp;' + res.title);
+                    createOrUpdateChart(blockId, res.chart_data);
+                }
+            },
+            error: function() {
+                blockContentDiv.html('<p style="color:red;">새로고침 실패</p>');
+            }
+        });
+    });
+
+    // --- 블록 추가 모달 관련 이벤트 ---
+    $('#content_plus').on('click', function() {
+        $('html, body').scrollTop(0);
+        $('#addBlockModal').css({
+            position: 'fixed',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            backgroundColor: 'rgba(0,0,0,0.8)',
+            display: 'flex',
+            zIndex: 99999
+        });
+    });
+    
+    $('#blockTypeSelector').on('change', function() {
+        if ($(this).val() === 'CategoryPosts') { 
+            $('#category').show(); 
+        } else { 
+            $('#category').hide(); 
+        }
+    }).change();
+
+    $('#confirmAddBlock').on('click', function() {
+        const blockType = $('#blockTypeSelector').val();
+        let config = {};
+        let period = 'weekly'; // 기본값
+        
+        if (blockType === 'CategoryPosts') {
+            config = {
+                category_idx: parseInt($('#categorySelector').val()),
+                category_name: $('#categorySelector option:selected').text(),
+                sort_type: $('#sortTypeSelector').val()
+            };
+        } else if (blockType === 'UserStats') {
+            // UserStats 블록의 경우 기간 선택이 있을 수 있으므로 기본값 사용
+            period = 'weekly';
+        }
+        
+        addBlockToServer(blockType, config, period);
+        $('#addBlockModal').hide();
+    });
+    
+    // 모달 외부 클릭/ESC로 닫기
+    $(document).on('keydown', function(e) {
+        if (e.key === 'Escape') {
+            $('#addBlockModal').hide();
+        }
+    });
+
+    $('#addBlockModal').on('click', function(e) {
+        if (e.target.id === 'addBlockModal') {
+            $(this).hide();
+        }
+    });
+   
+    // --- 워크스페이스 순서 편집 관련 이벤트 ---
+    // 편집 모드 진입
+    $('#edit-order-btn').on('click', function() {
+        enterEditMode();
+    });
+
+    // 편집 취소
+    $('#cancel-order-btn').on('click', function() {
+        if (initialBlockOrder) {
+            // 이동시킨 블록들 전부 제거
+            $('.generated_block').remove();
+
+            // 초기 상태의 블록들 다시 삽입
+            initialBlockOrder.each(function() {
+                $('#content_plus').before(this);
+                
+                if ($(this).find('canvas[id^="userStatsChart_"]').length > 0) {
+                    $(this).find('.refresh-block-btn').trigger('click');
+                }
+            });
+        }
+        exitEditMode();
+    });
+
+    // 편집된 순서 저장
+    $('#save-order-btn').on('click', function() {
+        saveBlockOrder();
+    });
+
+    // 동적으로 생성된 화살표 버튼 클릭 처리 : 이벤트 위임 사용
+    $('#contents_grid').on('click', '.move-block-btn', function() {
+        const $thisBlock = $(this).closest('.generated_block');
+        const movableBlocks = $('.generated_block').toArray();
+        const currentIndex = movableBlocks.indexOf($thisBlock[0]);
+
+        let targetIndex = -1;
+
+        if ($(this).hasClass('move-left-btn')) {
+            targetIndex = currentIndex - 1;
+        } else if ($(this).hasClass('move-right-btn')) {
+            targetIndex = currentIndex + 1;
+        }
+
+        if (targetIndex >= 0 && targetIndex < movableBlocks.length) {
+            const $targetBlock = $(movableBlocks[targetIndex]);
+            if ($(this).hasClass('move-left-btn')) {
+                $targetBlock.before($thisBlock);
+            } else {
+                $targetBlock.after($thisBlock);
+            }
+            updateArrowVisibility(); // 화살표 상태 즉시 업데이트
+        }
+    });
+
+    // --- 채팅방 관련 이벤트 ---
+    $('.message_item').on('click', function () {
+        const senderIdx = $(this).data('sender-idx');
+        currentChatSenderIdx = senderIdx;
+        const nickname = $(this).data('nickname');
+        $('#chatTitle').text(nickname);
+        
+        $.ajax({
+            url: contextPath + '/message.do',
+            type: 'GET',
+            data: { 
+                sender_idx: senderIdx,
+                view: 'CHAT'
+            },
+            dataType: 'json',
+            success: function (chatList) {
+                $('#chatHistory').empty();
+
+                if (!chatList || !Array.isArray(chatList) || chatList.length === 0) {
+                    $('#chatHistory').html('<p style="text-align:center; color:grey;">채팅 내역이 없습니다.</p>');
+                    return;
+                }
+                
+                const chatContainer = $('<div class="chat-container"></div>');
+                let lastDate = null;
+
+                chatList.forEach(msg => {
+                    if (msg.date !== lastDate) {
+                        lastDate = msg.date;
+                        const dateLabel = $('<div class="chat-date-separator"></div>').text(lastDate);
+                        chatContainer.append(dateLabel);
+                    }
+                    
+                    const who = msg.isMine ? 'bubble-me' : 'bubble-other';
+                    const formattedText = msg.text.replace(/\n/g, '<br>');
+
+                    const messageHtml = '<div class="chat-bubble ' + who + '">' +
+                        '<div class="bubble-text">' + formattedText + '</div>' +
+                        '<div class="bubble-time">' + msg.relativeTime + '</div>' +
+                        '</div>';
+                    chatContainer.append(messageHtml);
+                });
+
+                $('#chatHistory').append(chatContainer);
+
+                $('#chatModal').css({
+                    display: 'flex',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    backgroundColor: 'rgba(0,0,0,0.8)'
+                });
+                
+                if(chatContainer.length) {
+                    chatContainer.scrollTop(chatContainer[0].scrollHeight);
+                }
+            },
+            error: function () {
+                alert('채팅 내역 불러오기 실패');
+            }
+        });
+    });
+    
+    // 채팅방에서 메시지 전송 (버튼 클릭 또는 엔터)
+    $("#sendMessageBtn").on("click", sendChatMessage);
+
+    $("#chatInput").on("keydown", function(e) {
+        if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            sendChatMessage();
+        }
+    });
+}); // $(document).ready() 닫는 중괄호
