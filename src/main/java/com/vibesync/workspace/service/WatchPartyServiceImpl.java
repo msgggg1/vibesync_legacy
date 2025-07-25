@@ -14,14 +14,16 @@ import lombok.extern.log4j.Log4j;
 @Service
 @Log4j
 public class WatchPartyServiceImpl implements WatchPartyService {
-    
+
     @Autowired
     private WorkspaceWatchPartyMapper watchPartyMapper;
+    
+
 
     @Override
     @Transactional(readOnly = true)
     public List<WatchPartyDTO> getFollowingWatchPartyList(int acIdx) {
-        log.info("팔로우 중인 워치파티 목록 조회. 사용자 ID: " + acIdx);
+        log.info("팔로우하는 사용자들의 워치파티 목록 조회. 사용자 ID: " + acIdx);
         return watchPartyMapper.findFollowingWatchPartyList(acIdx);
     }
 } 

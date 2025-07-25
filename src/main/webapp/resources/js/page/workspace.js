@@ -1096,9 +1096,9 @@ function createOrUpdateChart(blockId, chartData) {
 }
 
 // 블록 추가 함수
-function addBlockToServer(blockType, config) {
+function addBlockToServer(blockType, config, period) {
     $.ajax({
-        url: contextPath + '/api/block?blockType=' + blockType,
+        url: contextPath + '/api/block?blockType=' + blockType + '&period=' + (period || 'weekly'),
         type: 'POST',
         data: JSON.stringify(config),
         contentType: 'application/json',
@@ -1395,6 +1395,7 @@ function reloadChatHistory() {
     $('#confirmAddBlock').on('click', function() {
         const blockType = $('#blockTypeSelector').val();
         let config = {};
+        let period = 'weekly'; // 기본값
         
         if (blockType === 'CategoryPosts') {
             config = {
@@ -1402,9 +1403,12 @@ function reloadChatHistory() {
                 category_name: $('#categorySelector option:selected').text(),
                 sort_type: $('#sortTypeSelector').val()
             };
+        } else if (blockType === 'UserStats') {
+            // UserStats 블록의 경우 기간 선택이 있을 수 있으므로 기본값 사용
+            period = 'weekly';
         }
         
-        addBlockToServer(blockType, config);
+        addBlockToServer(blockType, config, period);
         $('#addBlockModal').hide();
     });
     
