@@ -75,9 +75,10 @@
 				<div id="loginView"
 					style="${formToShow eq 'login' ? 'display: block;' : 'display: none;'}">
 					<div id="loginFormContainer" style="display: flex;">
-						<form action="${pageContext.request.contextPath}/login/process"
+						<!-- <form action="${pageContext.request.contextPath}/login/process" -->
+						<form action="${pageContext.request.contextPath}/login" 
 							method="post" id="loginForm">
-							<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+							<!-- <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/> -->
 
 							<%-- 비밀번호 재설정 요청 메시지 --%>
 							<c:if test="${ loginMessage != null && !loginMessage.isEmpty() }">
@@ -135,8 +136,8 @@
 
 							<div class="checkbox-group">
 								<div class="checkbox-pair">
-									<input type="checkbox" name="autoLogin" id="autoLogin">
-									<label for="autoLogin">Auto-Login</label>
+									<input type="checkbox" name="remember-me" id="remember-me">
+									<label for="remember-me">Auto-Login</label>
 								</div>
 								<div class="checkbox-pair">
 									<input type="checkbox" name="RememEmail" id="RememEmail"

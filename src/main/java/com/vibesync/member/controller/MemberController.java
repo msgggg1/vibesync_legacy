@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.vibesync.listener.DuplicateLoginPreventer;
 import com.vibesync.member.domain.MemberVO;
 import com.vibesync.member.domain.SignUpDTO;
 import com.vibesync.member.service.MemberService;
@@ -46,20 +45,6 @@ public class MemberController {
         response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
         response.setHeader("Pragma", "no-cache");
         response.setDateHeader("Expires", 0);
-
-        // 2. 자동 로그인 쿠키 확인
-        if (!"logout".equals(from)&&autoLoginEmail != null) {
-            MemberVO memberInfo = null;
-			try {
-				memberInfo = memberService.autoLogin(autoLoginEmail);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-            if (memberInfo != null) {
-                // 자동 로그인 성공 시, 공통 로그인 처리 후 리다이렉트
-                return processSuccessfulLogin(request, response, session, memberInfo, false, false);
-            }
-        }
 
         // 3. 이메일 기억하기 쿠키가 있으면 모델에 추가
         if (rememberedEmail != null) {
@@ -185,20 +170,6 @@ public class MemberController {
     private String processSuccessfulLogin(HttpServletRequest request, HttpServletResponse response, HttpSession session,
                                           MemberVO memberInfo, boolean rememberEmail, boolean autoLogin) throws IOException {
         String memberEmail = memberInfo.getEmail();
-
-        // 1. 중복 로그인 방지 로직
-        if (DuplicateLoginPreventer.loginUsers.containsKey(memberEmail)) {
-            HttpSession oldSession = DuplicateLoginPreventer.loginUsers.get(memberEmail);
-            if (oldSession != null && !oldSession.getId().equals(session.getId())) {
-                System.out.println("[UserController] 중복 로그인 감지! 기존 세션 강제 종료: " + memberEmail);
-                try {
-                    oldSession.invalidate(); // 기존 세션 무효화
-                } catch (IllegalStateException e) {
-                    System.err.println("이미 무효화된 세션에 접근: " + e.getMessage());
-                }
-            }
-        }
-        DuplicateLoginPreventer.loginUsers.put(memberEmail, session);
 
         // 2. '이메일 기억하기', '자동 로그인' 쿠키 처리
         handleLoginCookies(response, memberEmail, rememberEmail, autoLogin);
