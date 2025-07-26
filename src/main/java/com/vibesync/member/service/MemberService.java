@@ -9,7 +9,7 @@ import com.vibesync.member.domain.SignUpDTO;
 public interface MemberService {
 		
 		// 로그인 : 이메일, 비밀번호 활용
-		public MemberVO login(LoginDTO dto) throws Exception; 
+		//public MemberVO login(LoginDTO dto) throws Exception; 
 		
 		// 자동로그인 : 쿠키의 사용자 이메일 정보 활용
 		public MemberVO autoLogin(String email) throws Exception;

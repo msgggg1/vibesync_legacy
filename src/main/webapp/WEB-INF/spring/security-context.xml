@@ -23,26 +23,43 @@
       <security:intercept-url pattern="/**" access="isAuthenticated()" />
 
       <!-- 로그인 처리 -->
+         <!-- login-processing-url="/login/process" -->
       <security:form-login
          login-page="/member/login"
-         login-processing-url="/login/process"
-         authentication-success-handler-ref="customLoginSuccessHandler"
          default-target-url="/page/main"
          authentication-failure-url="/member/login?error=true"
          username-parameter="username"
          password-parameter="password"
+         authentication-success-handler-ref="customLoginSuccessHandler"
       />
       
+      <!-- 중복 로그인 방지 -->
       <security:session-management>
         <security:concurrency-control max-sessions="1" 
                                     expired-url="/member/login?expired" />
-    </security:session-management>
+      </security:session-management>
 
+      <!-- 자동 로그인 (Remember Me) - 쿠키 기반 (테스트용) 
+      <security:remember-me 
+         key="vibesyncRememberMeKey"
+         token-validity-seconds="2592000"
+         user-service-ref="userDetailsService"
+         remember-me-parameter="remember-me" />
+      -->
+      <!-- 자동 로그인 (Remember Me) - 데이터베이스 기반 -->
+      <security:remember-me 
+         data-source-ref="dataSource"
+         token-validity-seconds="2592000"
+         user-service-ref="userDetailsService"
+         remember-me-parameter="remember-me" />
+   
+      
       <!-- 로그아웃 처리 -->
       <security:logout 
       		invalidate-session="true" 
 			success-handler-ref="customLogoutSuccessHandler"
-         	logout-url="/member/logout" />
+         	logout-url="/member/logout"
+         	delete-cookies="remember-me" />
       <!-- 로그아웃 성공 시 다양한 처리를 하기 원한다면 클래스 선언 후 빈 등록 success-handler-ref = "logoutSuccessHandler" -->
    </security:http>
 
