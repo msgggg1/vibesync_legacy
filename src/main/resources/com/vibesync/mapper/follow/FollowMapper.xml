@@ -38,6 +38,30 @@
 			ac_follow = #{acFollow} AND ac_following = #{acFollowing}
 	</select>
 <!-- // -->
+
+<!-- 팔로잉 수 조회 -->
+<!-- public int selectFollowingCount(int acFollow); -->
+	<select id="selectFollowingCount" resultType="int">
+		SELECT
+			COUNT(follows_idx)
+		FROM
+			follows
+		WHERE
+			ac_follow = #{acFollow}
+	</select>
+<!-- // -->
+
+<!-- 팔로워 수 조회 -->
+<!-- public int selectFollowerCount(int acFollowing); -->
+	<select id="selectFollowerCount" resultType="int">
+		SELECT
+			COUNT(follows_idx)
+		FROM
+			follows
+		WHERE
+			acFollowing = #{acFollowing}
+	</select>
+<!-- // -->
     
 <!-- 팔로잉 목록 : 유저가 팔로우하고 있는 사용자 ID 목록 조회 -->
 <!-- public List<Integer> userFollowingIdList(int acIdx); -->

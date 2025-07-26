@@ -37,17 +37,15 @@ public interface FollowService {
      * @return 팔로우하는 사용자 상세 정보 목록
      */
     public List<FollowUserDTO> getFollowerList(int acIdx);
-    
-    /** 팔로잉 카운트 : 유저가 팔로우하고 있는 사용자 수를 조회
-     * @param acIdx 팔로우를 하는 사용자 ID
-     * @return 팔로잉 수
+
+    /** 팔로잉 수 조회
+     * @param followerAcIdx 팔로우를 하는 사용자 ID
      */
-    public int getFollowingCount(int acIdx);
-    
-    /** 팔로워 카운트 : 유저를 팔로우하고 있는 사용자 수를 조회
-     * @param acIdx 팔로우를 당하는 사용자 ID
-     * @return 팔로워 수
+    public int getFollowingCount(int followerAcIdx);
+
+    /** 팔로워 수 조회
+     * @param targetUserAcIdx 팔로우를 당하는 사용자 ID
      */
-    public int getFollowerCount(int acIdx);
+    public int getFollowerCount(int targetUserAcIdx);
     
 }

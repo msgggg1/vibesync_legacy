@@ -1,10 +1,5 @@
 package com.vibesync.board.domain;
 
-import java.util.List;
-
-import com.vibesync.common.domain.ContentVO;
-import com.vibesync.common.domain.GenreVO;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,16 +9,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class BoardWriteDTO {
+public class BoardEditRequestDTO {
 	
-	// GET
-	List<GenreVO> genreList;
-	List<ContentVO> contentList;
-	
-	// POST
 	private NoteVO note;
 	private String thumbnailBase64;
 	private String thumbnailExt;
-	private String images;
+	private String newImages; // 새로 추가된 이미지 목록
+	private String existingImages; // 수정된 note의 이미지 목록
+	private String originalImages; // 기존 note의 이미지 목록
 	
 }

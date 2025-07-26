@@ -42,7 +42,7 @@ public class FollowServiceImpl implements FollowService {
 
 	@Override
 	public boolean isFollowing(int followerAcIdx, int targetUserAcIdx) {
-		log.info("팔로우 상태 확인 요청. 대상: " + targetUserAcIdx);
+		log.info("팔로우 상태 확인 요청. 대상: " + followerAcIdx + " → " + targetUserAcIdx);
 		
 		FollowVO follow = FollowVO.builder()
 									.acFollow(followerAcIdx)
@@ -70,16 +70,17 @@ public class FollowServiceImpl implements FollowService {
 		return this.followMapper.getFollowerList(acIdx);
 	}
 	
-	@Override
-	public int getFollowingCount(int acIdx) {
-		log.info("팔로잉 카운트 조회. 사용자 ID: " + acIdx);
-		return this.followMapper.getFollowingCount(acIdx);
+	public int getFollowingCount(int followerAcIdx) {
+		log.info("팔로잉 수 조회 요청. 대상: " + followerAcIdx);
+		
+		return this.followMapper.selectFollowingCount(followerAcIdx);
 	}
-	
+
 	@Override
-	public int getFollowerCount(int acIdx) {
-		log.info("팔로워 카운트 조회. 사용자 ID: " + acIdx);
-		return this.followMapper.getFollowerCount(acIdx);
+	public int getFollowerCount(int targetUserAcIdx) {
+		log.info("팔로워 수 조회 요청. 대상: " + targetUserAcIdx);
+		
+		return this.followMapper.selectFollowerCount(targetUserAcIdx);
 	}
 	
 }

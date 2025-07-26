@@ -25,10 +25,10 @@ public interface FollowMapper {
     // 팔로워 목록 : 유저를 팔로우하고 있는 사용자 상세 정보 목록 조회
     public List<FollowUserDTO> getFollowerList(int acIdx);
     
-    // 팔로잉 카운트 : 유저가 팔로우하고 있는 사용자 수 조회
-    public int getFollowingCount(int acIdx);
+    // 팔로잉 수 조회
+    public int selectFollowingCount(int acFollow);
     
-    // 팔로워 카운트 : 유저를 팔로우하고 있는 사용자 수 조회
-    public int getFollowerCount(int acIdx);
+    // 팔로워 수 조회
+    public int selectFollowerCount(int acFollowing);
 	
 }

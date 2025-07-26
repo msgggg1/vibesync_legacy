@@ -1,12 +1,9 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
-<%@ page trimDirectiveWhitespaces="true"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
-<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags"%>
-<%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles"%>
+
+<c:set var="pageData" value="${boardEditDTO ne null ? boardEditDTO : formData.noteDetail}" />
+
 <div class="back_icon">
-	<a onclick="location.href = history.go(-1)"><img src="./sources/icons/arrow_back.svg" alt="arrow_back"></a>
+	<img src="${pageContext.request.contextPath}/sources/icons/arrow_back.svg" alt="arrow_back">
 </div>
 
 <div id="postview_Wrapper">
@@ -16,41 +13,51 @@
 
 	<div class="line"></div>
 	<div class="text_content">
-		<form id="postForm" method="post" action="noteedit.do" style="margin-bottom: 4rem;">
-			<input class="title" type="text" name="title" placeholder="title..." required value="${noteDetail.note.title}">
-			<textarea id="summernote" name="content">${noteDetail.note.text}</textarea>
+		<form id="postForm" method="post" action="${pageContext.request.contextPath}/board/edit" style="margin-bottom: 4rem;">
+			<input class="title" type="text" name="note.title" placeholder="title..." required value="${pageData.note.title}">
+			<textarea id="summernote" name="note.text">
+				<c:out value="${pageData.note.text}" escapeXml="false" />
+			</textarea>
 			<div class="note_op">
 				<div id="select_wrapper">
 					<div class="category">
-						<label for="category">category</label> <select id="category"
-							name="categoryIdx">
+						<label for="category">category</label>
+						<select id="category" name="note.categoryIdx">
 							<c:forEach items="${ categoryList }" var="category">
 								<option value="${ category.categoryIdx }"
-									<c:if test="${ category.categoryIdx == noteDetail.note.categoryIdx }">selected</c:if>>${ category.categoryName }</option>
+									<c:if test="${ category.categoryIdx == pageData.note.categoryIdx }">selected</c:if>>
+									${ category.categoryName }
+								</option>
 							</c:forEach>
 						</select>
 					</div>
 					<div class="genre">
-						<label for="genre">genre</label> <select id="genre" name="genreIdx">
-							<c:forEach items="${ genreList }" var="genre">
+						<label for="genre">genre</label>
+						<select id="genre" name="note.genreIdx">
+							<c:forEach items="${ formData.genreList }" var="genre">
 								<option value="${ genre.genreIdx }"
-									<c:if test="${ genre.genreIdx == noteDetail.note.genreIdx }">selected</c:if>>${ genre.genName }</option>
+									<c:if test="${ genre.genreIdx == pageData.note.genreIdx }">selected</c:if>>
+									${ genre.genName }
+								</option>
 							</c:forEach>
 						</select>
 					</div>
 					<div class="contents">
-						<label for="contents">content</label> <select id="contents"
-							name="contentIdx">
-							<c:forEach items="${ contentList }" var="content">
+						<label for="contents">content</label>
+						<select id="contents" name="note.contentIdx">
+							<c:forEach items="${ formData.contentList }" var="content">
 								<option value="${ content.contentIdx }"
-									<c:if test="${ content.contentIdx == noteDetail.note.contentIdx }">selected</c:if>>${ content.title }</option>
+									<c:if test="${ content.contentIdx == pageData.note.contentIdx }">selected</c:if>>
+									${ content.title }
+								</option>
 							</c:forEach>
 						</select>
 					</div>
 				</div>
-				<input type="hidden" id="images" name="images"> <input
-					type="hidden" id="pageidx" name="pageidx" value="${pageidx}">
-				<input type="hidden" id="noteIdx" name="noteIdx" value="${noteDetail.note.noteIdx}">
+				<input type="hidden" id="images" name="newImages">
+				<input type="hidden" name="existingImages">
+				<input type="hidden" name="originalImages" value="${formData.noteDetail.note.img}">
+				<input type="hidden" id="noteIdx" name="note.noteIdx" value="${formData.noteDetail.note.noteIdx}">
 				<div id="save_btn">
 					<button type="button" id="saveBtn" class="btn btn-primary mt-3">SAVE</button>
 				</div>
@@ -61,6 +68,12 @@
 
 <script>
   $(function() {
+      $(document).ready(function() {
+        	$('.text_content img').each(function() {
+  	        const src = $(this).attr('src');
+  	        $(this).attr('src', '${pageContext.request.contextPath}' + src);
+  	    });
+	  
 	    $('#summernote').summernote({
 	        height: 300,
             toolbar: [
@@ -95,18 +108,28 @@
 	        var markup = $('#summernote').summernote('code');
 	        var tempDiv = $('<div>').html(markup);
 	        var imgElements = tempDiv.find('img');
-	        var base64SrcArray = [];
+	        
+	        var newbase64SrcArray = [];
+	        var existingImageFileNames = [];
 
 	        imgElements.each(function(i) {
 	            var src = $(this).attr('src');
-	            // 새로 추가된 Base64 인코딩된 이미지만 수집
-	            if (src.startsWith('data:image/')) {
-	                base64SrcArray.push(src);
+	            if (src) {
+	                if (src.startsWith('data:image/')) {
+	                    // 새로 추가된 Base64 이미지
+	                    newBase64Images.push(src);
+	                } else if (src.includes('/sources/upload/board/noteImg')) {
+	                    // 기존에 저장된 이미지 중 살아남은 파일명 수집 (삭제된 이미지들은 서버에서 삭제 처리하기 위함)
+	                    // src에서 파일명만 추출 (예: "a1b2c3d4.jpg")
+	                    var fileName = src.substring(src.lastIndexOf('/') + 1);
+	                    existingImageFileNames.push(fileName);
+	                }
 	            }
 	        });
 
-	        $('#images').val(base64SrcArray.join('|')); 
-	        $('textarea[name=content]').val(markup); // [수정] 원본 markup을 전송
+	        $('#images').val(newBase64Images.join('|'));
+	        $('#existingImages').val(existingImageFileNames.join('|'));
+	        $('textarea[name="note.text"]').val(markup);
 	        $('#postForm').submit();
 	    });
 	});
