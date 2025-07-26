@@ -19,7 +19,8 @@
             </button>
         </div>
     </div>
-    <div class="block-content">
+    <div class="block-content" 
+         <c:if test="${block.blockType == 'UserStats' and not empty chartDataJson}">data-chart-data='${chartDataJson}'</c:if>>
         <c:set var="block" value="${block}" scope="request" />
         <jsp:include page="/WEB-INF/views/page/workspace/fragments/_${block.blockType}Content.jsp" />
     </div>

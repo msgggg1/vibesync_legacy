@@ -376,25 +376,21 @@ $(document).ready(function() {
         const $button = $(this);
     
         $.ajax({
-            url: '${pageContext.request.contextPath}/followToggle',
+                    url: '${pageContext.request.contextPath}/api/follow/followToggle',
             type: 'POST',
-            data: { 
-                authorId: targetAcIdx
-            },
-            dataType: 'json',
-           success: function(response) {
-            if (response.success) {
-                    if (response.following) { // 서버 응답에 따라 상태 변경
-                        $button.removeClass('unfollow').text('팔로잉').css('background','#f44336');
-                    } else {
-                        $button.addClass('unfollow').text('팔로우').css('background', '#4CAF50');
-                    }
-                    // 사이드바의 팔로워/팔로잉 카운트 업데이트
-                    updateFollowCount();
-                } else {
-                    alert('팔로우/언팔로우 처리 실패: ' + (response.message || '알 수 없는 오류'));
-                }
-            },
+                    data: { 
+            targetUserAcIdx: targetAcIdx
+        },
+        dataType: 'json',
+       success: function(isFollowing) {
+            if (isFollowing) { // 팔로우 상태
+                $button.removeClass('unfollow').text('팔로잉').css('background','#f44336');
+            } else { // 언팔로우 상태
+                $button.addClass('unfollow').text('팔로우').css('background', '#4CAF50');
+            }
+            // 사이드바의 팔로워/팔로잉 카운트 업데이트
+            updateFollowCount();
+        },
             error: function(xhr, status, error) {
                 alert('팔로우 요청 중 오류 발생: ' + error);
             }
@@ -435,9 +431,8 @@ function updateFollowCount() {
 function updateFollowingCount() {
     $.ajax({
         type: 'GET',
-        url: '${pageContext.request.contextPath}/follow',
+        url: '${pageContext.request.contextPath}/api/follow/following/count',
         cache: 'no-store',
-        data: {action: 'getFollowingCount'},
         dataType: 'json',
         success: function(followingCount) {
             $("#following-btn").find(".accountDataValue").text(followingCount);
@@ -451,9 +446,8 @@ function updateFollowingCount() {
 function updateFollowerCount() {
     $.ajax({
         type: 'GET',
-        url: '${pageContext.request.contextPath}/follow',
+        url: '${pageContext.request.contextPath}/api/follow/follower/count',
         cache: 'no-store',
-        data: {action: 'getFollowerCount'},
         dataType: 'json',
         success: function(followerCount) {
             $("#follower-btn").find(".accountDataValue").text(followerCount);
@@ -491,14 +485,14 @@ function loadFollowListData(tabType) {
     let requestData;
 
     if (tabType === 'following') {
-        apiUrl = '<%= request.getContextPath() %>/follow.do';
-        requestData = { action: 'getFollowing' };
+        apiUrl = '${pageContext.request.contextPath}/api/follow/following';
+        requestData = {};
     } else if (tabType === 'follower') {
-        apiUrl = '<%= request.getContextPath() %>/follow.do';
-        requestData = { action: 'getFollower' };
+        apiUrl = '${pageContext.request.contextPath}/api/follow/follower';
+        requestData = {};
     } else if (tabType === 'message') {
-        apiUrl = '<%= request.getContextPath() %>/message.do';
-        requestData = { view: 'LISTALL' };
+        apiUrl = '${pageContext.request.contextPath}/api/messages/all';
+        requestData = {};
     } else {
         listContainer.html('<p style="text-align:center; padding: 20px;">잘못된 탭 요청입니다.</p>');
         return;
@@ -518,7 +512,7 @@ function loadFollowListData(tabType) {
                     return;
                 }
                 list.forEach(user => {
-                   const profileImg = user.profile_img ? `${pageContext.request.contextPath}/\${user.profile_img}` : `\${basePath}sources/default/default_user.jpg`;
+                   const profileImg = user.profileImg ? `${pageContext.request.contextPath}/\${user.profileImg}` : `\${basePath}sources/default/default_user.jpg`;
                     const isFollowing = user.followedByCurrentUser;
                     const followButtonText = isFollowing ? '팔로잉' : '팔로우';
                     const followButtonClass = isFollowing ? 'follow-toggle-btn unfollow' : 'follow-toggle-btn';
@@ -554,8 +548,13 @@ function loadFollowListData(tabType) {
                     return;
                 }
                 messageList.forEach(message => {
-                    let profileImgHtml = message.other.profile_img ?
-                       `<img src="${pageContext.request.contextPath}/\${message.other.profile_img}" alt="profile">` :
+                    // 새로운 API 구조에 맞게 수정
+                    const senderIdx = message.acSender;
+                    const senderNickname = message.latestMessage.senderNickname;
+                    const senderImg = message.latestMessage.senderImg;
+                    
+                    let profileImgHtml = senderImg ?
+                       `<img src="${pageContext.request.contextPath}/\${senderImg}" alt="profile">` :
                        `<img src="\${basePath}sources/default/default_user.jpg" alt="기본 프로필">`;
 
                     let unreadBadgeHtml = '';
@@ -564,14 +563,14 @@ function loadFollowListData(tabType) {
                     }
                     
                     const messageHtml = `
-                        <div class="message_item" data-sender-idx="\${message.other.acIdx}" data-nickname="\${message.other.nickname}">
+                        <div class="message_item" data-sender-idx="\${senderIdx}" data-nickname="\${senderNickname}">
                             <div class="message_profile">
                                 \${profileImgHtml}
                             </div>
                             <div class="message_text_area">
                                 <div class="message_sender_row">
                                     <div class="message_sender">
-                                       <a href="userPage.do?acIdx=\${message.other.acIdx}">\${message.other.nickname}</a>
+                                       <a href="userPage.do?acIdx=\${senderIdx}">\${senderNickname}</a>
                                     </div>
                                     \${unreadBadgeHtml}
                                 </div>
@@ -605,17 +604,17 @@ function closeFollowListModal() {
 
 //특정 유저와의 채팅창 열기 함수
 function openchatRoomWithUser(userIdx, nickname) {   
-    currentchatRoomSenderIdx = userIdx;
-    $('#chatRoomTitle').text(nickname + '님과의 대화');
-    $('#chatRoomHistory').html('<p style="text-align:center; padding: 20px;">대화 내역을 불러오는 중...</p>'); // 로딩 표시
-    
-    closeFollowListModal(); // 팔로잉/팔로워/메시지 목록 모달이 열려있었다면 닫기
+    currentchatRoomSenderIdx = userIdx;
+    $('#chatRoomTitle').text(nickname + '님과의 대화');
+    $('#chatRoomHistory').html('<p style="text-align:center; padding: 20px;">대화 내역을 불러오는 중...</p>'); // 로딩 표시
+    
+    closeFollowListModal(); // 팔로잉/팔로워/메시지 목록 모달이 열려있었다면 닫기
 
-    $.ajax({
-        url: '${pageContext.request.contextPath}/message',
-        type: 'GET',
-        data: { sender_idx: userIdx, view: 'CHAT' },
-        dataType: 'json',
+    $.ajax({
+        url: '${pageContext.request.contextPath}/api/messages/chat',
+        type: 'GET',
+        data: { otherIdx: userIdx },
+        dataType: 'json',
       success: function (chatRoomList) {
           $('#chatRoomHistory').empty();
           
@@ -625,12 +624,19 @@ function openchatRoomWithUser(userIdx, nickname) {
               const chatRoomContainer = $('<div class="chatRoom-container"></div>');
               let lastDate = null;
               chatRoomList.forEach(message => {
-                  if (message.date !== lastDate) {
-                      lastDate = message.date;
-                      const dateLabel = $('<div class="chatRoom-date-separator"></div>').text(lastDate);
+                  // 날짜 구분선 추가
+                  const msgDate = new Date(message.time);
+                  const dateStr = msgDate.toLocaleDateString('ko-KR');
+                  
+                  if (dateStr !== lastDate) {
+                      lastDate = dateStr;
+                      const dateLabel = $('<div class="chatRoom-date-separator"></div>').text(dateStr);
                       chatRoomContainer.append(dateLabel);
                   }
-                  const who = message.isMine ? 'bubble-me' : 'bubble-other';
+                  
+                  // 내가 보낸 메시지인지 확인
+                  const isMine = message.acSender === currentUserAcIdx;
+                  const who = isMine ? 'bubble-me' : 'bubble-other';
                   const formattedText = message.text.replace(/\n/g, '<br>');
                   const messageHtml = `
                       <div class="chatRoom-bubble \${who}">
@@ -648,41 +654,45 @@ function openchatRoomWithUser(userIdx, nickname) {
       error: function () {
           alert('채팅 내역을 불러오는 데 실패했습니다.');
       }
-    });
+    });
 }
 
 //채팅 모달 닫기
 function closechatRoomModal() {
-    $('#chatRoomModal').hide();
-    currentchatRoomSenderIdx = null; // 현재 채팅 상대 초기화
-    // 메시지 목록을 다시 열어서 unread 카운트를 갱신
-    openFollowListModal('message');
+    $('#chatRoomModal').hide();
+    currentchatRoomSenderIdx = null; // 현재 채팅 상대 초기화
+    
+    // workspace 페이지에서는 메시지 목록 모달을 열지 않음
+    // sidebar 페이지에서만 메시지 목록 모달을 열음
+    if (!window.location.pathname.includes('workspace')) {
+        openFollowListModal('message');
+    }
 }
 
 //채팅 메시지 전송
 function sendchatRoomMessage() {
-    const message = $("#chatRoomInput").val().trim();
-    if (!message || !currentchatRoomSenderIdx) return;
+    const message = $("#chatRoomInput").val().trim();
+    if (!message || !currentchatRoomSenderIdx) return;
 
-    $.ajax({
-        url: '${pageContext.request.contextPath}/message',
-        type: 'POST',
-        data: JSON.stringify({
-            receiver_idx: currentchatRoomSenderIdx,
-            text: message
-        }),
-        contentType: "application/json; charset=utf-8",
-        dataType: 'json',
-        success: function(res) {
-            if(res.success) {
-                $("#chatRoomInput").val(""); // 입력창 비우기
-                reloadchatRoomHistory(); // 채팅 내역 갱신
-            } else {
-                alert('메시지 전송에 실패했습니다.');
-            }
-        },
-        error: function() { alert('메시지 전송 중 오류 발생!'); }
-    });
+    $.ajax({
+        url: '${pageContext.request.contextPath}/api/messages/send',
+        type: 'POST',
+        data: JSON.stringify({
+            receiverIdx: currentchatRoomSenderIdx,
+            text: message
+        }),
+        contentType: "application/json; charset=utf-8",
+        dataType: 'json',
+        success: function(res) {
+            if(res) {
+                $("#chatRoomInput").val(""); // 입력창 비우기
+                reloadchatRoomHistory(); // 채팅 내역 갱신
+            } else {
+                alert('메시지 전송에 실패했습니다.');
+            }
+        },
+        error: function() { alert('메시지 전송 중 오류 발생!'); }
+    });
 }
 
 //채팅 내역 새로고침

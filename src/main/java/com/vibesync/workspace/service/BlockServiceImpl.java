@@ -59,9 +59,9 @@ public class BlockServiceImpl implements BlockService {
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
-					categoryIdx = (Integer) config.get("category_idx");
-					categoryName = (String) config.get("category_name");
-					sortType = (String) config.get("sort_type");
+					categoryIdx = (Integer) config.get("categoryIdx");
+					categoryName = (String) config.get("categoryName");
+					sortType = (String) config.get("sortType");
                 }
                 
                 // NoteService를 호출하여 해당 조건에 맞는 게시글 목록 가져오기
@@ -196,8 +196,8 @@ public class BlockServiceImpl implements BlockService {
         log.info("블록 순서 변경. 사용자 ID: " + acIdx);
         
         for (Map<String, Object> order : orders) {
-            int blockId = ((Number) order.get("block_id")).intValue();
-            int blockOrder = ((Number) order.get("block_order")).intValue();
+            int blockId = ((Number) order.get("blockId")).intValue();
+            int blockOrder = ((Number) order.get("blockOrder")).intValue();
             
             blockMapper.updateBlockOrder(acIdx, blockId, blockOrder);
         }

@@ -3,8 +3,8 @@
 
 <mapper namespace="com.vibesync.workspace.mapper.WorkspaceWatchPartyMapper">
 
-    <!-- 호스트 ID 목록에 해당하는 워치파티 목록 조회 -->
-    <select id="selectWatchPartyListByHostId" resultType="com.vibesync.workspace.domain.WatchPartyDTO">
+    <!-- 팔로우하는 사용자들의 워치파티 목록 조회 -->
+    <select id="findFollowingWatchPartyList" resultType="com.vibesync.workspace.domain.WatchPartyDTO">
         SELECT 
             w.watchparty_idx as "watchparty.watchPartyIdx",
             w.title as "watchparty.title",

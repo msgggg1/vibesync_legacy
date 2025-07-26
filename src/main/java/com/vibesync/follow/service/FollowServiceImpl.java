@@ -4,6 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
+import com.vibesync.follow.domain.FollowUserDTO;
 import com.vibesync.follow.domain.FollowVO;
 import com.vibesync.follow.mapper.FollowMapper;
 
@@ -47,6 +50,36 @@ public class FollowServiceImpl implements FollowService {
 									.build();
 				
 		return this.followMapper.checkFollowStatus(follow) > 0 ? true : false;
+	}
+
+	@Override
+	public List<Integer> userFollowingIdList(int acIdx) {
+		log.info("팔로잉 목록 조회. 사용자 ID: " + acIdx);
+		return this.followMapper.userFollowingIdList(acIdx);
+	}
+	
+	@Override
+	public List<FollowUserDTO> getFollowingList(int acIdx) {
+		log.info("팔로잉 상세 목록 조회. 사용자 ID: " + acIdx);
+		return this.followMapper.getFollowingList(acIdx);
+	}
+	
+	@Override
+	public List<FollowUserDTO> getFollowerList(int acIdx) {
+		log.info("팔로워 상세 목록 조회. 사용자 ID: " + acIdx);
+		return this.followMapper.getFollowerList(acIdx);
+	}
+	
+	@Override
+	public int getFollowingCount(int acIdx) {
+		log.info("팔로잉 카운트 조회. 사용자 ID: " + acIdx);
+		return this.followMapper.getFollowingCount(acIdx);
+	}
+	
+	@Override
+	public int getFollowerCount(int acIdx) {
+		log.info("팔로워 카운트 조회. 사용자 ID: " + acIdx);
+		return this.followMapper.getFollowerCount(acIdx);
 	}
 	
 }

@@ -1,7 +1,7 @@
 package com.vibesync.common.controller; 
 
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import com.vibesync.common.annotation.AuthenticatedUserPages;
 
@@ -11,8 +11,5 @@ import com.vibesync.common.annotation.AuthenticatedUserPages;
 @Controller 
 @AuthenticatedUserPages
 public class PageController {
-	@GetMapping("/page/workspace")
-	public String workspace() {
-		return "page/workspace";	
-	}
+	// 워크스페이스는 별도 WorkspaceController에서 처리
 }

@@ -9,5 +9,5 @@ import com.vibesync.workspace.domain.WatchPartyDTO;
 
 @Mapper
 public interface WorkspaceWatchPartyMapper {
-    List<WatchPartyDTO> findFollowingWatchPartyList(@Param("acIdx") int acIdx);
+    List<WatchPartyDTO> findFollowingWatchPartyList(@Param("hostList") List<Integer> hostList);
 } 

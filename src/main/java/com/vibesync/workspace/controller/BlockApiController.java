@@ -34,8 +34,11 @@ import com.vibesync.workspace.domain.UserStatsBlockDTO;
 import com.vibesync.workspace.service.BlockService;
 import com.vibesync.workspace.service.WorkspaceNoteService;
 
+import lombok.extern.log4j.Log4j;
+
 @RestController
 @RequestMapping("/api/block")
+@Log4j
 public class BlockApiController {
 
     @Autowired
@@ -83,7 +86,7 @@ public class BlockApiController {
 
         // 4. 차트 블록인 경우, 차트 데이터도 JSON에 추가
         if (blockData instanceof UserStatsBlockDTO) {
-            jsonResponse.put("chart_data", ((UserStatsBlockDTO) blockData).getChartData());
+            jsonResponse.put("chartData", ((UserStatsBlockDTO) blockData).getChartData());
             jsonResponse.put("title", ((UserStatsBlockDTO) blockData).getTitle());
         }
 
@@ -120,6 +123,8 @@ public class BlockApiController {
             HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException {
 
+
+
         int acIdx = user.getAcIdx();
 
         // config를 JSON 문자열로 변환
@@ -149,7 +154,7 @@ public class BlockApiController {
 
             // 차트 블록인 경우, 차트 데이터도 JSON에 추가
             if (newBlockData instanceof UserStatsBlockDTO) {
-                jsonResponse.put("chart_data", ((UserStatsBlockDTO) newBlockData).getChartData());
+                jsonResponse.put("chartData", ((UserStatsBlockDTO) newBlockData).getChartData());
             }
 
             return ResponseEntity.status(HttpStatus.CREATED).body(jsonResponse);

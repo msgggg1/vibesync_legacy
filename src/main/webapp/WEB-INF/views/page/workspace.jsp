@@ -105,17 +105,14 @@
 			</h3>
 			<div class="message_card_list">
 				<c:choose>
-					<c:when test="${not empty initialData.unreadMessages}">
-						<c:forEach var="msg" items="${initialData.unreadMessages}">
+					<c:when test="${not empty workspaceData.unreadMessages}">
+						<c:forEach var="msg" items="${workspaceData.unreadMessages}">
 							<div class="message_card message_item"
-								data-sender-idx="${msg.ac_sender}"
-								data-nickname="${msg.latestMessage.sender_nickname}">
-								<%-- <div class="msg_profile">
-                                <img src="${pageContext.request.contextPath}/vibesync/sources/profile/${msg.latestMessage.sender_img}" alt="profile">
-                                </div> --%>
+								data-sender-idx="${msg.acSender}"
+								data-nickname="${msg.latestMessage.senderNickname}">
 								<div class="msg_text_area">
 									<div class="msg_sender_row">
-										<div class="msg_sender">${msg.latestMessage.sender_nickname}</div>
+										<div class="msg_sender">${msg.latestMessage.senderNickname}</div>
 										<span class="unread-badge">${msg.numOfUnreadMessages}</span>
 									</div>
 									<div class="msg_preview">${msg.latestMessage.text}</div>
@@ -157,7 +154,9 @@
 						</button>
 					</div>
 				</div>
-				<div class="block-content">
+				<div class="block-content" data-block-type="${block.blockType}" <c:if test="${block.blockType == 'UserStats'}">
+		                data-chart-data='${block.chartDataJson}'
+		            </c:if>>
 					<%-- 각 블록 타입에 맞는 JSP 프래그먼트를 include --%>
 					<c:set var="block" value="${block}" scope="request" />
 					<jsp:include
@@ -168,7 +167,6 @@
 
 		<!-- 블록 추가 버튼(블록) -->
 		<div id="content_plus" class="contents_item">+</div>
-
 	</div>
 </div>
 
@@ -253,23 +251,7 @@
 </div>
 
 <!-- 모달 -->
-<!-- 메시지 모달 -->
-<div id="chatModal" class="modal">
-	<div class="modal-content" style="min-width: 350px; max-width: 430px;">
-		<span class="close-modal" onclick="closeChatModal()"> &times; </span>
-		<h4 id="chatTitle" style="text-align: center;">채팅</h4>
-		<div id="chatHistory"></div>
-		<div class="chat-input-row">
-			<input type="text" id="chatInput" placeholder="메시지를 입력하세요..."
-				autocomplete="off" />
-			<button type="button" id="sendMessageBtn" title="전송">
-				<svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-		      <path d="M3 19L20 11L3 3V10L15 11L3 12V19Z" fill="#fff" />
-		    </svg>
-			</button>
-		</div>
-	</div>
-</div>
+<!-- 메시지 모달은 sidebar.jsp의 chatRoomModal을 사용 -->
 
 <!-- 블록 추가 모달 -->
 <div id="addBlockModal" class="modal">
@@ -297,18 +279,7 @@
 </div>
 <!-- 모달 끝 -->
 
-<!-- 초기 차트 데이터 설정 -->
-<c:forEach var="block" items="${workspaceData.blocks}">
-	<c:if test="${block.blockType == 'UserStats'}">
-		<script>
-            // 서버에서 받은 차트 데이터를 data 속성으로 설정
-            $(document).ready(function() {
-                $('#block-${block.blockId}').find('.block-content').attr('data-chart-data', '${block.chartDataJson}');
-            });
-        </script>
-	</c:if>
-</c:forEach>
-
 <script>
         const contextPath = "${pageContext.request.contextPath}";
+        const currentUserAcIdx = parseInt('${pageContext.request.userPrincipal.principal.acIdx}');
 </script>

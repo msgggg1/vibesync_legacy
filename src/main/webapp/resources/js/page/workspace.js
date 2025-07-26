@@ -208,7 +208,7 @@ function loadPostsWidget(options) {
                 posts.forEach(function(post) {
                     // 리스트 아이템 HTML 생성 (options.metaGenerator 함수 사용)
                     contentHtml += `<li>
-                                        <a href="postView.do?nidx=${post.note_idx}" title="${post.title}">
+                                        <a href="noteView.do?nidx=${post.noteIdx}" title="${post.title}">
                                             <span>${post.title}</span>
                                             ${options.metaGenerator(post)}
                                         </a>
@@ -1046,17 +1046,28 @@ $(document).ready(function() {
     
     // --- 블록 관련 초기화 ---
     // 초기 페이지 로드 - 차트 데이터 설정
+    console.log('=== 차트 자동 초기화 시작 ===');
+    console.log('현재 .generated_block 개수:', $('.generated_block').length);
+    
     $('.generated_block').each(function() {
+        console.log('자동 초기화: 블록 처리 시작');
         const blockId = $(this).attr('id').split('-')[1];
         const chartDataJson = $(this).find('.block-content').attr('data-chart-data');
+        console.log('블록 ID:', blockId, '차트 데이터 JSON:', chartDataJson);
         if (chartDataJson) {
             try {
-                createOrUpdateChart(blockId, JSON.parse(chartDataJson));
+                const parsedData = JSON.parse(chartDataJson);
+                console.log('파싱된 차트 데이터:', parsedData);
+                createOrUpdateChart(blockId, parsedData);
             } catch (e) {
                 console.error('차트 데이터 파싱 오류:', e);
-                    }
-    }
-});
+            }
+        } else {
+            console.log('차트 데이터가 없습니다. blockId:', blockId);
+        }
+        console.log('자동 초기화: 블록 처리 완료');
+    });
+    console.log('=== 차트 자동 초기화 완료 ===');
 
 // ========================================
 // 블록 관련 함수들
@@ -1071,15 +1082,21 @@ function updateAddBlockButtonVisibility() {
     }
 }
 
-// 차트 생성 함수
-function createOrUpdateChart(blockId, chartData) {
+// 차트 생성 함수 (전역으로 이동)
+window.createOrUpdateChart = function(blockId, chartData) {
     const chartId = 'userStatsChart_' + blockId;
+    
     if (userCharts[chartId]) {
         userCharts[chartId].destroy();
     }
+    
     const chartElement = document.getElementById(chartId);
     const ctx = chartElement ? chartElement.getContext('2d') : null;
-    if (!ctx) return;
+    
+    if (!ctx) {
+        console.error('캔버스 컨텍스트를 찾을 수 없습니다. chartId:', chartId);
+        return;
+    }
 
     const chart = new Chart(ctx, {
         type: 'line',
@@ -1093,7 +1110,7 @@ function createOrUpdateChart(blockId, chartData) {
         }
     });
     userCharts[chartId] = chart;
-}
+};
 
 // 블록 추가 함수
 function addBlockToServer(blockType, config, period) {
@@ -1104,15 +1121,14 @@ function addBlockToServer(blockType, config, period) {
         contentType: 'application/json',
         dataType: 'json',
         success: function(res) {
-            // 1. 새로운 HTML을 화면에 추가
             $('#content_plus').before(res.html);
-            
-            // 2. 만약 추가된 블록이 차트 블록이라면, 차트를 그려줌
-            if (res.block_type === 'UserStats' && res.chart_data) {
-                createOrUpdateChart(res.block_id, res.chart_data);
+
+            if (res.blockType === 'UserStats' && res.chartData) {
+                setTimeout(function() {
+                    createOrUpdateChart(res.blockId, res.chartData);
+                }, 0);
             }
             
-            // 3. '+' 버튼 표시 여부 업데이트
             updateAddBlockButtonVisibility();
         },
         error: function() { alert('블록을 추가하는 데 실패했습니다.'); }
@@ -1204,7 +1220,7 @@ function saveBlockOrder() {
     $('.generated_block').each(function(index) {
         const blockId = $(this).attr('id').split('-')[1];
         // block_order는 1부터 시작하도록 index + 1
-        orderData.push({ blockId: parseInt(blockId), block_order: index + 1 });
+        orderData.push({ blockId: parseInt(blockId), blockOrder: index + 1 });
     });
 
     $.ajax({
@@ -1228,48 +1244,10 @@ function saveBlockOrder() {
 }
 
 // ========================================
-// 채팅방 관련 함수들
+// 채팅방 관련 함수들 (sidebar.jsp의 chatRoomModal 사용)
 // ========================================
 
-// 채팅 내역 닫기
-function closeChatModal() {
-    $('#chatModal').hide();
-    location.reload();
-}
-
-// 채팅방에서 메시지 전송
-function sendChatMessage() {
-    const message = $("#chatInput").val().trim();
-    if (!message || !currentChatSenderIdx) return;
-
-    $.ajax({
-        url: contextPath + '/message.do',
-        type: 'POST',
-        data: JSON.stringify({
-            receiver_idx: currentChatSenderIdx,
-            text: message
-        }),
-        contentType: "application/json; charset=utf-8",
-        success: function(res) {
-            $("#chatInput").val(""); // 입력창 비우기
-
-            // 메시지 전송 성공시 채팅 내역 갱신
-            // 서버에서 새 메시지 저장 후, 최신 내역 반환
-            // 채팅내역 새로 불러오기
-            reloadChatHistory();
-        },
-        error: function() {
-            alert('메시지 전송 실패!');
-        }
-    });
-}
-
-// 채팅내역 새로 불러오기
-function reloadChatHistory() {
-    if (currentChatSenderIdx) {
-        $('.message_item[data-sender-idx="'+currentChatSenderIdx+'"]').click();
-    }
-}
+// workspace에서 사용할 채팅 관련 함수들은 sidebar.jsp의 함수를 사용
     
     // + 버튼 표시여부 결정
     updateAddBlockButtonVisibility();
@@ -1303,9 +1281,9 @@ function reloadChatHistory() {
                     blockContentDiv.html(res.html);
 
                     // 2. 만약 블록 타입이 'UserStats'이고 차트 데이터가 있다면 차트를 다시 그림
-                    if (res.block_type === 'UserStats' && res.chart_data) {
+                    if (res.blockType === 'UserStats' && res.chartData) {
                         $('#block-' + blockId).find('.block-header h4').html('<i class="fa-solid fa-chart-simple"></i>&nbsp;' + res.title);
-                        createOrUpdateChart(blockId, res.chart_data);
+                        createOrUpdateChart(blockId, res.chartData);
                     }
                 },
                 error: function() {
@@ -1358,10 +1336,10 @@ function reloadChatHistory() {
                 // 새 HTML로 교체
                 blockContentDiv.html(res.html);
                 // 차트 다시 그리기
-                if (res.block_type === 'UserStats' && res.chart_data) {
+                if (res.blockType === 'UserStats' && res.chartData) {
                     const $headerTitle = $('#block-' + blockId).find('.block-header h4');
                     $headerTitle.html('<i class="fa-solid fa-chart-simple"></i>&nbsp;' + res.title);
-                    createOrUpdateChart(blockId, res.chart_data);
+                    createOrUpdateChart(blockId, res.chartData);
                 }
             },
             error: function() {
@@ -1399,9 +1377,9 @@ function reloadChatHistory() {
         
         if (blockType === 'CategoryPosts') {
             config = {
-                category_idx: parseInt($('#categorySelector').val()),
-                category_name: $('#categorySelector option:selected').text(),
-                sort_type: $('#sortTypeSelector').val()
+                categoryIdx: parseInt($('#categorySelector').val()),
+                categoryName: $('#categorySelector option:selected').text(),
+                sortType: $('#sortTypeSelector').val()
             };
         } else if (blockType === 'UserStats') {
             // UserStats 블록의 경우 기간 선택이 있을 수 있으므로 기본값 사용
@@ -1484,71 +1462,32 @@ function reloadChatHistory() {
         const senderIdx = $(this).data('sender-idx');
         currentChatSenderIdx = senderIdx;
         const nickname = $(this).data('nickname');
-        $('#chatTitle').text(nickname);
         
-        $.ajax({
-            url: contextPath + '/message.do',
-            type: 'GET',
-            data: { 
-                sender_idx: senderIdx,
-                view: 'CHAT'
-            },
-            dataType: 'json',
-            success: function (chatList) {
-                $('#chatHistory').empty();
-
-                if (!chatList || !Array.isArray(chatList) || chatList.length === 0) {
-                    $('#chatHistory').html('<p style="text-align:center; color:grey;">채팅 내역이 없습니다.</p>');
-                    return;
-                }
-                
-                const chatContainer = $('<div class="chat-container"></div>');
-                let lastDate = null;
-
-                chatList.forEach(msg => {
-                    if (msg.date !== lastDate) {
-                        lastDate = msg.date;
-                        const dateLabel = $('<div class="chat-date-separator"></div>').text(lastDate);
-                        chatContainer.append(dateLabel);
-                    }
-                    
-                    const who = msg.isMine ? 'bubble-me' : 'bubble-other';
-                    const formattedText = msg.text.replace(/\n/g, '<br>');
-
-                    const messageHtml = '<div class="chat-bubble ' + who + '">' +
-                        '<div class="bubble-text">' + formattedText + '</div>' +
-                        '<div class="bubble-time">' + msg.relativeTime + '</div>' +
-                        '</div>';
-                    chatContainer.append(messageHtml);
-                });
-
-                $('#chatHistory').append(chatContainer);
-
-                $('#chatModal').css({
-                    display: 'flex',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    backgroundColor: 'rgba(0,0,0,0.8)'
-                });
-                
-                if(chatContainer.length) {
-                    chatContainer.scrollTop(chatContainer[0].scrollHeight);
-                }
-            },
-            error: function () {
-                alert('채팅 내역 불러오기 실패');
-            }
-        });
+        // sidebar.jsp의 chatRoomModal 사용
+        openchatRoomWithUser(senderIdx, nickname);
     });
     
-    // 채팅방에서 메시지 전송 (버튼 클릭 또는 엔터)
-    $("#sendMessageBtn").on("click", sendChatMessage);
 
-    $("#chatInput").on("keydown", function(e) {
-        if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault();
-            sendChatMessage();
+    
+    // 채팅 관련 이벤트는 sidebar.jsp의 chatRoomModal에서 처리
+    // 페이지 로드 시 UserStats 블록의 차트 자동 생성
+    $('.generated_block').each(function() {
+        const $block = $(this);
+        const blockType = $block.find('.block-content').data('block-type');
+        
+        if (blockType === 'UserStats') {
+            const $blockContent = $block.find('.block-content');
+            const chartDataAttr = $blockContent.attr('data-chart-data');
+            
+            if (chartDataAttr && chartDataAttr !== 'null' && chartDataAttr !== '{}') {
+                try {
+                    const chartData = JSON.parse(chartDataAttr);
+                    const blockId = $block.attr('id').replace('block-', '');
+                    createOrUpdateChart(blockId, chartData);
+                } catch (e) {
+                    console.error('차트 데이터 파싱 오류:', e);
+                }
+            }
         }
     });
 }); // $(document).ready() 닫는 중괄호
