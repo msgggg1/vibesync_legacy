@@ -63,4 +63,67 @@
 	</select>
 <!-- // -->
     
+<!-- 팔로잉 목록 : 유저가 팔로우하고 있는 사용자 ID 목록 조회 -->
+<!-- public List<Integer> userFollowingIdList(int acIdx); -->
+	<select id="userFollowingIdList" resultType="int">
+		SELECT
+			ac_following
+		FROM
+			follows
+		WHERE
+			ac_follow = #{acIdx}
+	</select>
+<!-- // -->
+
+<!-- 팔로잉 목록 : 유저가 팔로우하고 있는 사용자 상세 정보 목록 조회 -->
+<!-- public List<FollowUserDTO> getFollowingList(int acIdx); -->
+	<select id="getFollowingList" resultType="com.vibesync.follow.domain.FollowUserDTO">
+		SELECT 
+			ac_idx as acIdx, 
+			nickname, 
+			img as profile_img, 
+			1 as followedByCurrentUser
+		FROM follows f 
+		JOIN userAccount u ON u.ac_idx = f.ac_following 
+		WHERE ac_follow = #{acIdx}
+	</select>
+<!-- // -->
+
+<!-- 팔로워 목록 : 유저를 팔로우하고 있는 사용자 상세 정보 목록 조회 -->
+<!-- public List<FollowUserDTO> getFollowerList(int acIdx); -->
+	<select id="getFollowerList" resultType="com.vibesync.follow.domain.FollowUserDTO">
+		SELECT 
+			u.ac_idx as acIdx, 
+			u.nickname, 
+			u.img as profile_img,
+			CASE 
+				WHEN f_reverse.ac_following IS NOT NULL THEN 1 
+				ELSE 0 
+			END AS followedByCurrentUser
+		FROM follows f 
+		JOIN userAccount u ON u.ac_idx = f.ac_follow 
+		LEFT JOIN follows f_reverse ON f_reverse.ac_follow = f.ac_following 
+								   AND f_reverse.ac_following = f.ac_follow 
+		WHERE f.ac_following = #{acIdx}
+	</select>
+<!-- // -->
+
+<!-- 팔로잉 카운트 : 유저가 팔로우하고 있는 사용자 수 조회 -->
+<!-- public int getFollowingCount(int acIdx); -->
+	<select id="getFollowingCount" resultType="int">
+		SELECT COUNT(*)
+		FROM follows
+		WHERE ac_follow = #{acIdx}
+	</select>
+<!-- // -->
+
+<!-- 팔로워 카운트 : 유저를 팔로우하고 있는 사용자 수 조회 -->
+<!-- public int getFollowerCount(int acIdx); -->
+	<select id="getFollowerCount" resultType="int">
+		SELECT COUNT(*)
+		FROM follows
+		WHERE ac_following = #{acIdx}
+	</select>
+<!-- // -->
+    
  </mapper>

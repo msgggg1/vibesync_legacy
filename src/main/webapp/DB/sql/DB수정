@@ -13,3 +13,11 @@ UPDATE useraccount
 SET role = 'USER'
 WHERE email = 'test@test.com';
 commit;
+
+-- 스프링 시큐리티 자동로그인 테이블
+CREATE TABLE persistent_logins (
+    username VARCHAR(64) NOT NULL,
+    series VARCHAR(64) PRIMARY KEY,
+    token VARCHAR(64) NOT NULL,
+    last_used TIMESTAMP NOT NULL
+);

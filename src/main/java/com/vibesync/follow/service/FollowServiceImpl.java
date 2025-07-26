@@ -4,6 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
+import com.vibesync.follow.domain.FollowUserDTO;
 import com.vibesync.follow.domain.FollowVO;
 import com.vibesync.follow.mapper.FollowMapper;
 
@@ -50,6 +53,23 @@ public class FollowServiceImpl implements FollowService {
 	}
 
 	@Override
+	public List<Integer> userFollowingIdList(int acIdx) {
+		log.info("팔로잉 목록 조회. 사용자 ID: " + acIdx);
+		return this.followMapper.userFollowingIdList(acIdx);
+	}
+	
+	@Override
+	public List<FollowUserDTO> getFollowingList(int acIdx) {
+		log.info("팔로잉 상세 목록 조회. 사용자 ID: " + acIdx);
+		return this.followMapper.getFollowingList(acIdx);
+	}
+	
+	@Override
+	public List<FollowUserDTO> getFollowerList(int acIdx) {
+		log.info("팔로워 상세 목록 조회. 사용자 ID: " + acIdx);
+		return this.followMapper.getFollowerList(acIdx);
+	}
+	
 	public int getFollowingCount(int followerAcIdx) {
 		log.info("팔로잉 수 조회 요청. 대상: " + followerAcIdx);
 		

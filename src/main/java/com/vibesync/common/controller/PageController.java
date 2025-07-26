@@ -1,6 +1,7 @@
 package com.vibesync.common.controller; 
 
 import org.springframework.stereotype.Controller;
+
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,10 +12,9 @@ import com.vibesync.common.annotation.AuthenticatedUserPages;
 import lombok.extern.log4j.Log4j2;
 
 /**
- * 메인 페이지, 소개 페이지 등 단순 페이지 뷰로의 이동을 처리하는 컨트롤러
+ * 단순 페이지 뷰로의 이동을 처리하는 컨트롤러
  */
-@Controller
-@RequestMapping("/page") 
+@Controller 
 @AuthenticatedUserPages
 @Log4j2
 public class PageController {
@@ -25,5 +25,4 @@ public class PageController {
 		model.addAttribute("acIdx", acIdx);
 		return "page/user";
 	}
-	
 }

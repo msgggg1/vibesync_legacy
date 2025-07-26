@@ -16,6 +16,8 @@
 	<mybatis-spring:scan base-package="com.vibesync.mainpage.mapper" />
 	<mybatis-spring:scan base-package="com.vibesync.sidebar.mapper" />
 	<mybatis-spring:scan base-package="com.vibesync.userpage.mapper" />
+	<mybatis-spring:scan base-package="com.vibesync.workspace.mapper" />
+	<mybatis-spring:scan base-package="com.vibesync.message.mapper" />
 
 	<!-- DB 연결 -->
 	<bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
