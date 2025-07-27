@@ -98,8 +98,7 @@
 			event.preventDefault();
 			let noteIdx = $(this).attr("href");
 			actionForm
-			  .attr("action", "/vibesync/board/view")
-			  .append(`<input type="hidden" name="noteIdx" value="\${noteIdx}">`)
+			  .attr("action", `/vibesync/note/\${noteIdx}`)
 			  .submit();
 		}); // $("a.move").on("click", function() {
 		

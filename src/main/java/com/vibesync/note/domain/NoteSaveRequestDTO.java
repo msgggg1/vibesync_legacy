@@ -12,7 +12,9 @@ import lombok.NoArgsConstructor;
 public class NoteSaveRequestDTO {
 	
 	private String title;
-    private String contentJson; // Editor.js는 내용을 JSON 형태로 출력함
+    private String contentJson;
     private int categoryIdx;
+    private Integer parentNoteIdx;
+    private int displayOrder;
 	
 }

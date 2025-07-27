@@ -1,20 +1,21 @@
 package com.vibesync.note.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.vibesync.common.annotation.AuthenticatedUserPages;
-import com.vibesync.common.domain.Criteria;
 import com.vibesync.follow.service.FollowService;
-import com.vibesync.note.domain.NoteDetailDTO;
 import com.vibesync.note.domain.NoteSaveRequestDTO;
 import com.vibesync.note.domain.NoteViewDTO;
 import com.vibesync.note.service.NoteService;
@@ -25,56 +26,51 @@ import lombok.extern.log4j.Log4j;
 
 @RestController
 @Log4j
-@RequestMapping("/api/notes")
+@RequestMapping("/api/note")
 @AuthenticatedUserPages
 @RequiredArgsConstructor
 public class NoteApiController {
 	
-	@Autowired
-	NoteService noteService;
-	@Autowired
-	FollowService followService;
+	private final NoteService noteService;
+    private final FollowService followService;
 	
-	// 노트 페이지 (/vibesync/api/notes/30)
+	// 글 조회 (/vibesync/api/note/30)
 	@GetMapping(value="/{noteIdx}")
-	public String getNote(@PathVariable("noteIdx") int noteIdx, Criteria criteria,
-						  @AuthenticationPrincipal CustomUser user, Model model) {
-		log.info("노트 페이지 요청...GET");
-		
-		// 게시글 상세보기
-		NoteDetailDTO noteDetail = this.noteService.findNoteByNoteIdx(noteIdx);
-		int userAcIdx = 0;
-		boolean isFollowing = false;
-		boolean isLiking = false;
-		if (user != null) {
-			userAcIdx = user.getAcIdx();
-			isFollowing = this.followService.isFollowing(userAcIdx, noteDetail.getMember().getAcIdx());
-			// isLiking = this.likeService.isLiking();
-		}
-		NoteViewDTO dto = NoteViewDTO.builder()
-										.noteDetail(noteDetail)
-										.userAcIdx(userAcIdx)
-										.following(isFollowing)
-										.liking(isLiking)
-										.build();
-		
-		log.info("게시글 상세보기 페이지 DTO : " + dto);
-		
-		model.addAttribute("noteViewDTO", dto);
-		
-		return "note/note";
-	}
+	public ResponseEntity<NoteViewDTO> getNoteData(@PathVariable int noteIdx,
+												   @AuthenticationPrincipal CustomUser user) {
+        NoteViewDTO noteViewData = noteService.getNoteViewData(noteIdx, user);
+        System.out.println("NoteViewDTO : " + noteViewData);
+        return ResponseEntity.ok(noteViewData);
+    }
 	
-	// 새 노트 작성/저장 (/vibesync/api/notes)
-	@PostMapping(value="")
-	public ResponseEntity<Integer> saveNote(@RequestBody NoteSaveRequestDTO saveDTO,
-            			   @AuthenticationPrincipal CustomUser user) {
-		log.info("게시글 작성 페이지 요청...POST");
-		
-		// NoteService를 호출하여 노트를 저장하고, 생성된 noteIdx를 반환받음
-        int newNoteIdx = noteService.saveNewNote(saveDTO, user.getAcIdx());
-		
-        return ResponseEntity.ok(newNoteIdx);
-	}
+	// 새 글 저장 (/vibesync/api/note)
+	@PostMapping
+	public ResponseEntity<Map<String, Object>> saveNote(@RequestBody NoteSaveRequestDTO saveDTO,
+											@AuthenticationPrincipal CustomUser user) {
+        
+		Map<String, Object> response = noteService.saveNewNote(saveDTO, user.getAcIdx());
+        return ResponseEntity.ok(response);
+    }
+	
+	// 기존 글 수정 (/vibesync/api/note/30)
+    @PutMapping("/{noteIdx}")
+    public ResponseEntity<Map<String, Boolean>> updateNote(@PathVariable int noteIdx, @RequestBody NoteSaveRequestDTO saveDTO) {
+        noteService.updateNote(noteIdx, saveDTO);
+        return ResponseEntity.ok(Map.of("success", true));
+    }
+    
+    // 글 삭제
+    @DeleteMapping("/{noteIdx}")
+    public ResponseEntity<Void> deleteNote(@PathVariable int noteIdx) {
+        noteService.deleteNote(noteIdx);
+        return ResponseEntity.ok().build();
+    }
+    
+    // 하위 페이지 순서 변경
+    @PutMapping("/reorder")
+    public ResponseEntity<Void> reorderNotes(@RequestBody List<Integer> orderedNoteIds) {
+        noteService.updateDisplayOrder(orderedNoteIds);
+        return ResponseEntity.ok().build();
+    }
 	
 }

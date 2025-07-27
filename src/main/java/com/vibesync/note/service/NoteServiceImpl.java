@@ -1,13 +1,16 @@
 package com.vibesync.note.service;
 
-import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.vibesync.follow.domain.FollowVO;
 import com.vibesync.follow.mapper.FollowMapper;
-import com.vibesync.note.domain.BoardEditRequestDTO;
+import com.vibesync.note.domain.ChildNoteListDTO;
 import com.vibesync.note.domain.NoteDetailDTO;
 import com.vibesync.note.domain.NoteSaveRequestDTO;
 import com.vibesync.note.domain.NoteVO;
@@ -27,28 +30,13 @@ public class NoteServiceImpl implements NoteService {
     private FollowMapper followMapper;
     // @Autowired
     // private LikeMapper likeMapper;
-
-	@Override
-	public NoteDetailDTO findNoteByNoteIdx(int noteIdx) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public int save(NoteSaveRequestDTO dto, HttpServletRequest request) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public int edit(BoardEditRequestDTO dto, HttpServletRequest request) {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-	
+    
 	@Override
 	public NoteViewDTO getNoteViewData(int noteIdx, CustomUser currentUser) {
         NoteDetailDTO noteDetail = noteMapper.findNoteDetailByIdx(noteIdx);
+        List<ChildNoteListDTO> childNoteList = noteMapper.findChildNotesByParentIdx(noteIdx);
+        System.out.println("> childNoteList : " + childNoteList);
+        noteDetail.setChildNoteList(childNoteList);
         
         boolean isFollowing = false;
         boolean isLiking = false;
@@ -74,20 +62,63 @@ public class NoteServiceImpl implements NoteService {
 	}
 
 	@Override
-	public int saveNewNote(NoteSaveRequestDTO saveDTO, int acIdx) {
-	     // 1. DTO를 DB에 저장할 VO로 변환
-        NoteVO note = new NoteVO();
+	@Transactional
+	public Map<String, Object> saveNewNote(NoteSaveRequestDTO saveDTO, int acIdx) {
+		int noteIdx = this.noteMapper.selectNextNoteIdx();
+		
+		NoteVO note = new NoteVO();
+		note.setNoteIdx(noteIdx);
         note.setTitle(saveDTO.getTitle());
-        note.setText(saveDTO.getContentJson()); // text 컬럼에 JSON 저장
+        note.setText(saveDTO.getContentJson());
         note.setCategoryIdx(saveDTO.getCategoryIdx());
         note.setAcIdx(acIdx);
+        note.setParentNoteIdx(saveDTO.getParentNoteIdx());
+        if (saveDTO.getParentNoteIdx() != null) {
+            // 자식 노트일 경우: 부모의 마지막 자식 순서 + 1
+            int lastOrder = noteMapper.getLastDisplayOrder(saveDTO.getParentNoteIdx());
+            note.setDisplayOrder(lastOrder + 1);
+        } else {
+            // 최상위 노트일 경우: 기본값 1
+            note.setDisplayOrder(1);
+        }
         
-        // 2. 완성된 VO를 Mapper에 전달하여 DB에 저장
         noteMapper.insert(note);
         
-        // 3. 생성된 note_idx를 반환
-        return note.getNoteIdx();
+        Map<String, Object> result = new HashMap<>();
+        result.put("noteIdx", note.getNoteIdx());
+        result.put("title", note.getTitle());
         
+        System.out.println("> result : " + result);
+        
+        return result;
 	}
+
+	@Override
+	@Transactional
+	public void updateNote(int noteIdx, NoteSaveRequestDTO saveDTO) {
+        NoteVO note = new NoteVO();
+        note.setNoteIdx(noteIdx);
+        note.setTitle(saveDTO.getTitle());
+        note.setText(saveDTO.getContentJson());
+        note.setCategoryIdx(saveDTO.getCategoryIdx());
+        
+        noteMapper.update(note);
+	}
+
+	@Override
+    @Transactional
+    public void deleteNote(int noteIdx) {
+        noteMapper.delete(noteIdx);
+    }
+
+	@Override
+    @Transactional
+    public void updateDisplayOrder(List<Integer> orderedNoteIds) {
+        for (int i = 0; i < orderedNoteIds.size(); i++) {
+            int noteIdx = orderedNoteIds.get(i);
+            int displayOrder = i + 1; // 순서는 1부터 시작
+            noteMapper.updateDisplayOrder(noteIdx, displayOrder);
+        }
+    }
 	
 }

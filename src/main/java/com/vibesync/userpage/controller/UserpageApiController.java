@@ -32,6 +32,7 @@ public class UserpageApiController {
 											            @AuthenticationPrincipal CustomUser currentUser) {
     	log.info("유저 페이지 Api 데이터 요청...GET");
     	UserPageDTO userPageData = userpageService.getUserPageData(targetUserId, currentUser);
+    	System.out.println("> userPageData.posts : " + userPageData.getPosts());
         return ResponseEntity.ok(userPageData);
     }
     

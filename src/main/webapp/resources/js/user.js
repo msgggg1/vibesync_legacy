@@ -189,8 +189,7 @@ function showCombinedSettingsView() {
 }
 
 //========= js ===========
-
-    /*무한스크롤 함수*/
+    // 무한스크롤 함수
     var isLoading = false; // 중복 요청 방지 플래그
     
     $.ajaxSetup({

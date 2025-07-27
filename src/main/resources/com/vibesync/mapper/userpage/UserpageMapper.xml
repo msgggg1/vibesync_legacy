@@ -41,7 +41,7 @@
 		            FROM
 		                note
 		            WHERE
-		                ac_idx = #{acIdx} AND parent_note_idx = null
+		                ac_idx = #{acIdx} AND parent_note_idx IS NULL
 		            ORDER BY
 		                create_at DESC
 		        )

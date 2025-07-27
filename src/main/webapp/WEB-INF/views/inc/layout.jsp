@@ -10,6 +10,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="_csrf" content="${_csrf.token}"/>
+  <meta name="_csrf_header" content="${_csrf.headerName}"/>
+
   <title><tiles:getAsString name="title" /></title>
   <link rel="icon" href="${pageContext.request.contextPath}/favicon.ico" />
   
@@ -26,6 +29,8 @@
   
   <!-- js -->
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.13.3/jquery-ui.min.js"></script>
+  <script src="${path}/resources/js/editor-tools/page-tool.js"></script>
 
 </head>
 <body>

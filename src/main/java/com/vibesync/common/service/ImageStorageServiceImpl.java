@@ -16,33 +16,35 @@ public class ImageStorageServiceImpl implements ImageStorageService {
     private String uploadPath;
 
     @Override
-    public String store(MultipartFile multipartFile, String subPath) {
+    public String store(MultipartFile multipartFile, String subPath, int noteIdx) {
         if (multipartFile.isEmpty()) {
             return null;
         }
 
         try {
-            // 1. 고유한 파일 이름 생성
-            String originalFilename = multipartFile.getOriginalFilename();
-            String storeFilename = createStoreFileName(originalFilename);
-
-            // 2. 저장할 전체 경로 설정 (루트 경로 + 하위 경로 + 파일 이름)
+            // 1. 저장할 전체 경로 설정 (루트 경로 + 하위 경로 + 파일 이름)
+            subPath += File.separator + noteIdx;
             File uploadDir = new File(uploadPath + File.separator + subPath);
             if (!uploadDir.exists()) {
-                uploadDir.mkdirs(); // 하위 폴더가 없으면 생성
+                uploadDir. mkdirs(); // 하위 폴더가 없으면 생성
             }
+            
+            System.out.println("> subPath : " + subPath);
+            
+            // 2. 고유한 파일 이름 생성
+            String originalFilename = multipartFile.getOriginalFilename();
+            String storeFilename = createStoreFileName(originalFilename);
             File dest = new File(uploadDir, storeFilename);
             
             // 3. 파일 저장
             multipartFile.transferTo(dest);
             
             // 4. 웹에서 접근 가능한 상대 경로 반환
-            // (주의: File.separator는 OS마다 다르므로 URL 경로인 '/'로 교체)
             return ("/upload/" + subPath + "/" + storeFilename).replace(File.separator, "/");
 
         } catch (IOException e) {
             // 파일 저장 중 에러 처리
-            throw new RuntimeException("파일을 저장하는 데 실패했습니다.", e);
+        	throw new RuntimeException("파일 저장 실패", e);
         }
     }
 

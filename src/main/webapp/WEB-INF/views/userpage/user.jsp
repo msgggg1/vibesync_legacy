@@ -96,7 +96,8 @@
 </form>
 
 <script> /* 함수 */
-	const profileUserAcIdx = ${acIdx};
+	const path = '<c:out value="${path}"/>';
+	const profileUserAcIdx = <c:out value="${acIdx}" default="0"/>;
 	
 	let pageNum = 1; // 현재 페이지 번호
 	let isLoading = false; // 로딩 중 중복 요청 방지 플래그
@@ -108,20 +109,21 @@
             hasMorePosts = false;
             return;
         }
-		
 		let postHtml = '';
 	    posts.forEach(post => {
-	        const thumbnailUrl = post.titleimg
+	    	const title = post.title;
+	    	
+	    	const thumbnailUrl = post.titleimg
 	            ? `${path}/${post.titleimg}` 
 	            : `${path}/resources/images/system/default_thumbnail.png`;
-	
 	        postHtml += `
-	            <a href="${path}/note/${post.noteIdx}">
+	            <a href=${path}/note/\${post.noteIdx}>
 	                <div class="con_item">
-	                    <img src="${thumbnailUrl}" alt="${post.title} 썸네일">
+	                    <img src=\${thumbnailUrl} alt='썸네일: \${title}'>
 	                </div>
 	            </a>
 	        `;
+	        console.log(thumbnailUrl);
 	    });
 	    $('#con_wrapper').append(postHtml);
 	}
@@ -132,15 +134,18 @@
 	
 	    isLoading = true;
 	    $('#loadingIndicator').show();
-	    pageNum++; // 다음 페이지 요청
+	    const nextPage = pageNum + 1; // 다음 페이지 요청
 	
 	    $.ajax({
-	        url: `${path}/api/userpage/${profileUserAcIdx}/posts`,
+	        url: `${path}/api/userpage/\${profileUserAcIdx}/posts`,
 	        type: 'GET',
-	        data: { pageNum: pageNum, amount: 9 },
+	        data: { pageNum: nextPage, amount: 9 },
 	        dataType: 'json',
 	        success: function(morePosts) {
 	        	renderPosts(morePosts);
+	        	if (morePosts.length > 0) {
+	                pageNum = nextPage;  // 성공적으로 데이터가 왔을 때만 증가
+	            }
 	        },
 	        error: function() {
 	            console.error("게시물을 추가로 불러오는데 실패했습니다.");
@@ -187,7 +192,7 @@ $(document).ready(function() {
             	
                 profileFollowBtn.attr('data-author-id', ${userPageData.userProfile.acIdx});
                 profileFollowBtn.attr('data-following', ${userPageData.userProfile.followedByCurrentUser ? 'true' : 'false'});
-                profileFollowBtn.text(${userPageData.userProfile.followedByCurrentUser ? 'UNFOLLOW' : 'FOLLOW'});
+                profileFollowBtn.text(userPageData.userProfile.followedByCurrentUser ? 'UNFOLLOW' : 'FOLLOW');
 			} else if (isLoggedIn) {
                 // 다른 사람 페이지에 로그인해서 접속한 경우
                 $('#profileFollowBtn').attr('data-author-id', profile.acIdx);
@@ -214,9 +219,10 @@ $(document).ready(function() {
 
     // 스크롤 이벤트 리스너
     $(window).on('scroll', function() {
-        // (현재 스크롤 위치 + 브라우저 창 높이)가 (전체 문서 높이 - 100px)보다 클 때
-        if ($(window).scrollTop() + $(window).height() > $(document).height() - 100) {
-            loadMorePosts();
+    	const scrollBottom = $(window).scrollTop() + $(window).height();
+        const docHeight    = $(document).height();
+        if (scrollBottom > docHeight - 100) {
+          loadMorePosts();
         }
     });
 });

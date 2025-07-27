@@ -8,8 +8,9 @@ public interface ImageStorageService {
      * MultipartFile을 서버에 저장하고, 웹 접근 경로를 반환
      * @param multipartFile 저장할 이미지 파일
      * @param subPath 저장할 하위 경로 (예: "notes", "profiles")
-     * @return 저장된 파일의 웹 접근 경로 (예: /upload/note/(노트번호)/uuid_filename.jpg)
+     * @param noteIdx 하위 경로에 사용할 노트 번호
+     * @return 저장된 파일의 웹 접근 경로 (예: /upload/note/(noteIdx)/uuid_filename.jpg)
      */
-    String store(MultipartFile multipartFile, String subPath);
+    String store(MultipartFile multipartFile, String subPath, int noteIdx);
     
 }

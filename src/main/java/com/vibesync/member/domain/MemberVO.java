@@ -28,7 +28,7 @@ public class MemberVO {
 	private int categoryIdx;
 	
 	private String img;
-	private Long kakaoAuthId; 
+	private Long kakaoAuthId;
 	private Long googleId;
 	
 	private int followingCount;

@@ -1,6 +1,11 @@
 // 위치: /resources/js/note/note.js
-
-$(document).ready(function() {
+/*
+window.onload = function() {
+    // EditorJS 라이브러리가 로드되었는지 확인
+    if (typeof EditorJS === 'undefined') {
+        console.error('Editor.js 라이브러리가 로드되지 않았습니다. note_head.jsp를 확인하세요.');
+        return;
+    }
     
     // Editor.js 인스턴스 생성
     const editor = new EditorJS({
@@ -60,7 +65,7 @@ $(document).ready(function() {
             const saveData = {
                 title: $('#note-title').val(),
                 contentJson: contentJson,
-                categoryIdx: 1 // TODO: 실제 카테고리 선택 로직 필요
+                categoryIdx: $('#note-category-select').val()
             };
 
             const isUpdate = (noteIdx && noteIdx > 0);
@@ -98,4 +103,5 @@ $(document).ready(function() {
 
     // --- 초기 실행 ---
     loadNoteData();
-});
+};
+*/

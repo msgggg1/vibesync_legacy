@@ -4,13 +4,18 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class BoardEditFormDTO {
-	
-	private NoteDetailDTO noteDetail;
+@ToString
+public class ChildNoteListDTO {
+
+	private int noteIdx;
+	private String title;
+	private int displayOrder;
+	private String shareStatus;
 	
 }
