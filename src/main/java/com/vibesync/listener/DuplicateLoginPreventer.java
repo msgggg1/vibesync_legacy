@@ -8,7 +8,7 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
-import com.vibesync.member.domain.MemberVO;
+import com.vibesync.member.domain.MemberProfileDTO;
 
 @WebListener
 public class DuplicateLoginPreventer implements HttpSessionListener {
@@ -25,7 +25,7 @@ public class DuplicateLoginPreventer implements HttpSessionListener {
         // loginUsers 맵을 뒤져서, 소멸된 세션과 같은 값을 가진 엔트리를 찾아서 제거
         // (세션에 저장된 userInfo에서 직접 키를 찾는 것이 더 효율적)
         synchronized (loginUsers) {
-            MemberVO member = (MemberVO) destroyedSession.getAttribute("memberInfo");
+            MemberProfileDTO member = (MemberProfileDTO) destroyedSession.getAttribute("memberInfo");
             if (member != null) {
                 // 이 유저의 ID(이메일)를 키로 사용하여 맵에서 제거
                 loginUsers.remove(member.getEmail());

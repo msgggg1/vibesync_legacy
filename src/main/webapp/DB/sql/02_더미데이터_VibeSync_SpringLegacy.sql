@@ -13,11 +13,11 @@ INSERT INTO category (category_idx, category_name, img)
 VALUES (0, '관리자', 'images/system/admin_icon.png');
 
 -- 메인 카테고리 추가
-INSERT INTO category (category_idx, category_name, img) VALUES (1, '영화', 'images/category/movie.jpg');
-INSERT INTO category (category_idx, category_name, img) VALUES (2, '드라마', 'images/category/drama.jpg');
-INSERT INTO category (category_idx, category_name, img) VALUES (3, '음악', 'images/category/music.jpg');
-INSERT INTO category (category_idx, category_name, img) VALUES (4, '애니메이션', 'images/category/anime.jpg');
-INSERT INTO category (category_idx, category_name, img) VALUES (5, '일상', 'images/category/daily.jpg');
+INSERT INTO category (category_idx, category_name, img) VALUES (1, '영화', 'images/category/movie_icon.jpg');
+INSERT INTO category (category_idx, category_name, img) VALUES (2, '드라마', 'images/category/drama_icon.jpg');
+INSERT INTO category (category_idx, category_name, img) VALUES (3, '음악', 'images/category/music_icon.jpg');
+INSERT INTO category (category_idx, category_name, img) VALUES (4, '애니메이션', 'images/category/anime_icon.jpg');
+INSERT INTO category (category_idx, category_name, img) VALUES (5, '일상', 'images/category/daily_icon.jpg');
 COMMIT;
 
 SELECT * FROM category;
@@ -36,7 +36,7 @@ SELECT * FROM category;
 -- email = 'admin@admin.com'
 -- 평문 비밀번호 : qwe123!!!
 UPDATE userAccount
-SET role = 'ADMIN', category_idx = 0
+SET role = 'ROLE_ADMIN', category_idx = 0
 WHERE nickname = 'admin';
 COMMIT;
 

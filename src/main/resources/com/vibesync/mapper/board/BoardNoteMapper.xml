@@ -4,27 +4,6 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.vibesync.board.mapper.BoardNoteMapper">
 
-<!-- ResultMap -->
-<resultMap id="NoteDetailMap" type="NoteDetailDTO">
-    <id property="note.noteIdx" column="note_idx"/>
-    <result property="likeNum" column="like_num"/>
-    <result property="upacIdx" column="upac_idx"/>
-    
-    <association property="note" javaType="NoteVO">
-        <id property="noteIdx" column="note_idx"/>
-        <result property="title" column="title"/>
-        <result property="text" column="text"/>
-        <result property="viewCount" column="view_count"/>
-    </association>
-    
-    <association property="member" javaType="MemberVO">
-        <id property="acIdx" column="ac_idx"/>
-        <result property="nickname" column="nickname"/>
-        <result property="img" column="img"/>
-    </association>
-</resultMap>
-<!-- // -->
-
 <!-- 재사용 가능한 SQL 조각 정의 -->
 <sql id="criteria">
 	<if test="categoryIdx != null and categoryIdx > 0">
@@ -86,80 +65,6 @@
 	        rn > (#{pageNum} - 1) * #{amount}
 	    ]]>
 	</select>
-<!-- // -->
-
-<!-- 게시글 상세보기 -->
-<!-- public NoteVO selectByNoteIdx(int noteIdx); -->
-	<select id="selectByNoteIdx" resultMap="NoteDetailMap">
-		<![CDATA[
-			SELECT
-				n.note_idx, n.title, n.text,
-				TO_CHAR(n.create_at,'YYYY-MM-DD HH24:MI:SS') AS create_at,
-				n.view_count,
-				n.category_idx AS note_category_idx,
-				u.ac_idx, u.email, u.pw, u.nickname, u.img, u.name,
-				u.category_idx AS ac_category_idx,
-				NVL(l.cnt,0) AS like_num,
-				n.ac_idx AS upac_idx
-			FROM
-				note n
-			JOIN
-				userAccount u ON n.ac_idx = u.ac_idx
-			LEFT JOIN (
-				SELECT
-					note_idx, COUNT(*) AS cnt
-				FROM
-					likes
-				GROUP BY
-					note_idx
-			) l ON n.note_idx = l.note_idx
-			WHERE
-				n.note_idx = #{noteIdx}
-		]]>
-	</select>
-<!-- // -->
-
-<!-- note_seq의 다음 시퀀스 값 미리 조회 -->
-<!-- public int selectNextNoteIdx(); -->
-	<select id="selectNextNoteIdx" resultType="int">
-		SELECT note_seq.NEXTVAL FROM dual
-	</select>
-<!-- // -->
-
-<!-- 게시글 작성 -->
-<!-- public int insert(NoteVO note); -->
-<insert id="insert" parameterType="NoteVO">
-	INSERT INTO note (
-		note_idx, parent_note_idx, ac_idx,
-		title, text,
-		display_order, share_status,
-		create_at, edit_at, view_count, titleimg,
-		category_idx, custom_category_idx
-	)
-	VALUES (
-		#{noteIdx}, #{parentNoteIdx}, #{acIdx}
-		#{title}, #{text},
-		#{displayOrder}, #{shareStatus},
-		SYSDATE, SYSDATE, 0, #{titleimg},
-		#{categoryIdx}, #{customCategoryIdx}
-	)
-</insert>
-<!-- // -->
-
-<!-- 게시글 수정 -->
-<!-- public int update(NoteVO note); -->
-<update id="update" parameterType="NoteVO">
-	UPDATE
-		note
-	SET
-		title = #{title}
-		text = #{text}
-		titleimg = #{titleimg}
-		edit_at = SYSDATE
-		category_idx = #{categoryIdx}
-	WHERE
-		note_idx = #{noteIdx}
-</update>
 <!-- // -->
 
 </mapper>

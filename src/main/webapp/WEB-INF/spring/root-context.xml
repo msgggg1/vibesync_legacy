@@ -9,14 +9,17 @@
 
 	<!-- Root Context: defines shared resources visible to all other web components -->
 	<context:component-scan base-package="com.vibesync" />
+	
 	<mybatis-spring:scan base-package="com.vibesync.board.mapper" />
 	<mybatis-spring:scan base-package="com.vibesync.category.mapper" />
-	<mybatis-spring:scan base-package="com.vibesync.common.mapper" />
 	<mybatis-spring:scan base-package="com.vibesync.follow.mapper" />
+	<mybatis-spring:scan base-package="com.vibesync.like.mapper" />
 	<mybatis-spring:scan base-package="com.vibesync.mainpage.mapper" />
 	<mybatis-spring:scan base-package="com.vibesync.member.mapper" />
+	<mybatis-spring:scan base-package="com.vibesync.note.mapper" />
 	<mybatis-spring:scan base-package="com.vibesync.sidebar.mapper" />
 	<mybatis-spring:scan base-package="com.vibesync.userpage.mapper" />
+	<mybatis-spring:scan base-package="com.vibesync.watchparty.mapper" />
 
 	<!-- DB 연결 -->
 	<bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
@@ -52,7 +55,7 @@
 	</bean>
 
  	<context:property-placeholder
-		location="classpath:mail.properties" />
+ 		location="classpath:/config/*.properties" />
 
 	<bean id="mailSender"
 		class="org.springframework.mail.javamail.JavaMailSenderImpl">

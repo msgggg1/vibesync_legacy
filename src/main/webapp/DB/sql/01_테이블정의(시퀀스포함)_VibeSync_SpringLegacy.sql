@@ -4,12 +4,13 @@
 -- 테이블 삭제 (제약조건 순서에 유의)
 --------------------------------------------------------------------------------
 -- 자식 테이블
+DROP TABLE notification_settings;
 DROP TABLE schedule;
 DROP TABLE workspace_blocks;
+DROP TABLE notification;
 DROP TABLE commentlist;
 DROP TABLE note_share;
 DROP TABLE likes;
-DROP TABLE notification;
 DROP TABLE note;
 DROP TABLE follows;
 DROP TABLE todolist;
@@ -79,17 +80,29 @@ CREATE TABLE passwordResetTokens (
 -- 3. userAccount (계정) : category 참조
 --------------------------------------------------------------------------------
 CREATE TABLE userAccount (
+    -- PK
     ac_idx NUMBER PRIMARY KEY,
+
+    -- 주요 식별 정보
     email VARCHAR2(255) NOT NULL UNIQUE,
     pw VARCHAR2(255) NOT NULL,
     nickname VARCHAR2(50) NOT NULL UNIQUE,
-    img VARCHAR2(255),
     name VARCHAR2(100) NOT NULL,
-    role VARCHAR2(50) DEFAULT 'USER',
-    created_at TIMESTAMP DEFAULT SYSDATE,
+    role VARCHAR2(50) DEFAULT 'ROLE_USER',
+
+    -- FK
     category_idx NUMBER NOT NULL,
+    
+    -- 기타 속성
+    img VARCHAR2(255),
     kakao_auth_id NUMBER NULL UNIQUE,
     google_id NUMBER NULL UNIQUE,
+
+    -- 카운트 및 날짜 (부가 정보)
+    following_count NUMBER DEFAULT 0,
+    follower_count NUMBER DEFAULT 0,
+    created_at TIMESTAMP DEFAULT SYSDATE,
+    
     CONSTRAINT fk_userAccount_TO_category FOREIGN KEY (category_idx) REFERENCES category(category_idx) ON DELETE CASCADE
 );
 CREATE SEQUENCE userAccount_seq START WITH 1 INCREMENT BY 1;
@@ -114,10 +127,9 @@ CREATE SEQUENCE custom_category_seq START WITH 1 INCREMENT BY 1;
 --------------------------------------------------------------------------------
 CREATE TABLE setting (
     setting_idx NUMBER PRIMARY KEY,
-    font VARCHAR2(100) NOT NULL,
-    theme VARCHAR2(50) NOT NULL,
-    noti VARCHAR2(50) NOT NULL,
     ac_idx NUMBER NOT NULL,
+    font VARCHAR2(100) DEFAULT 'Pretendard' NOT NULL,
+    theme VARCHAR2(50) DEFAULT 'light' NOT NULL,
     CONSTRAINT FK_setting_TO_userAccount FOREIGN KEY (ac_idx) REFERENCES userAccount(ac_idx) ON DELETE CASCADE
 );
 CREATE SEQUENCE setting_seq START WITH 1 INCREMENT BY 1;
@@ -126,13 +138,21 @@ CREATE SEQUENCE setting_seq START WITH 1 INCREMENT BY 1;
 -- 6. message (메시지) : userAccount 참조
 --------------------------------------------------------------------------------
 CREATE TABLE message (
+    -- PK
     msg_idx NUMBER PRIMARY KEY,
-    text CLOB not null,
-    time TIMESTAMP NOT NULL,
-    img VARCHAR2(255),
-    chk NUMBER(1) NOT NULL,
+
+    -- FK
     ac_receiver NUMBER NOT NULL,
     ac_sender NUMBER NOT NULL,
+
+    -- 주요 데이터
+    text CLOB NOT NULL,
+    img VARCHAR2(255),
+
+    -- 기타 속성 및 날짜
+    chk NUMBER(1) NOT NULL,
+    time TIMESTAMP NOT NULL,
+    
     CONSTRAINT FK_message_TO_userAccount_rcvr FOREIGN KEY (ac_receiver) REFERENCES userAccount(ac_idx) ON DELETE CASCADE,
     CONSTRAINT FK_message_TO_userAccount_sndr FOREIGN KEY (ac_sender) REFERENCES userAccount(ac_idx) ON DELETE CASCADE
 );
@@ -169,19 +189,30 @@ CREATE SEQUENCE follows_seq START WITH 1 INCREMENT BY 1;
 -- 9. note (글) : userAccount, category, custom_category, note 자신 참조
 --------------------------------------------------------------------------------
 CREATE TABLE note (
+    -- PK
     note_idx NUMBER PRIMARY KEY,
-    parent_note_idx NUMBER,
+
+    -- FK
     ac_idx NUMBER NOT NULL,
+    category_idx NUMBER NOT NULL,
+    parent_note_idx NUMBER,
+    custom_category_idx NUMBER,
+    
+    -- 주요 데이터
     title VARCHAR2(2000) NOT NULL,
     text CLOB,
+    titleimg VARCHAR2(255),
+
+    -- 기타 속성
     display_order NUMBER NOT NULL,
     share_status VARCHAR2(20) DEFAULT 'PRIVATE',
+
+    -- 카운트 및 날짜 (부가 정보)
+    view_count NUMBER DEFAULT 0,
+    like_count NUMBER DEFAULT 0,
     create_at TIMESTAMP DEFAULT SYSDATE,
     edit_at TIMESTAMP DEFAULT SYSDATE,
-    view_count NUMBER DEFAULT 0,
-    titleimg VARCHAR2(255),
-    category_idx NUMBER NOT NULL,
-    custom_category_idx NUMBER,
+    
     CONSTRAINT FK_note_TO_category FOREIGN KEY (category_idx) REFERENCES category(category_idx) ON DELETE CASCADE,
     CONSTRAINT FK_note_TO_custom_category FOREIGN KEY (custom_category_idx) REFERENCES custom_category(custom_category_idx) ON DELETE CASCADE,
     CONSTRAINT fk_note_parent FOREIGN KEY (parent_note_idx) REFERENCES note(note_idx) ON DELETE CASCADE,
@@ -245,19 +276,17 @@ CREATE TABLE note_share (
 CREATE SEQUENCE note_share_seq START WITH 1 INCREMENT BY 1;
 
 --------------------------------------------------------------------------------
--- 14. notification (알림) : userAccount, setting 참조
+-- 14. notification_settings (알림 설정) : setting 참조
 --------------------------------------------------------------------------------
-CREATE TABLE notification (
-    notifi_idx NUMBER PRIMARY KEY,
-    time TIMESTAMP NOT NULL,
-    text CLOB NOT NULL,
-    chk NUMBER(1) NOT NULL,
-    ac_idx NUMBER NOT NULL,
-    setting_idx NUMBER,
-    CONSTRAINT FK_notification_TO_userAccount FOREIGN KEY (ac_idx) REFERENCES userAccount(ac_idx) ON DELETE CASCADE,
-    CONSTRAINT FK_notification_TO_setting FOREIGN KEY (setting_idx) REFERENCES setting(setting_idx) ON DELETE CASCADE
+CREATE TABLE notification_settings (
+    setting_idx NUMBER NOT NULL,
+    notification_type VARCHAR2(50) NOT NULL, -- 'LIKE', 'COMMENT', 'FOLLOW' 등
+    is_enabled NUMBER(1) DEFAULT 1 NOT NULL, -- 1: ON, 0: OFF
+    
+    PRIMARY KEY (setting_idx, notification_type),
+    CONSTRAINT FK_notif_settings_TO_setting FOREIGN KEY (setting_idx) REFERENCES setting(setting_idx) ON DELETE CASCADE,
+    CONSTRAINT chk_notif_settings_enabled CHECK (is_enabled IN (0, 1))
 );
-CREATE SEQUENCE notification_seq START WITH 1 INCREMENT BY 1;
 
 --------------------------------------------------------------------------------
 -- 15. likes (좋아요) : note, userAccount 참조
@@ -276,14 +305,24 @@ CREATE SEQUENCE likes_seq START WITH 1 INCREMENT BY 1;
 -- 16. commentlist (댓글) : note, userAccount, commentlist 자신 참조
 --------------------------------------------------------------------------------
 CREATE TABLE commentlist (
+    -- PK
     commentlist_idx NUMBER PRIMARY KEY,
-    text CLOB NOT NULL,
-    like_count NUMBER,
-    create_at TIMESTAMP DEFAULT SYSDATE,
-    re_commentlist_idx NUMBER,
+
+    -- FK
     note_idx NUMBER NOT NULL,
     ac_idx NUMBER NOT NULL,
-    depth NUMBER DEFAULT 1 NOT NULL, -- [추가] 댓글 깊이 컬럼
+    re_commentlist_idx NUMBER,
+
+    -- 주요 데이터
+    text CLOB NOT NULL,
+
+    -- 기타 속성
+    depth NUMBER DEFAULT 1 NOT NULL,
+
+    -- 카운트 및 날짜 (부가 정보)
+    like_count NUMBER DEFAULT 0,
+    create_at TIMESTAMP DEFAULT SYSDATE,
+    
     CONSTRAINT FK_comment_TO_comment FOREIGN KEY (re_commentlist_idx) REFERENCES commentlist(commentlist_idx) ON DELETE CASCADE,
     CONSTRAINT FK_comment_TO_note FOREIGN KEY (note_idx) REFERENCES note(note_idx) ON DELETE CASCADE,
     CONSTRAINT FK_comment_TO_userAccount FOREIGN KEY (ac_idx) REFERENCES userAccount(ac_idx) ON DELETE CASCADE
@@ -291,7 +330,31 @@ CREATE TABLE commentlist (
 CREATE SEQUENCE commentlist_seq START WITH 1 INCREMENT BY 1;
 
 --------------------------------------------------------------------------------
--- 17. wa_sync : watchParty 참조
+-- 17. notification (알림) : userAccount 참조
+--------------------------------------------------------------------------------
+CREATE TABLE notification (
+    notifi_idx NUMBER PRIMARY KEY,
+    ac_idx NUMBER NOT NULL, -- 알림을 받는 사람
+
+    -- 알림의 원인 (Nullable Foreign Keys)
+    source_ac_idx NUMBER,       -- 알림을 유발한 사람 (예: 나를 팔로우한 사람)
+    note_idx NUMBER,          -- 관련된 노트
+    commentlist_idx NUMBER,   -- 관련된 댓글
+    
+    notification_type VARCHAR2(20) NOT NULL, -- 'NEW_LIKE', 'NEW_COMMENT', 'NEW_FOLLOWER'
+    text CLOB NOT NULL,
+    is_read NUMBER(1) DEFAULT 0 NOT NULL, -- chk -> is_read로 이름 변경
+    created_at TIMESTAMP DEFAULT SYSDATE, -- time -> created_at로 이름 변경
+
+    CONSTRAINT FK_notification_TO_user FOREIGN KEY (ac_idx) REFERENCES userAccount(ac_idx) ON DELETE CASCADE,
+    CONSTRAINT FK_notification_source_user FOREIGN KEY (source_ac_idx) REFERENCES userAccount(ac_idx) ON DELETE SET NULL,
+    CONSTRAINT FK_notification_TO_note FOREIGN KEY (note_idx) REFERENCES note(note_idx) ON DELETE SET NULL,
+    CONSTRAINT FK_notification_TO_comment FOREIGN KEY (commentlist_idx) REFERENCES commentlist(commentlist_idx) ON DELETE SET NULL
+);
+CREATE SEQUENCE notification_seq START WITH 1 INCREMENT BY 1;
+
+--------------------------------------------------------------------------------
+-- 18. wa_sync : watchParty 참조
 --------------------------------------------------------------------------------
 CREATE TABLE wa_sync (
     sync_idx NUMBER PRIMARY KEY,
@@ -303,7 +366,7 @@ CREATE TABLE wa_sync (
 CREATE SEQUENCE seq_wa_sync START WITH 1 INCREMENT BY 1;
 
 --------------------------------------------------------------------------------
--- 18. wa_comment : watchParty 참조
+-- 19. wa_comment : watchParty 참조
 --------------------------------------------------------------------------------
 CREATE TABLE wa_comment (
     wac_idx NUMBER PRIMARY KEY,
@@ -322,7 +385,7 @@ CREATE SEQUENCE seq_wa_comment START WITH 1 INCREMENT BY 1;
 -------------------
 -- 생성된 테이블 조회
 -------------------
-SELECT COUNT(*) 
+SELECT COUNT(*) -- 19
 FROM USER_TABLES;
 -------------------
 SELECT * 

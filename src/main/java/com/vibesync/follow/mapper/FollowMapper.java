@@ -1,6 +1,9 @@
 package com.vibesync.follow.mapper;
 
+import java.util.List;
+
 import com.vibesync.follow.domain.FollowVO;
+import com.vibesync.follow.domain.FollowerInfoDTO;
 
 public interface FollowMapper {
 	
@@ -18,5 +21,11 @@ public interface FollowMapper {
     
     // 팔로워 수 조회
     public int selectFollowerCount(int followedAcIdx);
+    
+    // 팔로잉 목록 조회
+    public List<FollowerInfoDTO> selectFollowingList(int followerAcIdx);
+    
+    // 팔로워 목록 조회
+    public List<FollowerInfoDTO> selectFollowerList(int followedAcIdx);
 	
 }

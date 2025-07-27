@@ -4,7 +4,7 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.vibesync.sidebar.mapper.SidebarFollowMapper">
 
-	<resultMap id="userSummaryMap" type="com.vibesync.sidebar.domain.UserSummaryVO">
+	<resultMap id="userSummaryMap" type="SidebarProfileDTO">
 		<id property="acIdx" column="ac_idx" />
 		<result property="nickname" column="nickname" />
 		<result property="profileImg" column="img" />
@@ -12,7 +12,7 @@
 		<result property="followedByCurrentUser"
 			column="followedByCurrentUser" />
 	</resultMap>
-	<!-- public List<UserSummaryVO> userFollowingList(int acIdx) ; -->
+	<!-- public List<SidebarProfileDTO> userFollowingList(int acIdx) ; -->
 	<select id="userFollowerList" resultMap="userSummaryMap" parameterType="int">
         <![CDATA[
             SELECT
@@ -29,7 +29,7 @@
         ]]>
     </select>
 	
-	<!-- public List<UserSummaryVO> userFollowerList(int ac_idx) ; -->
+	<!-- public List<SidebarProfileDTO> userFollowerList(int ac_idx) ; -->
 	<select id="userFollowingList" resultMap="userSummaryMap" parameterType="int">
         <![CDATA[
             SELECT

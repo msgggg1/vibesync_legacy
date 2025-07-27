@@ -14,6 +14,7 @@
       <security:intercept-url pattern="/static/**" access="permitAll" />
       <security:intercept-url pattern="/resources/**" access="permitAll" />
       <security:intercept-url pattern="/sources/**" access="permitAll" />
+      <security:intercept-url pattern="/favicon.ico" access="permitAll" />
     
       <security:intercept-url pattern="/member/login" access="permitAll" />
       <security:intercept-url pattern="/member/signup" access="permitAll" />
@@ -27,7 +28,7 @@
          login-page="/member/login"
          login-processing-url="/login/process"
          authentication-success-handler-ref="customLoginSuccessHandler"
-         default-target-url="/page/main"
+         default-target-url="/mainpage"
          authentication-failure-url="/member/login?error=true"
          username-parameter="username"
          password-parameter="password"

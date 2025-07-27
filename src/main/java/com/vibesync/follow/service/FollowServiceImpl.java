@@ -1,10 +1,13 @@
 package com.vibesync.follow.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.vibesync.follow.domain.FollowVO;
+import com.vibesync.follow.domain.FollowerInfoDTO;
 import com.vibesync.follow.mapper.FollowMapper;
 
 import lombok.extern.log4j.Log4j;
@@ -61,6 +64,20 @@ public class FollowServiceImpl implements FollowService {
 		log.info("팔로워 수 조회 요청. 대상: " + targetUserAcIdx);
 		
 		return this.followMapper.selectFollowerCount(targetUserAcIdx);
+	}
+
+	@Override
+	public List<FollowerInfoDTO> getFollowingList(int followerAcIdx) {
+		log.info("팔로잉 목록 조회 요청. 대상: " + followerAcIdx);
+		
+		return this.followMapper.selectFollowingList(followerAcIdx);
+	}
+
+	@Override
+	public List<FollowerInfoDTO> getFollowerList(int followedAcIdx) {
+		log.info("팔로워 목록 조회 요청. 대상: " + followedAcIdx);
+		
+		return this.followMapper.selectFollowerList(followedAcIdx);
 	}
 	
 }

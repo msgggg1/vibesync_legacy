@@ -6,38 +6,40 @@
 <mapper namespace="com.vibesync.member.mapper.MemberMapper">
 
 	<insert id="insertUser" parameterType="com.vibesync.member.domain.SignUpDTO">
+		<selectKey keyProperty="acIdx" resultType="int" order="AFTER">
+			SELECT userAccount_seq.CURRVAL FROM DUAL
+		</selectKey>
 		INSERT INTO userAccount
 		(ac_idx, email, pw, nickname, name, created_at, category_idx, ROLE)
-		VALUES (useraccount_seq.nextval, #{email}, #{password}, #{nickname}, #{name}, SYSTIMESTAMP, #{categoryIdx}, 'USER')
+		VALUES (userAccount_seq.nextval, #{email}, #{password}, #{nickname}, #{name}, SYSTIMESTAMP, #{categoryIdx}, 'ROLE_USER')
 	</insert>
 
-	<select id="findVOByEmail" resultType="com.vibesync.member.domain.MemberVO">
-		SELECT ac_idx, nickname, img, name, category_idx, email
-		FROM userAccount WHERE email = #{email}
+	<select id="findProfileByEmail" resultType="com.vibesync.member.domain.MemberProfileDTO">
+		SELECT
+            u.ac_idx, u.email, u.nickname, u.name, u.role,
+            u.category_idx, u.img,
+            u.following_count, u.follower_count, u.created_at,
+            s.theme
+		FROM
+			userAccount u
+		LEFT JOIN
+			setting s ON u.ac_idx = s.ac_idx
+		WHERE
+			u.email = #{email}
 	</select>
-	
-	<resultMap id="memberResultMap" type="com.vibesync.member.domain.Member">
-        <id property="acIdx" column="ac_idx"/>
-        <result property="email" column="email"/>
-        <result property="pw" column="pw"/>
-        <result property="nickname" column="nickname"/>
-        <result property="img" column="img"/>
-        <result property="name" column="name"/>
-        <result property="createdAt" column="created_at"/>
-        <result property="categoryIdx" column="category_idx"/>
-        <result property="kakaoAuthId" column="kakao_auth_id"/>
-        <result property="googleId" column="google_id"/>
-        <result property="role" column="role"/>
-    </resultMap>
 
-    <select id="findByEmail" resultMap="memberResultMap">
+    <select id="findByEmailForAuth" resultType="com.vibesync.member.domain.MemberProfileDTO">
         SELECT 
-            ac_idx, pw, nickname, img, name, category_idx, created_at, 
-            kakao_auth_id, google_id, email, role
+            u.ac_idx, u.email, u.pw, u.nickname, u.name, u.role,
+            u.category_idx, u.img, u.kakao_auth_id, u.google_id,
+            u.following_count, u.follower_count, u.created_at,
+            s.theme
         FROM 
-            userAccount 
+            userAccount u
+        LEFT JOIN
+        	setting s ON u.ac_idx = s.ac_idx
         WHERE 
-            email = #{email}
+            u.email = #{email}
     </select>
 
 	<select id="duplicateTest" resultType="com.vibesync.member.domain.MemberVO">

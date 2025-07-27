@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Watch Party - ${wp.title}</title>
     <!-- 수정: favicon 경로 EL로 변경 -->
-    <link rel="icon" href="${pageContext.request.contextPath}/sources/favicon.ico" />
+    <link rel="icon" href="${pageContext.request.contextPath}/favicon.ico" />
     <style>
         body { background: #000; color: #fff; font-family: Arial, sans-serif; width: 100%; height: 98vh; margin: 0;}
         h1 {margin: 0; height: 6%; font-size: min(28px, 4vw);}

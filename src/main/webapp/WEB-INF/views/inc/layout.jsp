@@ -6,12 +6,12 @@
 <c:set var="path" value="${pageContext.request.contextPath}" />
 
 <!DOCTYPE html>
-<html lang="ko" color-theme="${sessionScope.theme != null ? sessionScope.theme : 'light'}">
+<html lang="ko" color-theme="${userProfile != null ? userProfile.theme : 'light'}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title><tiles:getAsString name="title" /></title>
-  <link rel="icon" href="${path}/sources/favicon.ico" />
+  <link rel="icon" href="${pageContext.request.contextPath}/favicon.ico" />
   
   <!-- 특정 페이지에서만 사용되는 Framework/Library -->
   <tiles:insertAttribute name="pageHead" ignore="true"/>
@@ -26,23 +26,20 @@
   
   <!-- js -->
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-  
-  <!-- 로그인 상태관리 -->
-  <sec:authentication property="principal" var="customUser" />
 
 </head>
 <body>
   <div id="notion-app">
     <input type="hidden" id="mode" value="main">
     <div class="notion-app-inner">
-   <tiles:insertAttribute name="sidebar" flush="false"/>
+    	<tiles:insertAttribute name="sidebar" flush="false"/>
 
-      <!-- content -->
-      <div id="content_wrapper">
-        <section id="content">
-  			<tiles:insertAttribute name="body" flush="false"/>
-        </section>
-      </div>
+	    <!-- content -->
+	    <div id="content_wrapper">
+	      <section id="content">
+	  	  	<tiles:insertAttribute name="body" flush="false"/>
+	      </section>
+	    </div>
 
     </div>
   </div>
@@ -52,7 +49,7 @@
 <script>
 	const ctx = "${path}";
 	const isLoggedIn = '<sec:authorize access="isAuthenticated()">true</sec:authorize><sec:authorize access="isAnonymous()">false</sec:authorize>' === 'true';
-	const loggedInUserAcIdx = isLoggedIn ? ${customUser.acIdx} : -1;
+	const loggedInUserAcIdx = isLoggedIn ? ${userProfile.acIdx} : -1;
 </script>
 <script src="${path}/resources/js/script.js"></script>
 <script defer src="${path}/resources/js/theme.js"></script>

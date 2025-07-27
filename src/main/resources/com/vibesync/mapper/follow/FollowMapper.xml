@@ -62,5 +62,34 @@
 			followed_ac_idx = #{followedAcIdx}
 	</select>
 <!-- // -->
+
+<!-- 팔로잉 목록 조회 -->
+<!-- public List<FollowerInfoDTO> selectFollowingList(int followerAcIdx); -->
+	<select id="selectFollowingList" resultType="FollowerInfoDTO">
+	    SELECT
+	        u.ac_idx, u.nickname, u.img AS profileImg, u.category_idx,
+	        CASE
+	            WHEN f_reverse.followed_ac_idx IS NOT NULL THEN 1
+	            ELSE 0
+	        END AS followedByCurrentUser
+	    FROM follows f
+	    JOIN userAccount u ON u.ac_idx = f.follower_ac_idx
+	    LEFT JOIN follows f_reverse ON f_reverse.follower_ac_idx = f.followed_ac_idx
+	                               AND f_reverse.followed_ac_idx = f.follower_ac_idx
+	    WHERE f.followed_ac_idx = #{followerAcIdx}
+	</select>
+<!-- // -->
+
+<!-- 팔로워 목록 조회 -->
+<!-- public List<FollowerInfoDTO> selectFollowerList(int followedAcIdx); -->
+	<select id="selectFollowerList" resultType="FollowerInfoDTO">
+	    SELECT
+	        u.ac_idx, u.nickname, u.img AS profileImg, u.category_idx,
+	        1 AS followedByCurrentUser
+	    FROM follows f
+	    JOIN userAccount u ON u.ac_idx = f.followed_ac_idx
+	    WHERE f.follower_ac_idx = #{followedAcIdx}
+	</select>
+<!-- // -->
     
  </mapper>

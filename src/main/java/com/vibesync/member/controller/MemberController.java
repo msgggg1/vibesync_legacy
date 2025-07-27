@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.vibesync.listener.DuplicateLoginPreventer;
-import com.vibesync.member.domain.MemberVO;
+import com.vibesync.member.domain.MemberProfileDTO;
 import com.vibesync.member.domain.SignUpDTO;
 import com.vibesync.member.service.MemberService;
 import com.vibesync.member.util.Config;
@@ -49,7 +49,7 @@ public class MemberController {
 
         // 2. 자동 로그인 쿠키 확인
         if (!"logout".equals(from)&&autoLoginEmail != null) {
-            MemberVO memberInfo = null;
+            MemberProfileDTO memberInfo = null;
 			try {
 				memberInfo = memberService.autoLogin(autoLoginEmail);
 			} catch (Exception e) {
@@ -113,7 +113,7 @@ public class MemberController {
         	memberService.register(newGoogleUser);
             session.removeAttribute("newGoogleUser");
             
-            MemberVO newMemberInfo = memberService.getUserByEmail(newGoogleUser.getEmail());
+            MemberProfileDTO newMemberInfo = memberService.getUserByEmail(newGoogleUser.getEmail());
             if (newMemberInfo != null) {
                 System.out.println("Google 신규 회원 가입 성공, 즉시 로그인");
                 // 구글 회원가입 성공 시, 자동 로그인을 위해 쿠키는 true로 설정
@@ -183,7 +183,7 @@ public class MemberController {
      * (중복 로그인 방지, 쿠키 설정, 세션 설정, 페이지 리다이렉트)
      */
     private String processSuccessfulLogin(HttpServletRequest request, HttpServletResponse response, HttpSession session,
-                                          MemberVO memberInfo, boolean rememberEmail, boolean autoLogin) throws IOException {
+                                          MemberProfileDTO memberInfo, boolean rememberEmail, boolean autoLogin) throws IOException {
         String memberEmail = memberInfo.getEmail();
 
         // 1. 중복 로그인 방지 로직
