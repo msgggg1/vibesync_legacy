@@ -15,6 +15,5 @@ public class NoteViewDTO {
 	private int userAcIdx;
 	private boolean following;
 	private boolean liking;
-	private boolean author;
 	
 }

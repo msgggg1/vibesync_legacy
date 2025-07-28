@@ -43,4 +43,17 @@ public interface MemberMapper {
 	    
 	    // 이메일 주소를 기준으로 사용자의 비밀번호 업데이트
 	    public void updatePassword(@Param("email") String email, @Param("pw") String hashedPassword);
+	    
+	    // 팔로잉 수 증가
+	    void increaseFollowingCount(@Param("followerAcIdx") int followerAcIdx);
+	    
+	    // 팔로워 수 증가
+	    void increaseFollowerCount(@Param("followedAcIdx") int followedAcIdx);
+	    
+	    // 팔로잉 수 감소
+	    void decreaseFollowingCount(@Param("followerAcIdx") int followerAcIdx);
+	    
+	    // 팔로워 수 감소
+	    void decreaseFollowerCount(@Param("followedAcIdx") int followedAcIdx);
+	    
 }

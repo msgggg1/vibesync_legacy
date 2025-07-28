@@ -4,6 +4,41 @@
 <c:set var="noteIdForJs" value="${noteIdx ne null ? noteIdx : 0}" />
 <c:set var="parentIdForJs" value="${parentNoteIdx ne null ? parentNoteIdx : 0}" />
 
+	<div class="writer_info">
+		<div class="writer">
+			<img id="writer_profileImg" src="${path}/sources/default/default_user.jpg" alt="writer_profile">
+			<a id="writer_userpage" href="userpage/${boardViewDTO.noteDetail.member.acIdx}">${boardViewDTO.noteDetail.member.nickname}</a>
+			<c:if test="${boardViewDTO.userAcIdx != boardViewDTO.noteDetail.upacIdx}">
+				<form id="followForm" style="display: inline; margin: 0; padding: 0;">
+					<button id="followBtn" type="button"
+							style="background: #99bc85; border-radius: 5px; border: none; cursor: pointer; padding: 5px 10px;">
+						${boardViewDTO.following ? "Unfollow" : "Follow"}
+					</button>
+				</form>
+			</c:if>
+		</div>
+		<div class="like_share">
+			<div>
+				<p>
+					<span>view : </span><span>${boardViewDTO.noteDetail.note.viewCount}</span>
+				</p>
+			</div>
+			<form id="likeForm" style="display: inline; margin: 0; padding: 0;">
+				<button id="likeBtn" type="submit" data-user-idx="${boardViewDTO.userAcIdx}"
+					data-note-idx="${boardViewDTO.noteDetail.note.noteIdx}"
+					style="border: none; background: none; cursor: pointer; filter: var(- -icon-filter);">
+					<c:set var="fillHeartIcon" value="${pageContext.request.contextPath}/resources/images/icons/fill_heart.png" />
+					<c:set var="emptyHeartIcon" value="${pageContext.request.contextPath}/resources/images/icons/heart.svg" />
+					<img id="likeImg" src="${boardViewDTO.liking ? fillHeartIcon : emptyHeartIcon}" alt="heart"
+						style="vertical-align: middle; width: 2rem; height: 2rem;">
+						<span id="likeCount" style="vertical-align: middle;">
+							${boardViewDTO.noteDetail.likeNum}
+						</span>
+				</button>
+			</form>
+		</div>
+	</div>
+
 <div class="note-editor-container">
 	<%-- 상단 기능 헤더 --%>
 	<div class="note-editor-header">
@@ -45,7 +80,7 @@
         
         <%-- 현재 글이 저장된 상태일 때만 (noteIdx > 0) 버튼 표시 --%>
         <c:if test="${noteIdx > 0}">
-            <button type="button" id="add-child-note-btn">+ Add a page, get connected!</button>
+            <button type="button" id="add-child-note-btn">+ Add a page inside</button>
         </c:if>
     </div>
 	
@@ -67,12 +102,14 @@
 </script>
 <script>
 $(document).ready(function() {
+	
+	
     let autoSaveTimer; // 자동 저장을 위한 타이머 변수
     const DEBOUNCE_DELAY = 2000; // 2초 (2000ms)
-  // Editor.js 인스턴스 생성
+  	// Editor.js 인스턴스 생성
     const editor = new EditorJS({
         holder: myHolder,
-        placeholder: noteIdx > 0 ? '' : '내용을 입력하세요...',
+        placeholder: '내용을 입력하세요...',
         data: { blocks: [] },
         // 추가 플러그인들 설정
         tools: {
@@ -240,6 +277,22 @@ $(document).ready(function() {
         }
     });
 
+
+$.ajax({
+    type: 'GET',
+    url: '${path}/api/follows/followerCount',
+    cache: 'no-store',
+    data: {followedAcIdx: loggedInUserAcIdx},
+    dataType: 'json',
+    success: function(followerCount) {
+        $("#follower-btn").find(".accountDataValue").text(followerCount);
+    },
+    error: function(xhr, status, error) {
+        console.error('AJAX Error:', error);
+    }
+});
+
+
 	editor.isReady.then(() => {
 		console.log('Editor.js is ready.');
 		new DragDrop(editor);
@@ -251,7 +304,10 @@ $(document).ready(function() {
 	            type: 'GET',
 	            dataType: 'json',
 	            success: function(response) {
-	                let note = response.noteDetail;
+					let writerInfo = response.noteDetail.member;
+					$('#writer_profileImg').attr('src', `${path}/sources/default/default_user.jpg`);            
+	
+					let note = response.noteDetail;
 	                $('#note-title').val(note.title);
 	                $('#note-category-select').val(note.categoryIdx);
 	               
@@ -260,29 +316,14 @@ $(document).ready(function() {
 	                editor.isReady.then(() => {
 	                    editor.render(contentData);
 	                });
-	
-					if (!response.author) {
-						// editor.readOnly.toggle(true);
-						$('#editorjs').addClass('editor-readonly');
-						$('#note-title').prop('readonly', true);
-					} else {
-						$('#save-btn').show();
-						$('#delete-btn').show();
-						$('#editorjs').on('change', triggerAutoSave);
-						$('#editorjs').on('input', triggerAutoSave);
-					}
 					
 					renderChildNotes(note.childNoteList);
 	            },
 	            error: () => alert('게시글 로딩 실패')
 	        });
-	    } else {
-			$('#save-btn').show();
-			$('#delete-btn').show();
-			$('#editorjs').on('change', triggerAutoSave);
-			$('#editorjs').on('input', triggerAutoSave);
-		}
-		
+	    }
+		$('#editorjs').on('change', triggerAutoSave);
+		$('#editorjs').on('input', triggerAutoSave);
 	}).catch(error => {
         console.error("Editor.js 초기화 또는 준비 과정에서 에러 발생:", error);
     });
@@ -293,7 +334,7 @@ $(document).ready(function() {
 	    container.empty(); // 기존 목록 비우기
 	
 	    if (!childNotes || childNotes.length === 0) {
-	        container.html('<p>No pages related.</p>');
+	        container.html('<p>No pages inside.</p>');
 	        return;
 	    }
 	
@@ -359,7 +400,7 @@ $(document).ready(function() {
                 data: JSON.stringify(saveData),
                 success: function(result) {
                     if (!isUpdate) {
-						if (!isAutoSave) {
+                        if (!isAutoSave) {
 	                        alert('저장되었습니다. 이미지 업로드가 활성화됩니다.');
 	                        location.href = `\${path}/note/\${result.noteIdx}`;
                         } else {
@@ -382,7 +423,8 @@ $(document).ready(function() {
         });
     }
 
-
+	// 작성자 프로필 로드 함수
+	//
 
     // --- 이벤트 핸들러 ---
     $('#save-btn').on('click', () => saveNoteData(false)); // 수동 저장은 false

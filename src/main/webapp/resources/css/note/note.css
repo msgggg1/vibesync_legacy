@@ -1,11 +1,6 @@
 /* 위치: /resources/css/note/note.css */
 @charset "UTF-8";
 
-.editor-readonly {
-    pointer-events: none;
-    opacity: 0.7;
-}
-
 .header-left {
   display: flex;
   align-items: center;
@@ -18,12 +13,6 @@
 }
 .back_icon:hover{
 	cursor: pointer;
-}
-
-.back_icon img {
-    width: 24px;
-    height: 24px;
-    cursor: pointer;
 }
 
 .category-selector {
@@ -53,7 +42,7 @@
     gap: 20px;
 }
 
-.back-link img {
+.back_icon img {
     width: 24px;
     height: 24px;
     cursor: pointer;
@@ -89,12 +78,10 @@
 
 #save-btn{
 	background-color: #B0D19F;
-	display: none;
 }
 
 #delete-btn{
 	background-color: #DE9486;
-	display: none;
 }
 
 #save-btn:hover, #list-btn:hover, #delete-btn:hover {

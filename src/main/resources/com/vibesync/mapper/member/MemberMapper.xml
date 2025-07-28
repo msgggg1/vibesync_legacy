@@ -86,5 +86,40 @@
 		UPDATE userAccount SET pw = #{pw}, salt = #{salt} WHERE email = #{email}
 	</update>
 
+<!-- 팔로잉 수 증가 -->
+<!-- void increaseFollowingCount(@Param("followerAcIdx") int followerAcIdx); -->
+	<update id="increaseFollowingCount">
+		UPDATE userAccount
+		SET following_count = following_count + 1
+		WHERE ac_idx = #{followerAcIdx}
+	</update>
+<!-- // -->
+
+<!-- 팔로워 수 증가 -->
+<!-- void increaseFollowerCount(@Param("followedAcIdx") int followedAcIdx); -->
+	<update id="increaseFollowerCount">
+		UPDATE userAccount
+		SET follower_count = follower_count + 1
+		WHERE ac_idx = #{followedAcIdx}
+	</update>
+<!-- // -->
+
+<!-- 팔로잉 수 감소 -->
+<!-- void decreaseFollowingCount(@Param("followerAcIdx") int followerAcIdx); -->
+	<update id="decreaseFollowingCount">
+		UPDATE userAccount
+		SET following_count = following_count - 1
+		WHERE ac_idx = #{followerAcIdx}
+	</update>
+<!-- // -->
+
+<!-- 팔로워 수 감소 -->
+<!-- void decreaseFollowerCount(@Param("followedAcIdx") int followedAcIdx); -->
+	<update id="decreaseFollowerCount">
+		UPDATE userAccount
+		SET follower_count = follower_count - 1
+		WHERE ac_idx = #{followedAcIdx}
+	</update>
+<!-- // -->
 
 </mapper>  

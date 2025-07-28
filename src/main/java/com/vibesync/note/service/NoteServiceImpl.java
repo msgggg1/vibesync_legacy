@@ -40,7 +40,6 @@ public class NoteServiceImpl implements NoteService {
         
         boolean isFollowing = false;
         boolean isLiking = false;
-        boolean isAuthor = false;
         
         if (currentUser != null) {
             int currentUserId = currentUser.getAcIdx();
@@ -49,8 +48,6 @@ public class NoteServiceImpl implements NoteService {
             if (currentUserId != authorId) {
             	FollowVO vo = FollowVO.builder().followerAcIdx(currentUserId).followedAcIdx(authorId).build();
                 isFollowing = followMapper.checkFollowStatus(vo) > 0;
-            } else {
-            	isAuthor = true;
             }
             
             // isLiking = likeMapper.checkLike(currentUserId, noteIdx) > 0;
@@ -60,7 +57,6 @@ public class NoteServiceImpl implements NoteService {
                 .noteDetail(noteDetail)
                 .following(isFollowing)
                 .liking(isLiking)
-                .author(isAuthor)
                 .build();
         
 	}

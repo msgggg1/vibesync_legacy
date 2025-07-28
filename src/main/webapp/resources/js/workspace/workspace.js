@@ -94,24 +94,6 @@ function loadDailySchedules(dateString) {
     $('#tab_schedule .schedule-date-title').text(formattedDate);
 	
     console.log('일별 스케줄 요청:', dateString);
-    
-    // 먼저 캐시에서 해당 날짜의 일정을 확인
-    if (schedulesByDate && schedulesByDate[dateString]) {
-        console.log('캐시에서 일정 로드:', schedulesByDate[dateString]);
-        displaySchedules(schedulesByDate[dateString]);
-        return;
-    }
-    
-    // 캐시가 비어있거나 해당 날짜가 없으면 잠시 기다린 후 다시 시도
-    if (!schedulesByDate || Object.keys(schedulesByDate).length === 0) {
-        console.log('캐시가 비어있어서 잠시 기다린 후 다시 시도합니다.');
-        setTimeout(() => {
-            loadDailySchedules(dateString);
-        }, 100);
-        return;
-    }
-    
-    // 캐시에 없으면 서버에서 가져오기
     $.ajax({
         url: contextPath + '/api/schedules/daily',
         type: 'GET',
@@ -119,43 +101,38 @@ function loadDailySchedules(dateString) {
         dataType: 'json',
         success: function(schedules) {
             console.log('일별 스케줄 응답:', schedules);
-            displaySchedules(schedules);
+            let scheduleHtml = '<ul class="schedule-list">';
+            if (schedules && schedules.length > 0) {
+                // 가져온 데이터로 목록 UI를 만듭니다. (기존 로직과 유사)
+                schedules.forEach(schedule => {
+                    const startDate = new Date(schedule.startTime); // 필드명은 VO/DTO에 맞게
+                    const endDate = new Date(schedule.endTime);
+                    const startTime = String(startDate.getHours()).padStart(2, '0') + ":" + String(startDate.getMinutes()).padStart(2, '0');
+                    const endTime = String(endDate.getHours()).padStart(2, '0') + ":" + String(endDate.getMinutes()).padStart(2, '0');
+                    const descriptionHtml = (schedule.description && schedule.description.trim() !== '') ? ' <span class="schedule-desc">' + schedule.description + '</span>' : '';
+
+                    scheduleHtml += `<li data-id="${schedule.scheduleIdx}">
+                                         <div class="schedule-item-content">
+                                             <span class="schedule-time">${startTime} - ${endTime}</span>
+                                             <div class="schedule-details">
+                                                 <span class="schedule-title">${schedule.title}</span>
+                                                 ${descriptionHtml}
+                                             </div>
+                                         </div>
+                                         <button class="schedule-delete-btn">&times;</button>
+                                     </li>`;
+                });
+            } else {
+                scheduleHtml += '<li class="no-schedule">등록된 일정이 없습니다.</li>';
+            }
+            scheduleHtml += '</ul>';
+            $('#daily-schedule-list-container').html(scheduleHtml);
         },
         error: function(xhr, status, error) {
             console.error('일별 스케줄 요청 실패:', xhr.status, error);
             $('#daily-schedule-list-container').html('<p>일정을 불러오는 데 실패했습니다.</p>');
         }
     });
-}
-
-// 일정 표시 함수 분리
-function displaySchedules(schedules) {
-    let scheduleHtml = '<ul class="schedule-list">';
-    if (schedules && schedules.length > 0) {
-        // 가져온 데이터로 목록 UI를 만듭니다. (기존 로직과 유사)
-        schedules.forEach(schedule => {
-            const startDate = new Date(schedule.startTime || schedule.start); // 필드명은 VO/DTO에 맞게
-            const endDate = new Date(schedule.endTime || schedule.end);
-            const startTime = String(startDate.getHours()).padStart(2, '0') + ":" + String(startDate.getMinutes()).padStart(2, '0');
-            const endTime = String(endDate.getHours()).padStart(2, '0') + ":" + String(endDate.getMinutes()).padStart(2, '0');
-            const descriptionHtml = (schedule.description && schedule.description.trim() !== '') ? ' <span class="schedule-desc">' + schedule.description + '</span>' : '';
-
-            scheduleHtml += `<li data-id="${schedule.scheduleIdx || schedule.id}">
-                                 <div class="schedule-item-content">
-                                     <span class="schedule-time">${startTime} - ${endTime}</span>
-                                     <div class="schedule-details">
-                                         <span class="schedule-title">${schedule.title}</span>
-                                         ${descriptionHtml}
-                                     </div>
-                                 </div>
-                                 <button class="schedule-delete-btn">&times;</button>
-                             </li>`;
-        });
-    } else {
-        scheduleHtml += '<li class="no-schedule">등록된 일정이 없습니다.</li>';
-    }
-    scheduleHtml += '</ul>';
-    $('#daily-schedule-list-container').html(scheduleHtml);
 }
 
 // [함수] 할 일 목록 로딩
@@ -522,8 +499,6 @@ $(document).ready(function() {
                         console.log('일정 삭제 응답:', response);
                         // ResponseEntity<Void>는 성공 시 빈 응답을 반환
                         alert("일정이 삭제되었습니다.");
-                        
-                        // 캐시 초기화하여 최신 데이터로 업데이트
                         dateToRefreshAfterFetch = scheduleDate;
                         calendar.refetchEvents();
                     },
@@ -606,8 +581,6 @@ $(document).ready(function() {
                         alert('일정이 성공적으로 ' + alertMessage + '되었습니다.');
                         saveRecentColor(scheduleData.color);
                         $unifiedModal.hide();
-                        
-                        // 캐시 초기화하여 최신 데이터로 업데이트
                         dateToRefreshAfterFetch = scheduleData.startTime.substring(0, 10);
                         calendar.refetchEvents();
                     } else { 
@@ -1055,10 +1028,7 @@ $(document).ready(function() {
 			            },
 						success : function(){
 							console.log("일정 이동 성공");
-							
-							// 캐시 초기화하여 최신 데이터로 업데이트
-							dateToRefreshAfterFetch = dropInfo.event.start.toISOString().substring(0, 10);
-							calendar.refetchEvents();
+							loadDailySchedules(dropInfo.event.start.toISOString().substring(0, 10));
 						},
 						error: function(){
 							alert("서버와 통신 중 오류가 발생했습니다.");
@@ -1088,6 +1058,7 @@ $(document).ready(function() {
 						success : function(response){
 							if(response && response.scheduleIdx){
 								// 캐시 초기화하여 최신 데이터로 업데이트
+								schedulesByDate = {};
 								dateToRefreshAfterFetch = scheduleData.startTime.substring(0,10);
 								calendar.refetchEvents();
 							}else{

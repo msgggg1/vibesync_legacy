@@ -87,7 +87,6 @@
 			event.preventDefault();
 			let pageNum = $(this).attr("href");
 			actionForm
-					  .attr('action', `${pageContext.request.contextPath}/board/list`)
 					  .find(":hidden[name=pageNum]")
 					  								.val(pageNum)
 					  								.end()
