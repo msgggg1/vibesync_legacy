@@ -1,14 +1,29 @@
 /* 위치: /resources/css/note/note.css */
 @charset "UTF-8";
 
+.editor-readonly {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
 .header-left {
   display: flex;
   align-items: center;
   gap: 4px;             /* 화살표와 셀렉트 사이 기본 간격을 20→4px 로 */
 }
 
-.back-link {
-  margin-right: 0;      /* 혹시 남아 있는 여백 제거 */
+.back_icon {
+  margin-right: 0;
+  margin-bottom: 0;
+}
+.back_icon:hover{
+	cursor: pointer;
+}
+
+.back_icon img {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
 }
 
 .category-selector {
@@ -74,10 +89,12 @@
 
 #save-btn{
 	background-color: #B0D19F;
+	display: none;
 }
 
 #delete-btn{
 	background-color: #DE9486;
+	display: none;
 }
 
 #save-btn:hover, #list-btn:hover, #delete-btn:hover {

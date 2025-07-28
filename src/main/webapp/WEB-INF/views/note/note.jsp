@@ -8,9 +8,9 @@
 	<%-- 상단 기능 헤더 --%>
 	<div class="note-editor-header">
 		<div class="header-left">
-			<a href="${path}/board/list${criteria.listLink}" class="back-link">
+			<div class="back_icon">
 				<img src="${path}/resources/images/icons/arrow_back.svg" alt="뒤로가기">
-			</a>
+			</div>
 			<span style="font-weight: bold;">CATEGORY</span>
 			<div class="category-selector">
 				<select id="note-category-select" name="categoryIdx">
@@ -45,7 +45,7 @@
         
         <%-- 현재 글이 저장된 상태일 때만 (noteIdx > 0) 버튼 표시 --%>
         <c:if test="${noteIdx > 0}">
-            <button type="button" id="add-child-note-btn">+ Add a page inside</button>
+            <button type="button" id="add-child-note-btn">+ Add a page, get connected!</button>
         </c:if>
     </div>
 	
@@ -72,7 +72,7 @@ $(document).ready(function() {
   // Editor.js 인스턴스 생성
     const editor = new EditorJS({
         holder: myHolder,
-        placeholder: '내용을 입력하세요...',
+        placeholder: noteIdx > 0 ? '' : '내용을 입력하세요...',
         data: { blocks: [] },
         // 추가 플러그인들 설정
         tools: {
@@ -260,14 +260,29 @@ $(document).ready(function() {
 	                editor.isReady.then(() => {
 	                    editor.render(contentData);
 	                });
+	
+					if (!response.author) {
+						// editor.readOnly.toggle(true);
+						$('#editorjs').addClass('editor-readonly');
+						$('#note-title').prop('readonly', true);
+					} else {
+						$('#save-btn').show();
+						$('#delete-btn').show();
+						$('#editorjs').on('change', triggerAutoSave);
+						$('#editorjs').on('input', triggerAutoSave);
+					}
 					
 					renderChildNotes(note.childNoteList);
 	            },
 	            error: () => alert('게시글 로딩 실패')
 	        });
-	    }
-		$('#editorjs').on('change', triggerAutoSave);
-		$('#editorjs').on('input', triggerAutoSave);
+	    } else {
+			$('#save-btn').show();
+			$('#delete-btn').show();
+			$('#editorjs').on('change', triggerAutoSave);
+			$('#editorjs').on('input', triggerAutoSave);
+		}
+		
 	}).catch(error => {
         console.error("Editor.js 초기화 또는 준비 과정에서 에러 발생:", error);
     });
@@ -278,7 +293,7 @@ $(document).ready(function() {
 	    container.empty(); // 기존 목록 비우기
 	
 	    if (!childNotes || childNotes.length === 0) {
-	        container.html('<p>No pages inside.</p>');
+	        container.html('<p>No pages related.</p>');
 	        return;
 	    }
 	
@@ -344,7 +359,7 @@ $(document).ready(function() {
                 data: JSON.stringify(saveData),
                 success: function(result) {
                     if (!isUpdate) {
-                        if (!isAutoSave) {
+						if (!isAutoSave) {
 	                        alert('저장되었습니다. 이미지 업로드가 활성화됩니다.');
 	                        location.href = `\${path}/note/\${result.noteIdx}`;
                         } else {
