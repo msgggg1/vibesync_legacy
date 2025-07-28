@@ -160,7 +160,7 @@
 					<%-- 각 블록 타입에 맞는 JSP 프래그먼트를 include --%>
 					<c:set var="block" value="${block}" scope="request" />
 					<jsp:include
-						page="/WEB-INF/views/page/workspace/fragments/_${block.blockType}Content.jsp" />
+						page="/WEB-INF/views/workspace/workspace/fragments/_${block.blockType}Content.jsp" />
 				</div>
 			</div>
 		</c:forEach>
@@ -282,4 +282,6 @@
 <script>
         const contextPath = "${pageContext.request.contextPath}";
         const currentUserAcIdx = parseInt('${pageContext.request.userPrincipal.principal.acIdx}');
+        window.csrfHeaderName = "${_csrf.headerName}";
+        window.csrfToken = "${_csrf.token}";
 </script>

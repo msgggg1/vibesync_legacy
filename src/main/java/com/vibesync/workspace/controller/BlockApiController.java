@@ -76,7 +76,7 @@ public class BlockApiController {
             request.setAttribute("chartDataJson", chartDataJsonString);
         }
         
-        String forwardPath = "/WEB-INF/views/page/workspace/fragments/_" + blockData.getBlockType() + "Content.jsp";
+        String forwardPath = "/WEB-INF/views/workspace/workspace/fragments/_" + blockData.getBlockType() + "Content.jsp";
         String htmlContent = renderJspToString(request, response, forwardPath);
 
         // 3. 클라이언트에 보낼 JSON 데이터 구성
@@ -143,7 +143,7 @@ public class BlockApiController {
                 request.setAttribute("chartDataJson", chartDataJsonString);
             }
             
-            String forwardPath = "/WEB-INF/views/page/workspace/fragments/_blockWrapper.jsp";
+            String forwardPath = "/WEB-INF/views/workspace/workspace/fragments/_blockWrapper.jsp";
             String htmlContent = renderJspToString(request, response, forwardPath);
 
             // 클라이언트에 보낼 JSON 데이터 구성
@@ -234,7 +234,7 @@ public class BlockApiController {
         // JSP 프래그먼트를 HTML 문자열로 렌더링
         request.setAttribute("blockData", blockData);
         
-        String forwardPath = "/WEB-INF/views/page/workspace/fragments/_fixed" + blockType + "Content.jsp";
+        String forwardPath = "/WEB-INF/views/workspace/workspace/fragments/_fixed" + blockType + "Content.jsp";
         String htmlContent = renderJspToString(request, response, forwardPath);
 
         // 클라이언트에 보낼 JSON 데이터 구성

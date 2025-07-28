@@ -14,7 +14,7 @@ import com.vibesync.common.domain.Criteria;
 import com.vibesync.security.domain.CustomUser;
 import com.vibesync.userpage.domain.NoteSummaryDTO;
 import com.vibesync.userpage.domain.UserPageDTO;
-import com.vibesync.userpage.service.UserpageService;
+import com.vibesync.userpage.service.UserPageService;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -24,7 +24,7 @@ import lombok.extern.log4j.Log4j2;
 public class UserpageApiController {
 
 	@Autowired
-	UserpageService userpageService;
+	UserPageService userpageService;
 	
 	// 초기 데이터 (프로필 + 첫 페이지 게시물)
     @GetMapping("/{targetUserId}")

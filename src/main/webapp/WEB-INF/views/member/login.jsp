@@ -78,7 +78,7 @@
 						<!-- <form action="${pageContext.request.contextPath}/login/process" -->
 						<form action="${pageContext.request.contextPath}/login" 
 							method="post" id="loginForm">
-							<!-- <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/> -->
+							<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
 
 							<%-- 비밀번호 재설정 요청 메시지 --%>
 							<c:if test="${ loginMessage != null && !loginMessage.isEmpty() }">

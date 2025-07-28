@@ -8,7 +8,7 @@
 	<resultMap id="noteSummaryDTOMap" type="com.vibesync.mainpage.domain.NoteSummaryDTO">
 		<id property="noteIdx" column="note_idx" />
 		<result property="title" column="title" />
-		<result property="thumbnailImg" column="thumbnail_img" />
+		<result property="titleimg" column="titleimg" />
 		<result property="viewCount" column="view_count" />
 		<result property="likeCount" column="like_count" />
 		<result property="authorName" column="author_name" />
@@ -23,7 +23,7 @@
 
 	<select id="popularNoteByAllCategory" resultMap="noteSummaryDTOMap">
 		<![CDATA[
-			SELECT n.note_idx, n.title, n.titleimg AS thumbnail_img, n.view_count, rnk.like_count,
+			SELECT n.note_idx, n.title, n.titleimg, n.view_count, rnk.like_count,
 				ua.nickname AS author_name, n.category_idx
 			FROM (
 			SELECT n.note_idx, n.category_idx, COUNT(l.likes_idx) AS like_count, 
@@ -44,12 +44,12 @@
 		    SELECT
 		        note_idx        AS noteIdx,
 		        title           AS title,
-		        thumbnail_img   AS thumbnailImg,
+		        titleimg,
 		        view_count      AS viewCount,
 		        like_count      AS likeCount,
 		        author_name     AS authorName
 		    FROM (
-		        SELECT n.note_idx, n.title, n.titleimg AS thumbnail_img, n.view_count, ua.nickname AS author_name,
+		        SELECT n.note_idx, n.title, n.titleimg, n.view_count, ua.nickname AS author_name,
 		            COALESCE(lc.like_count, 0) AS like_count,
 		            ROW_NUMBER() OVER (ORDER BY n.create_at DESC) as rn
 		        FROM note n
@@ -68,9 +68,9 @@
 
 	<select id="popularNoteByMyCategory" resultMap="noteSummaryDTOMap">
 		<![CDATA[
-		SELECT note_idx, title, thumbnail_img, view_count, like_count, author_name
+		SELECT note_idx, title, titleimg, view_count, like_count, author_name
 		FROM (
-				SELECT n.note_idx, n.title, n.titleimg AS thumbnail_img,
+				SELECT n.note_idx, n.title, n.titleimg,
 						n.view_count, ua.nickname AS author_name,
 						COALESCE(lc.like_count, 0) AS like_count,
 						ROW_NUMBER() OVER (ORDER BY (COALESCE(lc.like_count, 0) + n.view_count) DESC, n.create_at DESC) as rn

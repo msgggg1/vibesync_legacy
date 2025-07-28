@@ -552,9 +552,6 @@ function loadFollowListData(tabType) {
                     return;
                 }
                 messageList.forEach(message => {
-                    let profileImgHtml = message.other.profileImg ?
-                       `<img src="${path}/upload/\${message.other.profileImg}" alt="profile">` :
-                       `<img src="${path}/resources/images/system/default_user.jpg" alt="기본 프로필">`;
                     // 새로운 API 구조에 맞게 수정
                     const senderIdx = message.acSender;
                     const senderNickname = message.latestMessage.senderNickname;

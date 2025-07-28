@@ -367,6 +367,11 @@ $(document).ready(function() {
                 type: 'PUT',
                 data: JSON.stringify(isChecked ? 1 : 0),
                 contentType: 'application/json',
+                beforeSend: function(xhr) {
+	                if (csrfHeaderName && csrfToken) {
+	                    xhr.setRequestHeader(csrfHeaderName, csrfToken);
+	                }
+	            },
                 success: function(response) {
                     console.log("Todo [ID:" + todoIdx + "] 상태 변경 완료:", response);
                 },
@@ -386,6 +391,11 @@ $(document).ready(function() {
                 $.ajax({
                     url: contextPath + '/api/todos/' + todoIdx,
                     type: 'DELETE',
+                    beforeSend: function(xhr) {
+		                if (csrfHeaderName && csrfToken) {
+		                    xhr.setRequestHeader(csrfHeaderName, csrfToken);
+		                }
+		            },
                     success: function(response) {
                         console.log("Todo [ID:" + todoIdx + "] 삭제 완료:", response);
                         $li.fadeOut(300, function() { $(this).remove(); }); // 애니메이션 끝나고 실행
@@ -480,6 +490,11 @@ $(document).ready(function() {
                 $.ajax({
                     url: contextPath + `/api/schedules/${scheduleIdx}`,
                     type: 'DELETE',
+                    beforeSend: function(xhr) {
+		                if (csrfHeaderName && csrfToken) {
+		                    xhr.setRequestHeader(csrfHeaderName, csrfToken);
+		                }
+		            },
                     success: function(response) {
                         console.log('일정 삭제 응답:', response);
                         // ResponseEntity<Void>는 성공 시 빈 응답을 반환
@@ -554,6 +569,11 @@ $(document).ready(function() {
                 type: isUpdating ? 'PUT' : 'POST',
                 data: JSON.stringify(scheduleData),
                 contentType: 'application/json',
+                beforeSend: function(xhr) {
+	                if (csrfHeaderName && csrfToken) {
+	                    xhr.setRequestHeader(csrfHeaderName, csrfToken);
+	                }
+	            },
                 success: function(response) {
                     console.log('스케줄 응답:', response);
                     // ScheduleVO 객체가 반환되면 성공 (scheduleIdx가 있으면 성공)
@@ -589,6 +609,11 @@ $(document).ready(function() {
                 type: isUpdating ? 'PUT' : 'POST',
                 data: JSON.stringify(todoData),
                 contentType: 'application/json',
+                beforeSend: function(xhr) {
+	                if (csrfHeaderName && csrfToken) {
+	                    xhr.setRequestHeader(csrfHeaderName, csrfToken);
+	                }
+	            },
                 success: function(response) {
                     // TodoVO 객체가 반환되면 성공 (todoIdx가 있으면 성공)
                     if (response && response.todoIdx) {
@@ -996,6 +1021,11 @@ $(document).ready(function() {
 							endTime: dropInfo.event.end ? dropInfo.event.end.toISOString() : dropInfo.event.start.toISOString()
 						}),
 						contentType: 'application/json',
+						beforeSend: function(xhr) {
+			                if (csrfHeaderName && csrfToken) {
+			                    xhr.setRequestHeader(csrfHeaderName, csrfToken);
+			                }
+			            },
 						success : function(){
 							console.log("일정 이동 성공");
 							loadDailySchedules(dropInfo.event.start.toISOString().substring(0, 10));
@@ -1020,6 +1050,11 @@ $(document).ready(function() {
 						type :'PUT',
 						data: JSON.stringify(scheduleData),
 						contentType: 'application/json',
+						beforeSend: function(xhr) {
+			                if (csrfHeaderName && csrfToken) {
+			                    xhr.setRequestHeader(csrfHeaderName, csrfToken);
+			                }
+			            },
 						success : function(response){
 							if(response && response.scheduleIdx){
 								// 캐시 초기화하여 최신 데이터로 업데이트
@@ -1120,6 +1155,11 @@ function addBlockToServer(blockType, config, period) {
         data: JSON.stringify(config),
         contentType: 'application/json',
         dataType: 'json',
+        beforeSend: function(xhr) {
+                if (csrfHeaderName && csrfToken) {
+                    xhr.setRequestHeader(csrfHeaderName, csrfToken);
+                }
+            },
         success: function(res) {
             $('#content_plus').before(res.html);
 
@@ -1142,6 +1182,11 @@ function deleteBlock(blockId) {
         url: contextPath + '/api/block/' + blockId,
         type: 'DELETE',
         dataType: 'json',
+        beforeSend: function(xhr) {
+	                if (csrfHeaderName && csrfToken) {
+	                    xhr.setRequestHeader(csrfHeaderName, csrfToken);
+	                }
+	            },
         success: function(res) {
             if (res.success) {
                 $('#block-' + blockId).fadeOut(function() {
@@ -1229,6 +1274,11 @@ function saveBlockOrder() {
         data: JSON.stringify(orderData),
         contentType: 'application/json',
         dataType: 'json',
+        beforeSend: function(xhr) {
+                if (csrfHeaderName && csrfToken) {
+                    xhr.setRequestHeader(csrfHeaderName, csrfToken);
+                }
+            },
         success: function(res) {
             if (res.success) {
                 alert('블록 순서가 저장되었습니다.');

@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 
 import com.vibesync.common.domain.Criteria;
 import com.vibesync.security.domain.CustomUser;
-import com.vibesync.userpage.domain.MorePostsDTO;
 import com.vibesync.userpage.domain.NoteSummaryDTO;
 import com.vibesync.userpage.domain.UserPageDTO;
 import com.vibesync.userpage.domain.UserProfileDTO;
@@ -36,11 +35,5 @@ public class UserPageServiceImpl implements UserPageService{
     public List<NoteSummaryDTO> getMorePosts(int targetUserId, Criteria criteria) {
         return userpageMapper.findPostsByAuthorIdx(targetUserId, criteria);
     }
-
-	@Override
-	public MorePostsDTO getMorePostsWithStatus(int profileUserAcIdx, int pageNumber) {
-		//
-		return null;
-	}
 
 }

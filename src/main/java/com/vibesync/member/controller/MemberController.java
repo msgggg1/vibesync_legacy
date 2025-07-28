@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.vibesync.member.domain.MemberVO;
+import com.vibesync.member.domain.MemberProfileDTO;
 import com.vibesync.member.domain.SignUpDTO;
 import com.vibesync.member.service.MemberService;
 import com.vibesync.member.util.Config;
@@ -212,7 +212,7 @@ public class MemberController {
         if (referer != null && !referer.isEmpty() && !referer.contains("/member/login")) {
             return "redirect:" + referer;
         } else {
-            return "redirect:/page/main";
+            return "redirect:/mainpage";
         }
     }
 }
