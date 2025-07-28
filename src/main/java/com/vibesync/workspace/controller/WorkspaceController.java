@@ -11,17 +11,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vibesync.common.annotation.AuthenticatedUserPages;
+import com.vibesync.message.domain.MessageListDTO;
+import com.vibesync.message.service.MessageService;
 import com.vibesync.security.domain.CustomUser;
 import com.vibesync.workspace.domain.BlockDTO;
 import com.vibesync.workspace.domain.UserStatsBlockDTO;
 import com.vibesync.workspace.service.BlockService;
-import com.vibesync.message.domain.MessageListDTO;
-import com.vibesync.message.service.MessageService;
 
 import lombok.extern.log4j.Log4j;
 
 @Controller
-@RequestMapping("/page/workspace")
+@RequestMapping("/workspace")
 @AuthenticatedUserPages
 @Log4j
 public class WorkspaceController {
@@ -72,6 +72,6 @@ public class WorkspaceController {
             }});
         }
         
-        return "page/workspace";
+        return "workspace/workspace";
     }
 } 

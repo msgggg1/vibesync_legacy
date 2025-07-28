@@ -6,7 +6,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.vibesync.member.domain.Member;
+import com.vibesync.member.domain.MemberProfileDTO;
 import com.vibesync.member.mapper.MemberMapper;
 import com.vibesync.security.domain.CustomUser;
 
@@ -19,7 +19,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Member member = memberMapper.findByEmail(username);
+        MemberProfileDTO member = memberMapper.findByEmailForAuth(username);
 
         if (member == null) {
             throw new UsernameNotFoundException("Cannot find user with that email: " + username);

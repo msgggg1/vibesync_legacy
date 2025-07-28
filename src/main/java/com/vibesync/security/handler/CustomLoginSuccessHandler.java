@@ -50,7 +50,7 @@ public class CustomLoginSuccessHandler implements AuthenticationSuccessHandler{
 	        }
 	        
 	        // Spring Security의 기본 리다이렉트 로직을 사용하여 Remember Me 쿠키가 정상 생성되도록 함
-	        String targetUrl = request.getContextPath() + "/page/main";
+	        String targetUrl = request.getContextPath() + "/mainpage";
 	        response.sendRedirect(targetUrl);
 	    }
 } 

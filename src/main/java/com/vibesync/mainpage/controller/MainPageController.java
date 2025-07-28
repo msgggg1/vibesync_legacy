@@ -13,7 +13,7 @@ import com.vibesync.mainpage.service.MainPageService;
 import com.vibesync.security.domain.CustomUser;
 
 @Controller
-@RequestMapping("/page/main") 
+@RequestMapping("/mainpage") 
 @AuthenticatedUserPages
 // @log4j2
 public class MainPageController {
@@ -22,13 +22,14 @@ public class MainPageController {
 	private MainPageService mainPageService;
 
     @GetMapping
-    public void showMainPage(Model model, @AuthenticationPrincipal CustomUser user) {
+    public String showMainPage(Model model, @AuthenticationPrincipal CustomUser user) {
     	// log.info("> PageController.showMainPage() - 호출");
       
     	MainPageDTO mainPageDTO = mainPageService.loadMainPage(user.getCategoryIdx());
 
     	model.addAttribute("mainPageDTO", mainPageDTO);
     	model.addAttribute("categoryIdx", user.getCategoryIdx());
-
+    	
+    	return "mainpage/main";
     }
 }

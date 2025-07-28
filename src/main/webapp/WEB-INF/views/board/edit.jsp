@@ -3,7 +3,7 @@
 <c:set var="pageData" value="${boardEditDTO ne null ? boardEditDTO : formData.noteDetail}" />
 
 <div class="back_icon">
-	<img src="${pageContext.request.contextPath}/sources/icons/arrow_back.svg" alt="arrow_back">
+	<img src="${pageContext.request.contextPath}/resources/images/icons/arrow_back.svg" alt="arrow_back">
 </div>
 
 <div id="postview_Wrapper">

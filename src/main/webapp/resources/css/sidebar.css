@@ -1,6 +1,6 @@
 .notion-sidebar a:hover{text-decoration:none !important;color:var(--font-color) !important;}
 .notion-sidebar .sidebar_icon{filter:var(--icon-filter);}
-.notion-app-inner .notion-sidebar-container{position:fixed;height:100%;background:var(--sidebar-color);background-image:url(./back4.png);width:200px;white-space:nowrap;padding:10px;z-index:111;transition:transform 0.3s ease;}
+.notion-app-inner .notion-sidebar-container{position:fixed;height:100%;background:var(--sidebar-color);background-image:url(../images/sidebar/back4.png);width:200px;white-space:nowrap;padding:10px;z-index:111;transition:transform 0.3s ease;}
 .notion-app-inner .notion-sidebar-container .notion-sidebar{position:relative;display:flex;flex-direction:column;justify-content:space-between;height:100%;width:100%;}
 .notion-app-inner .notion-sidebar-container .notion-sidebar .menu_content{display:flex;justify-content:center;align-items:start;flex-direction:column;gap:30px;font-size:min(16px,4vw);font-weight:bold;margin-left:10px;margin-block:60px;}
 .notion-app-inner .notion-sidebar-container .notion-sidebar .menu_content .nickname{font-size:18px;text-decoration:none;color:var(--font-color);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}

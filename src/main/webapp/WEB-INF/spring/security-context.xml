@@ -8,12 +8,13 @@
    <!-- 스프링 표현식(SpEL) 사용 여부 -->
    <security:http use-expressions="true">
    	  <!-- 보안 설정 OFF -->
-   	  <security:csrf disabled="true" />
+   	  <!-- <security:csrf disabled="true" /> -->
    
       <!-- 접근 제어 -->
       <security:intercept-url pattern="/static/**" access="permitAll" />
       <security:intercept-url pattern="/resources/**" access="permitAll" />
       <security:intercept-url pattern="/sources/**" access="permitAll" />
+      <security:intercept-url pattern="/favicon.ico" access="permitAll" />
     
       <security:intercept-url pattern="/member/login" access="permitAll" />
       <security:intercept-url pattern="/member/signup" access="permitAll" />
@@ -26,7 +27,7 @@
          <!-- login-processing-url="/login/process" -->
       <security:form-login
          login-page="/member/login"
-         default-target-url="/page/main"
+         default-target-url="/mainpage"
          authentication-failure-url="/member/login?error=true"
          username-parameter="username"
          password-parameter="password"
