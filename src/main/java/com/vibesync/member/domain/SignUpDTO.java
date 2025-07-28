@@ -15,6 +15,7 @@ import lombok.ToString;
 @ToString
 public class SignUpDTO {
 	
+	private int acIdx;
     private String name;
     private String nickname;
     private String email;

@@ -21,9 +21,9 @@
 	href="https://fonts.googleapis.com/css2?family=Cal+Sans&display=swap"
 	rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
-<link rel="icon" href="${pageContext.request.contextPath}/sources/favicon.ico">
+<link rel="icon" href="${pageContext.request.contextPath}/favicon.ico">
 <title>VibeSync Login</title>
-<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/login.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/member/login.css">
 <style>
 .welcome-message {
 	font-family: 'Cal Sans', sans-serif;
@@ -54,14 +54,14 @@
 	<div class="container">
 		<div id="logo">
 			<img
-				src="${pageContext.request.contextPath}/sources/logo1.png"
+				src="${pageContext.request.contextPath}/resources/images/common/logo1.png"
 				alt="VibeSync 로고" width="30%">
 		</div>
 
 		<div id="login">
 			<div id="inner_logo">
 				<img
-					src="${pageContext.request.contextPath}/sources/login/footer_logo.png"
+					src="${pageContext.request.contextPath}/resources/images/common/footer_logo.png"
 					alt="VibeSync 로고"
 					style="width: 150px; filter: drop-shadow(-1px 0px 0px #000) drop-shadow(-1px 0px 0px #000) drop-shadow(-1px 0px 0px #000) drop-shadow(1px 0px 0px #000) drop-shadow(0px 1px 0px #000);">
 			</div>
@@ -158,7 +158,7 @@
 							<a
 								href="https://kauth.kakao.com/oauth/authorize?client_id=5552b4df7e716e5ec496a4a58b2cf809&redirect_uri=http://192.168.10.183:8081/vibesync/vibesync/auth/kakao/callback.do&response_type=code&prompt=login"
 								class="kakao-login-btn"> <img id="kakao_img"
-								src="${pageContext.request.contextPath}/sources/icons/KakaoTalk_logo.svg"
+								src="${pageContext.request.contextPath}/resources/images/icons/KakaoTalk_logo.svg"
 								alt="카카오 로그인" /> <span style="">KAKAO LOGIN</span>
 							</a>
 						</div>

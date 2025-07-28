@@ -2,28 +2,25 @@ package com.vibesync.member.mapper;
 
 import java.util.List;
 
-import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
-import com.vibesync.member.domain.Member;
+import com.vibesync.member.domain.MemberProfileDTO;
 import com.vibesync.member.domain.MemberSummaryVO;
-import com.vibesync.member.domain.MemberVO;
 import com.vibesync.member.domain.SignUpDTO;
 
-@Mapper
 public interface MemberMapper {
 
 		// 회원가입
 		int insertUser(SignUpDTO dto);
 		
 		// 이메일로 계정 정보 조회. 로그인 시 사용
-		Member findByEmail(String email);
+		MemberProfileDTO findByEmailForAuth(String email);
 		
 		// 일반 조회용: pw를 제외한 안전한 정보만 조회
-	    public MemberVO findVOByEmail(String email); 
+	    public MemberProfileDTO findProfileByEmail(String email); 
 		
 		// 회원가입 시 중복 검사 : 닉네임, 이메일 한번에
-		List<MemberVO> duplicateTest(@Param("nickname") String nickname, @Param("email")String email);
+		List<MemberProfileDTO> duplicateTest(@Param("nickname") String nickname, @Param("email")String email);
 		
 		//회원 활동 관련
 		int preferredCategoryIdx(int acIdx);

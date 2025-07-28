@@ -1,5 +1,7 @@
 package com.vibesync.follow.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -8,6 +10,7 @@ import java.util.List;
 
 import com.vibesync.follow.domain.FollowUserDTO;
 import com.vibesync.follow.domain.FollowVO;
+import com.vibesync.follow.domain.FollowerInfoDTO;
 import com.vibesync.follow.mapper.FollowMapper;
 
 import lombok.extern.log4j.Log4j;
@@ -25,8 +28,8 @@ public class FollowServiceImpl implements FollowService {
 		log.info("팔로우 토글 요청. 팔로우/언팔로우 요청 대상: " + targetUserAcIdx);
 
 		FollowVO follow = FollowVO.builder()
-									.acFollow(followerAcIdx)
-									.acFollowing(targetUserAcIdx)
+									.followerAcIdx(followerAcIdx)
+									.followedAcIdx(targetUserAcIdx)
 									.build();
 		
 		if (this.isFollowing(followerAcIdx, targetUserAcIdx)) {
@@ -45,8 +48,8 @@ public class FollowServiceImpl implements FollowService {
 		log.info("팔로우 상태 확인 요청. 대상: " + followerAcIdx + " → " + targetUserAcIdx);
 		
 		FollowVO follow = FollowVO.builder()
-									.acFollow(followerAcIdx)
-									.acFollowing(targetUserAcIdx)
+									.followerAcIdx(followerAcIdx)
+									.followedAcIdx(targetUserAcIdx)
 									.build();
 				
 		return this.followMapper.checkFollowStatus(follow) > 0 ? true : false;
@@ -81,6 +84,20 @@ public class FollowServiceImpl implements FollowService {
 		log.info("팔로워 수 조회 요청. 대상: " + targetUserAcIdx);
 		
 		return this.followMapper.selectFollowerCount(targetUserAcIdx);
+	}
+
+	@Override
+	public List<FollowerInfoDTO> getFollowingList(int followerAcIdx) {
+		log.info("팔로잉 목록 조회 요청. 대상: " + followerAcIdx);
+		
+		return this.followMapper.selectFollowingList(followerAcIdx);
+	}
+
+	@Override
+	public List<FollowerInfoDTO> getFollowerList(int followedAcIdx) {
+		log.info("팔로워 목록 조회 요청. 대상: " + followedAcIdx);
+		
+		return this.followMapper.selectFollowerList(followedAcIdx);
 	}
 	
 }

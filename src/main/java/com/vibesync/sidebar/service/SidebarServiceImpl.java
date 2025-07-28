@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.vibesync.security.domain.CustomUser;
 import com.vibesync.sidebar.domain.SidebarDTO;
 import com.vibesync.sidebar.domain.UserProfileViewDTO;
-import com.vibesync.sidebar.domain.UserSummaryVO;
+import com.vibesync.sidebar.domain.SidebarProfileDTO;
 import com.vibesync.sidebar.mapper.SidebarFollowMapper;
 import com.vibesync.sidebar.mapper.SidebarNoteMapper;
 
@@ -32,8 +32,8 @@ public class SidebarServiceImpl implements SidebarService {
         int acIdx = customUser.getAcIdx();
         
         // 2. DB에서 데이터 조회
-    	List<UserSummaryVO> followingList = followMapper.userFollowingList(acIdx);
-    	List<UserSummaryVO> followerList = followMapper.userFollowerList(acIdx);
+    	List<SidebarProfileDTO> followingList = followMapper.userFollowingList(acIdx);
+    	List<SidebarProfileDTO> followerList = followMapper.userFollowerList(acIdx);
         
         int postCount = noteMapper.getNoteIdxListByUser(acIdx).size();
 		int postViewCount = noteMapper.getViewCountsForNotesAllByUser(acIdx);
