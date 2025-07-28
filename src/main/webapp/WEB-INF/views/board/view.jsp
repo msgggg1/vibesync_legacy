@@ -6,9 +6,7 @@
 <%@ taglib prefix="tiles" uri="http://tiles.apache.org/tags-tiles"%>
 
 <div class="back_icon">
-	<a href="javascript:void(0);" onclick="goBackSmartly()">
-		<img src="${pageContext.request.contextPath}/sources/icons/arrow_back.svg" alt="arrow_back">
-	</a>
+	<img src="${pageContext.request.contextPath}/resources/images/icons/arrow_back.svg" alt="arrow_back">
 </div>
 <div id="postview_Wrapper">
 	<div class="title">
@@ -51,8 +49,8 @@
 				<button id="likeBtn" type="submit" data-user-idx="${boardViewDTO.userAcIdx}"
 					data-note-idx="${boardViewDTO.noteDetail.note.noteIdx}"
 					style="border: none; background: none; cursor: pointer; filter: var(- -icon-filter);">
-					<c:set var="fillHeartIcon" value="${pageContext.request.contextPath}/sources/icons/fill_heart.png" />
-					<c:set var="emptyHeartIcon" value="${pageContext.request.contextPath}/sources/icons/heart.svg" />
+					<c:set var="fillHeartIcon" value="${pageContext.request.contextPath}/resources/images/icons/fill_heart.png" />
+					<c:set var="emptyHeartIcon" value="${pageContext.request.contextPath}/resources/images/icons/heart.svg" />
 					<img id="likeImg" src="${boardViewDTO.liking ? fillHeartIcon : emptyHeartIcon}" alt="heart"
 						style="vertical-align: middle; width: 2rem; height: 2rem;">
 						<span id="likeCount" style="vertical-align: middle;">

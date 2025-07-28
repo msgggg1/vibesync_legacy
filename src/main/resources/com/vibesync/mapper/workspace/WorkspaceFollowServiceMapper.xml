@@ -5,9 +5,9 @@
 
     <!-- 사용자가 팔로우하는 사용자들의 ID 목록 조회 -->
     <select id="selectUserFollowingIdList" resultType="int">
-        SELECT following_idx
-        FROM follow
-        WHERE follower_idx = #{acIdx}
+        SELECT followed_ac_idx
+        FROM follows
+        WHERE follower_ac_idx = #{acIdx}
         ORDER BY created_at DESC
     </select>
 

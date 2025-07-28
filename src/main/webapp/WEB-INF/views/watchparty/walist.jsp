@@ -12,7 +12,7 @@
       const CONTEXT_PATH = '${pageContext.request.contextPath}';
       const NICKNAME     = '${sessionScope.userInfo != null ? sessionScope.userInfo.nickname : "익명"}';  <!-- 수정: 닉네임 EL로 변경 -->
   </script>
-  <link rel="icon" href="${pageContext.request.contextPath}/sources/favicon.ico" />  <!-- 수정: favicon 경로 EL로 변경 -->
+  <link rel="icon" href="${pageContext.request.contextPath}/favicon.ico" />  <!-- 수정: favicon 경로 EL로 변경 -->
   <script src="https://www.youtube.com/iframe_api"></script>
   <!-- 수정: JS 경로 EL로 변경 -->
   <script defer src="${pageContext.request.contextPath}/watchparty.js"></script>
@@ -68,7 +68,7 @@ li div { display: flex; align-items: center; gap: 20px; }
       <!-- 수정: 삭제 URL contextPath EL로 변경 -->
       <a href="${pageContext.request.contextPath}/watchparty/watchpartyDelete.do?hostIdx=${sessionScope.userInfo.ac_idx}"
          onclick="return confirm('내가 올린 모든 파티를 삭제하시겠습니까?');">
-        <img src="${pageContext.request.contextPath}/sources/icons/off.svg" alt="off">
+        <img src="${pageContext.request.contextPath}/resources/images/icons/off.svg" alt="off">
       </a>
     </button>
   </section>

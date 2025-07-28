@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class FollowVO {
 
 	private int followsIdx;
-	private int acFollow;
-	private int acFollowing;
+	private int followerAcIdx; // 팔로우하는 사용자
+	private int followedAcIdx; // 팔로우 당하는 사용자
 	
 }

@@ -2,7 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 <div class="back_icon">
-	<img src="${pageContext.request.contextPath}/sources/icons/arrow_back.svg" alt="arrow_back">
+	<img src="${pageContext.request.contextPath}/resources/images/icons/arrow_back.svg" alt="arrow_back">
 </div>
 
 <div id="postview_Wrapper">

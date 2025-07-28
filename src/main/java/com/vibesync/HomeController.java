@@ -9,7 +9,7 @@ import lombok.extern.log4j.Log4j;
 @Log4j
 public class HomeController {
 	
-	@GetMapping(value="/index.htm")
+	@GetMapping(value="/index")
 	public String home() {
 		return "index";
 	}

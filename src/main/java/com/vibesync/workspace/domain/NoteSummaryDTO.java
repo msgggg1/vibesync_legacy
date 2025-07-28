@@ -16,7 +16,7 @@ import lombok.ToString;
 public class NoteSummaryDTO {
     private int noteIdx;
     private String title;
-    private String thumbnailImg;
+    private String titleimg;
     private int viewCount;
     private int likeCount;
     private String authorName;

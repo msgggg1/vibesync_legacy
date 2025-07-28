@@ -1,10 +1,12 @@
-<%@page import="com.vibesync.member.domain.MemberVO"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+<c:set var="path" value="${pageContext.request.contextPath}" />
 
+<!-- Libary : Font Awesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
+<!-- css -->
 <style>
 .notion-sidebar{position:relative;display:flex;flex-direction:column;justify-content:space-between;height:100%;width:100%;}
 .notion-sidebar .menu_content{display:flex;justify-content:center;align-items:start;flex-direction:column;gap:40px;font-size:20px;font-weight:bold;margin-left:10px;margin-block:60px;}
@@ -112,115 +114,140 @@ input:focus{outline:none;}
 <nav class="notion-sidebar-container" id="sidebar">
   <div class="notion-sidebar">
     <div class="menu_content">
-
-      <div class="nickname-container">
-        <span class="profile" id="profile-display">
-          <c:choose>
-             <c:when test="${not empty sidebar.userProfile.img}">
-                <img src="${pageContext.request.contextPath}/vibesync/${sidebar.userProfile.img}" alt="프로필">
-            </c:when>
-            <c:otherwise>
-               <img src="${pageContext.request.contextPath}/sources/default/default_user.jpg" alt="기본 프로필">
-            </c:otherwise>
-          </c:choose>
-        </span>
-        <span class="nickname" id="nickname-display">
-          ${sidebar.userProfile.nickname}
-        </span>
-        <div class="accountData" id="accountData-display">
-           <button type="button" id="following-btn" class="modal-follow-message">
-               <span class="accountDataLabel">팔로잉</span><span id="sidebarFollowingCount" class="accountDataValue">${sidebar.userProfile.followingCount}</span>
-            </button>
-            <button type="button" id="follower-btn" class="modal-follow-message">
-            <span class="accountDataLabel">팔로워</span><span id="sidebarFollowerCount" class="accountDataValue">${sidebar.userProfile.followerCount}</span>
-         </button>
-        </div>
-        <div id="nickname-modal" class="modal-sidebar">
-          <div id="nickname-modal-1">
-             <a href="/page/userPage?acIdx=${sidebar.userProfile.acIdx}" class="modal-nickname">
-               ${sidebar.userProfile.nickname}
-             </a>
-             <div id="setting">
-               <button type="button" id="setting-btn" class="modal-btn">
-                  <img src="${pageContext.request.contextPath}/sources/icons/settings.svg" alt="setting icon"> Theme
-               </button>
-            </div>
-            <div id="logout">
-              <form action="${pageContext.request.contextPath}/member/logout" method="post">
-              <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
-                <button type="submit" class="modal-btn">
-                   <i class="fa-solid fa-right-from-bracket"></i> Logout
-                </button>
-              </form>
-            </div>
-         </div>
-         <div id="nickname-modal-2">
-           <button type="button" id="back-btn" class="modal-btn">
-               <i class="fa-solid fa-arrow-left"></i> 뒤로가기
-           </button>
-         <div class="theme-selector-container">
-           
-           <label class="theme-option-label">
-             <input type="radio" name="theme" value="light" ${sessionScope.theme == 'light' || empty sessionScope.theme ? 'checked' : ''}>
-             <div class="custom-radio">
-               <div class="inner-circle"></div>
-             </div>
-             <span class="theme-label-text">Light</span>
-             <div class="theme-icon-svg">
-               <img src="${pageContext.request.contextPath}/sources/sidebar/light_icon.svg">
-             </div>
-           </label>
-         
-           <label class="theme-option-label">
-             <input type="radio" name="theme" value="dark" ${sessionScope.theme == 'dark' ? 'checked' : ''}>
-             <div class="custom-radio">
-                 <div class="inner-circle"></div>
-             </div>
-             <span class="theme-label-text">Dark</span>
-             <div class="theme-icon-svg">
-               <img src="${pageContext.request.contextPath}/sources/sidebar/dark_icon.svg">
-             </div>
-           </label>
-         
-         </div>
-         </div>
-        </div>
-      </div>
+    	<div class="nickname-container">
+    		<c:choose>
+    			<c:when test="${not empty userProfile}">
+			  	  	<span class="profile" id="profile-display">
+				  	    <c:choose>
+					  	    <c:when test="${not empty userProfile.img}">
+					  	    	<img src="${path}/upload/${userProfile.img}" alt="프로필">
+					  	    </c:when>
+					  	    <c:otherwise>
+					  	    	<img src="${path}/resources/images/system/default_avatar.png" alt="기본 프로필">
+					  	    </c:otherwise>
+				  	    </c:choose>
+			  	  	</span>
+			  	  	<span class="nickname" id="nickname-display">
+			  	  		${userProfile.nickname}
+			  	  	</span>
+					<div class="accountData" id="accountData-display">
+						<button type="button" id="following-btn" class="modal-follow-message">
+							<span class="accountDataLabel">팔로잉</span>
+							<span id="sidebarFollowingCount" class="accountDataValue">
+								${userProfile.followingCount}
+							</span>
+						</button>
+						<button type="button" id="follower-btn" class="modal-follow-message">
+							<span class="accountDataLabel">팔로워</span>
+							<span id="sidebarFollowerCount" class="accountDataValue">
+								${userProfile.followerCount}
+							</span>
+						</button>
+					</div>
+					
+					<div id="nickname-modal" class="modal-sidebar">
+						<div id="nickname-modal-1">
+							<a href="${path}/userpage/${userProfile.acIdx}" class="modal-nickname">
+								${userProfile.nickname}
+							</a>
+							<div id="setting">
+								<button type="button" id="setting-btn" class="modal-btn">
+                   					<img src="${path}/resources/images/icons/settings.svg" alt="setting icon">
+                   					Theme
+                				</button>
+							</div>
+							<div id="logout">
+				                <form action="${path}/member/logout" method="post">
+				                <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+				                <button type="submit" class="modal-btn">
+				                   <i class="fa-solid fa-right-from-bracket"></i> Logout
+				                </button>
+				                </form>
+              				</div>
+						</div>
+						<div id="nickname-modal-2">
+							<button type="button" id="back-btn" class="modal-btn">
+            					<i class="fa-solid fa-arrow-left"></i> 뒤로가기
+             				</button>
+					        <div class="theme-selector-container">
+					        	<label class="theme-option-label">
+					            	<input type="radio" name="theme" value="light" ${userProfile.theme == 'light' ? 'checked' : ''}>
+					            	<div class="custom-radio">
+					              		<div class="inner-circle">
+					              		</div>
+					            	</div>
+					            	<span class="theme-label-text">Light</span>
+					            	<div class="theme-icon-svg">
+					              		<img src="${path}/resources/images/sidebar/light_icon.svg">
+					            	</div>
+					          	</label>
+					          	
+					          	<label class="theme-option-label">
+					            	<input type="radio" name="theme" value="dark" ${userProfile.theme == 'dark' ? 'checked' : ''}>
+					            	<div class="custom-radio">
+					                	<div class="inner-circle">
+					                	</div>
+					            	</div>
+					            	<span class="theme-label-text">Dark</span>
+					            	<div class="theme-icon-svg">
+					              		<img src="${path}/resources/images/sidebar/dark_icon.svg">
+					            	</div>
+					          	</label>
+					        </div>
+						</div>
+					</div>
+    			</c:when>
+    			<c:otherwise>
+			  		<span class="profile" id="profile-display">
+			  			<img src="${path}/resources/images/system/default_avatar.png" alt="게스트 프로필">
+			  		</span>
+			  		<span class="nickname" id="nickname-display">Guest</span>
+			  		<div class="accountData" id="accountData-display">
+			  			<a href="${path}/member/login" class="modal-btn" style="text-decoration: none;">로그인</a>
+			  		</div>
+    			</c:otherwise>
+    		</c:choose>
+		</div>
+	  
       <!-- <div class="search icon_wrap">
-        <img src="./sources/icons/search.svg" alt="search icon" class="sidebar_icon">
+        <img src="./resources/images/icons/search.svg" alt="search icon" class="sidebar_icon">
         <input type="text" class="search-input" placeholder="Search…">
       </div> -->
-
-      <a href="main" class="home icon_wrap">
-        <img src="${pageContext.request.contextPath}/sources/icons/home.svg" alt="home icon" class="sidebar_icon">
+      
+      <!-- 공통 메뉴 -->
+      <a href="${path}/mainpage" class="home icon_wrap">
+        <img src="${path}/resources/images/icons/home.svg" alt="home icon" class="sidebar_icon">
         <span>HOME</span>
       </a>
 
-      <a href="workspace" class="workspace icon_wrap">
-        <img src="${pageContext.request.contextPath}/sources/icons/work.svg" alt="workspace icon" class="sidebar_icon">
+      <a href="${path}/workspace" class="workspace icon_wrap">
+        <img src="${path}/resources/images/icons/work.svg" alt="workspace icon" class="sidebar_icon">
         <span>WORKSPACE</span>
       </a>
       
-      <a href="page" class="workspace icon_wrap">
-        <img src="${pageContext.request.contextPath}/sources/icons/page.svg" alt="workspace icon" class="sidebar_icon">
+      <a href="${path}/board/list" class="workspace icon_wrap">
+        <img src="${path}/resources/images/icons/page.svg" alt="workspace icon" class="sidebar_icon">
         <span>PAGES</span>
       </a>
 
-      <div id="follow">
-        <div class="follow_list" id="followButton">
-          <div class="follow_tag icon_wrap">
-            <img src="${pageContext.request.contextPath}/sources/icons/follow.svg" alt="follow icon" class="sidebar_icon">
-            <label for="follow_toggle">FOLLOW</label>
-          </div>
-          
-          <form id="followForm_side">
-          </form>
-
-          <ul class="follow_items">
-            </ul>
-
+	  <%-- 로그인이 필요한 FOLLOW 펼침 메뉴 --%>
+	  <sec:authorize access="isAuthenticated()">
+	  	<div id="follow">
+	        <div class="follow_list" id="followButton">
+		        <div class="follow_tag icon_wrap">
+		          <img src="${path}/resources/images/icons/follow.svg" alt="follow icon" class="sidebar_icon">
+		          <label for="follow_toggle">FOLLOW</label>
+		        </div>
+	          
+		        <form id="followForm_side">
+		        </form>
+		
+		        <ul class="follow_items">
+		        </ul>
+	
+	        </div>
         </div>
-      </div>
+	  </sec:authorize>
 
     </div>
   </div>
@@ -259,11 +286,12 @@ input:focus{outline:none;}
 <script>
 
 $(document).ready(function() {
-   
-   var isExpanded = false;
+	updateFollowerCount();
+	
+   	var isExpanded = false;
 
     $('#followButton').on('click', function(e) {
-        // [수정] 클릭된 대상이 <a> 태그이거나 그 자식일 경우, 아무것도 하지 않고 기본 동작(링크 이동)을 허용
+        // 클릭된 대상이 <a> 태그이거나 그 자식일 경우, 아무것도 하지 않고 기본 동작(링크 이동)을 허용
         if ($(e.target).closest('a').length) {
             return;
         }
@@ -283,8 +311,8 @@ $(document).ready(function() {
 
         $.ajax({
             type: 'GET',
-            url: '${pageContext.request.contextPath}/follow',
-            data: {action: 'getFollowing'},
+            url: '${path}/api/follows/followingList',
+            data: { followerAcIdx : loggedInUserAcIdx },
             dataType: 'json',
             success: function(response) {
                 var items = response;
@@ -294,11 +322,11 @@ $(document).ready(function() {
                     $ul.append('<li><p>No Follower</p></li>');
                 } else {
                     $.each(items, function(i, user) {
-                       let profileImg = user.profile_img != null ? user.profile_img : '${pageContext.request.contextPath}/vibesync/sources/default/default_user.jpg';
+                       let profileImg = user.profileImg != null ? user.profileImg : '${path}/vibesync/resources/images/system/default_user.jpg';
                        
                         var liHtml = ''
                             + '<li class="sidebar-profile">'
-                            +   '<a href="userPage?acIdx=' + user.acIdx + '">' 
+                            +   '<a href="user?acIdx=' + user.acIdx + '">' 
                             +     '<img src="'+ profileImg +'" alt="profileImg">'
                             +     '<span class="sidebar-follow-span">'+ user.nickname +'</span>' 
                             +   '</a>'
@@ -370,21 +398,26 @@ $(document).ready(function() {
         const $button = $(this);
     
         $.ajax({
-                    url: '${pageContext.request.contextPath}/api/follow/followToggle',
+            url: '${path}/api/follows/followToggle',
             type: 'POST',
-                    data: { 
-            targetUserAcIdx: targetAcIdx
-        },
-        dataType: 'json',
-       success: function(isFollowing) {
-            if (isFollowing) { // 팔로우 상태
-                $button.removeClass('unfollow').text('팔로잉').css('background','#f44336');
-            } else { // 언팔로우 상태
-                $button.addClass('unfollow').text('팔로우').css('background', '#4CAF50');
-            }
-            // 사이드바의 팔로워/팔로잉 카운트 업데이트
-            updateFollowCount();
-        },
+            data: { 
+                targetUserAcIdx: targetAcIdx
+            },
+            dataType: 'json',
+           success: function(response) {
+            if (response.success) {
+                    if (response.isFollowing) { // 서버 응답에 따라 상태 변경
+                        $button.removeClass('unfollow').text('팔로잉').css('background','#f44336');
+    					$("#follower-btn").find(".accountDataValue").text(response.currentUserFollowingCount);
+                    } else {
+                        $button.addClass('unfollow').text('팔로우').css('background', '#4CAF50');
+   						$("#follower-btn").find(".accountDataValue").text(response.currentUserFollowingCount);
+                    }
+    
+                } else {
+                    alert('팔로우/언팔로우 처리 실패: ' + (response.message || '알 수 없는 오류'));
+                }
+            },
             error: function(xhr, status, error) {
                 alert('팔로우 요청 중 오류 발생: ' + error);
             }
@@ -416,32 +449,12 @@ $(document).ready(function() {
 </script>
 
 <script> /* 함수 */
-
-function updateFollowCount() {
-   updateFollowingCount();
-   updateFollowerCount();
-}
-
-function updateFollowingCount() {
-    $.ajax({
-        type: 'GET',
-        url: '${pageContext.request.contextPath}/api/follow/following/count',
-        cache: 'no-store',
-        dataType: 'json',
-        success: function(followingCount) {
-            $("#following-btn").find(".accountDataValue").text(followingCount);
-        },
-        error: function(xhr, status, error) {
-            console.error('AJAX Error:', error);
-        }
-    });
-}
-
 function updateFollowerCount() {
     $.ajax({
         type: 'GET',
-        url: '${pageContext.request.contextPath}/api/follow/follower/count',
+        url: '${path}/api/follows/followerCount',
         cache: 'no-store',
+        data: {followedAcIdx: loggedInUserAcIdx},
         dataType: 'json',
         success: function(followerCount) {
             $("#follower-btn").find(".accountDataValue").text(followerCount);
@@ -455,8 +468,7 @@ function updateFollowerCount() {
 // 팔로잉/팔로워/메시지 모달 열기 함수
 function openFollowListModal(defaultTab = 'following') {
     if (!isLoggedIn) {
-        alert("로그인이 필요합니다.");
-        location.href = "${pageContext.request.contextPath}/member/login";
+        requireLogin();
         return;
     }
 
@@ -473,20 +485,18 @@ function loadFollowListData(tabType) {
     const listContainer = $('#followListContent');
     listContainer.empty().html('<p style="text-align:center; padding: 20px;">로딩 중...</p>'); // 로딩 스피너
 
-    const basePath = '${pageContext.request.contextPath}/';
-
     let apiUrl;
     let requestData;
 
     if (tabType === 'following') {
-        apiUrl = '${pageContext.request.contextPath}/api/follow/following';
-        requestData = {};
+        apiUrl = '${path}/api/follows/followingList';
+        requestData = { followerAcIdx: loggedInUserAcIdx };
     } else if (tabType === 'follower') {
-        apiUrl = '${pageContext.request.contextPath}/api/follow/follower';
-        requestData = {};
+        apiUrl = '${path}/api/follows/followerList';
+        requestData = { followingAcIdx: loggedInUserAcIdx };
     } else if (tabType === 'message') {
-        apiUrl = '${pageContext.request.contextPath}/api/messages/all';
-        requestData = {};
+        apiUrl = '${path}/api/message/messageList';
+        requestData = { acIdx: loggedInUserAcIdx };
     } else {
         listContainer.html('<p style="text-align:center; padding: 20px;">잘못된 탭 요청입니다.</p>');
         return;
@@ -506,7 +516,7 @@ function loadFollowListData(tabType) {
                     return;
                 }
                 list.forEach(user => {
-                   const profileImg = user.profileImg ? `${pageContext.request.contextPath}/\${user.profileImg}` : `\${basePath}sources/default/default_user.jpg`;
+                	const profileImg = user.profileImg ? `${path}/upload/\${user.profileImg}` : `${path}/resources/images/system/default_user.jpg`;
                     const isFollowing = user.followedByCurrentUser;
                     const followButtonText = isFollowing ? '팔로잉' : '팔로우';
                     const followButtonClass = isFollowing ? 'follow-toggle-btn unfollow' : 'follow-toggle-btn';
@@ -515,7 +525,7 @@ function loadFollowListData(tabType) {
                         <div class="follow-list-item">
                             <img src="\${profileImg}" alt="프로필">
                             <div class="user-info">
-                                <a href="userPage?acIdx=\${user.acIdx}" class="nickname">\${user.nickname}</a>
+                                <a href="user?acIdx=\${user.acIdx}" class="nickname">\${user.nickname}</a>
                             </div>
                             <div class="action-buttons">
                                <button type="button" class="\${followButtonClass}" data-target-ac-idx="\${user.acIdx}">
@@ -564,7 +574,7 @@ function loadFollowListData(tabType) {
                             <div class="message_text_area">
                                 <div class="message_sender_row">
                                     <div class="message_sender">
-                                       <a href="userPage.do?acIdx=\${senderIdx}">\${senderNickname}</a>
+                                       <a href="userpage?acIdx=\${message.other.acIdx}">\${message.other.nickname}</a>
                                     </div>
                                     \${unreadBadgeHtml}
                                 </div>

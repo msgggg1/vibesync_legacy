@@ -7,7 +7,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.vibesync.member.domain.MemberVO;
+import com.vibesync.member.domain.MemberProfileDTO;
 import com.vibesync.member.mapper.MemberMapper;
 
 import lombok.extern.log4j.Log4j;
@@ -24,7 +24,7 @@ public class UserMapperTest {
     @Test
     public void testUserMapper() {
         log.info("testUserMapper 실행");
-        MemberVO user = userMapper.findVOByEmail("test@test.com");
+        MemberProfileDTO user = userMapper.findProfileByEmail("test@test.com");
      
         log.info(user.toString());
     }
