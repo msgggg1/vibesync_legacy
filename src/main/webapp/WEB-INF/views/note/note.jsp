@@ -80,7 +80,7 @@
         
         <%-- 현재 글이 저장된 상태일 때만 (noteIdx > 0) 버튼 표시 --%>
         <c:if test="${noteIdx > 0}">
-            <button type="button" id="add-child-note-btn">+ Add a page inside</button>
+            <button type="button" id="add-child-note-btn">+ Add a page, get connected!</button>
         </c:if>
     </div>
 	
@@ -109,7 +109,7 @@ $(document).ready(function() {
   	// Editor.js 인스턴스 생성
     const editor = new EditorJS({
         holder: myHolder,
-        placeholder: '내용을 입력하세요...',
+        placeholder: noteIdx > 0 ? '' : '내용을 입력하세요...',
         data: { blocks: [] },
         // 추가 플러그인들 설정
         tools: {
@@ -317,11 +317,25 @@ $.ajax({
 	                    editor.render(contentData);
 	                });
 					
+					if (!response.author) {
+						// editor.readOnly.toggle(true);
+						$('#editorjs').addClass('editor-readonly');
+						$('#note-title').prop('readonly', true);
+					} else {
+						$('#save-btn').show();
+						$('#delete-btn').show();
+						$('#editorjs').on('change', triggerAutoSave);
+						$('#editorjs').on('input', triggerAutoSave);
+					}
+					
 					renderChildNotes(note.childNoteList);
 	            },
 	            error: () => alert('게시글 로딩 실패')
 	        });
-	    }
+	    } else {
+			$('#save-btn').show();
+			$('#delete-btn').show();
+		}
 		$('#editorjs').on('change', triggerAutoSave);
 		$('#editorjs').on('input', triggerAutoSave);
 	}).catch(error => {
@@ -334,7 +348,7 @@ $.ajax({
 	    container.empty(); // 기존 목록 비우기
 	
 	    if (!childNotes || childNotes.length === 0) {
-	        container.html('<p>No pages inside.</p>');
+	    	container.html('<p>No pages related.</p>');
 	        return;
 	    }
 	

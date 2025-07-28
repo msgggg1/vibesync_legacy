@@ -20,6 +20,7 @@ DROP TABLE wa_sync;
 DROP TABLE wa_comment;
 DROP TABLE watchParty;
 DROP TABLE custom_category;
+DROP TABLE persistent_logins;
 
 -- 부모 테이블
 DROP TABLE userAccount;
@@ -379,8 +380,17 @@ CREATE TABLE wa_comment (
 );
 CREATE SEQUENCE seq_wa_comment START WITH 1 INCREMENT BY 1;
 
+--------------------------------------------------------------------------------
+-- 20. 스프링 시큐리티 자동로그인 테이블
+--------------------------------------------------------------------------------
+CREATE TABLE persistent_logins (
+    username VARCHAR(64) NOT NULL,
+    series VARCHAR(64) PRIMARY KEY,
+    token VARCHAR(64) NOT NULL,
+    last_used TIMESTAMP NOT NULL
+);
 
-
+COMMIT;
 
 -------------------
 -- 생성된 테이블 조회
