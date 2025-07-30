@@ -3,8 +3,6 @@ package com.vibesync.mainpage.domain;
 import java.util.List;
 import java.util.Map;
 
-import com.vibesync.member.domain.MemberSummaryVO;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,7 +20,7 @@ public class MainPageDTO {
 
     private List<NoteSummaryDTO> latestNotes; // 선호 카테고리 최신글
     private List<NoteSummaryDTO> popularNotes; // 선호 카테고리 인기글
-    private List<MemberSummaryVO> popularUsers; // 선호 카테고리 인기유저
+    private List<UserSummaryVO> popularUsers; // 선호 카테고리 인기유저
     private Map<Integer, List<NoteSummaryDTO>> popularNotesNotByMyCategory; // 비선호 카테고리별 인기글
 	
 }

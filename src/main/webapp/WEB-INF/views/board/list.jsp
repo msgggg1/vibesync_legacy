@@ -87,6 +87,7 @@
 			event.preventDefault();
 			let pageNum = $(this).attr("href");
 			actionForm
+					  .attr('action', `${pageContext.request.contextPath}/board/list`)
 					  .find(":hidden[name=pageNum]")
 					  								.val(pageNum)
 					  								.end()
@@ -98,8 +99,7 @@
 			event.preventDefault();
 			let noteIdx = $(this).attr("href");
 			actionForm
-			  .attr("action", "/vibesync/board/view")
-			  .append(`<input type="hidden" name="noteIdx" value="\${noteIdx}">`)
+			  .attr("action", `/vibesync/note/\${noteIdx}`)
 			  .submit();
 		}); // $("a.move").on("click", function() {
 		

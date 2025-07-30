@@ -14,6 +14,7 @@ public class Criteria {
 	private int pageNum; // 현재 페이지 번호
 	private int amount; // 한 페이지에 출력할 게시글 수
 	
+	// 게시판 목록 등에서만 사용될 선택적 필드
 	private Integer categoryIdx; // 카테고리 번호
 	private String type; // 검색 조건 (T, C, W, TC, TW, TCW)
 	private String keyword; // 검색어

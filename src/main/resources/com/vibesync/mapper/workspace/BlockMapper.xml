@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vibesync.workspace.mapper.BlockMapper">
+
+    <!-- 특정 사용자의 모든 블록 설정을 순서대로 가져오기 -->
+    <select id="findBlocksByAcIdx" parameterType="int" resultType="com.vibesync.workspace.domain.BlockVO">
+        SELECT 
+            block_id as blockId,
+            ac_idx as acIdx,
+            block_type as blockType,
+            block_order as blockOrder,
+            config
+        FROM workspace_blocks 
+        WHERE ac_idx = #{acIdx}
+        ORDER BY block_order ASC
+    </select>
+
+    <!-- 특정 ID의 블록 정보만 가져오기 : 부분 새로고침용 -->
+    <select id="findBlockById" parameterType="int" resultType="com.vibesync.workspace.domain.BlockVO">
+        SELECT 
+            block_id as blockId,
+            ac_idx as acIdx,
+            block_type as blockType,
+            block_order as blockOrder,
+            config
+        FROM workspace_blocks 
+        WHERE block_id = #{blockId}
+    </select>
+
+    <!-- 새로운 블록 추가 -->
+    <insert id="insertBlock" parameterType="com.vibesync.workspace.domain.BlockVO">
+        <selectKey keyProperty="blockId" resultType="int" order="BEFORE">
+            SELECT WORKSPACE_BLOCKS_SEQ.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO workspace_blocks (
+            block_id, 
+            ac_idx, 
+            block_type, 
+            block_order, 
+            config
+        ) VALUES (
+            #{blockId}, 
+            #{acIdx}, 
+            #{blockType}, 
+            (SELECT NVL(MAX(block_order), 0) + 1 FROM workspace_blocks WHERE ac_idx = #{acIdx}), 
+            #{config}
+        )
+    </insert>
+
+    <!-- 블록 삭제 -->
+    <delete id="deleteBlock">
+        DELETE FROM workspace_blocks 
+        WHERE block_id = #{blockId} AND ac_idx = #{acIdx}
+    </delete>
+
+    <!-- 블록 순서 변경 -->
+    <update id="updateBlockOrder">
+        UPDATE workspace_blocks 
+        SET block_order = #{blockOrder} 
+        WHERE block_id = #{blockId} AND ac_idx = #{acIdx}
+    </update>
+
+</mapper> 

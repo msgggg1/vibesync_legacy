@@ -6,11 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.vibesync.follow.mapper.FollowMapper;
 import com.vibesync.security.domain.CustomUser;
 import com.vibesync.sidebar.domain.SidebarDTO;
 import com.vibesync.sidebar.domain.UserProfileViewDTO;
-import com.vibesync.sidebar.domain.UserSummaryVO;
+import com.vibesync.sidebar.domain.SidebarProfileDTO;
+import com.vibesync.sidebar.mapper.SidebarFollowMapper;
 import com.vibesync.sidebar.mapper.SidebarNoteMapper;
 
 @Service
@@ -20,7 +20,7 @@ public class SidebarServiceImpl implements SidebarService {
     private SidebarNoteMapper noteMapper; // 사용자 정보용 매퍼
     
     @Autowired
-    private FollowMapper followMapper; // 팔로우 정보용 매퍼
+    private SidebarFollowMapper followMapper; // 팔로우 정보용 매퍼
 
     @Override
     @Transactional(readOnly = true)
@@ -32,8 +32,8 @@ public class SidebarServiceImpl implements SidebarService {
         int acIdx = customUser.getAcIdx();
         
         // 2. DB에서 데이터 조회
-    	List<UserSummaryVO> followingList = followMapper.userFollowingList(acIdx);
-    	List<UserSummaryVO> followerList = followMapper.userFollowerList(acIdx);
+    	List<SidebarProfileDTO> followingList = followMapper.userFollowingList(acIdx);
+    	List<SidebarProfileDTO> followerList = followMapper.userFollowerList(acIdx);
         
         int postCount = noteMapper.getNoteIdxListByUser(acIdx).size();
 		int postViewCount = noteMapper.getViewCountsForNotesAllByUser(acIdx);
@@ -47,12 +47,13 @@ public class SidebarServiceImpl implements SidebarService {
 														   .followerCount(followerList.size())
 														   .build();
         
-	 
-        return new SidebarDTO().builder()
-				 .userProfile(userProfile)
-				 .followingList(followingList)
-				 .followerList(followerList)
-				 .build();
+		sidebarDTO = SidebarDTO.builder()
+								 .userProfile(userProfile)
+								 .followingList(followingList)
+								 .followerList(followerList)
+								 .build();
+		
+        return sidebarDTO;
     }
 
 }

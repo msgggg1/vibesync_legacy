@@ -1,6 +1,7 @@
 package com.vibesync.member.service;
 
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -10,11 +11,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.vibesync.common.service.EmailService;
-import com.vibesync.member.domain.LoginDTO;
-import com.vibesync.member.domain.Member;
-import com.vibesync.member.domain.MemberVO;
+import com.vibesync.member.domain.MemberProfileDTO;
+import com.vibesync.member.domain.SettingVO;
 import com.vibesync.member.domain.SignUpDTO;
 import com.vibesync.member.mapper.MemberMapper;
+import com.vibesync.member.mapper.SettingMapper;
 
 @Service
 public class MemberServiceImpl implements MemberService{
@@ -28,56 +29,47 @@ public class MemberServiceImpl implements MemberService{
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 	
+	@Autowired
+    private SettingMapper settingMapper;
 
 	@Override
-	public MemberVO login(LoginDTO dto) throws Exception {
-		// 1. DTO에서 받은 이메일로 사용자 정보를 조회합니다.
-        Member member = memberMapper.findByEmail(dto.getEmail());
-
-        // 2. 사용자 정보가 존재하고, 입력된 비밀번호가 DB의 암호화된 비밀번호와 일치하는지 확인합니다.
-        if (member != null && passwordEncoder.matches(dto.getPassword(), member.getPw())) {
-            // 3. 로그인 성공 시, 사용자 정보 객체를 반환합니다.
-        	MemberVO memberVO = new MemberVO().builder().acIdx(member.getAcIdx())
-        											.categoryIdx(member.getCategoryIdx())
-        											.createdAt(member.getCreatedAt())
-        											.email(member.getEmail())
-        											.img(member.getImg())
-        											.kakaoAuthId(member.getKakaoAuthId())
-        											.name(member.getName())
-        											.nickname(member.getNickname())
-        											.build();
-            return memberVO;
-        }
-        // 로그인 실패 시 null을 반환합니다.
-        return null; 
-	}
-
-	@Override
-	public MemberVO autoLogin(String email) throws Exception {
-		return this.memberMapper.findVOByEmail(email);
+	public MemberProfileDTO autoLogin(String email) throws Exception {
+		return this.memberMapper.findProfileByEmail(email);
 	}
 
 	// 소셜 로그인 가입 후 즉시 로그인 처리
 	@Override
-	public MemberVO getUserByEmail(String email) {
-		return this.memberMapper.findVOByEmail(email);
+	public MemberProfileDTO getUserByEmail(String email) {
+		return this.memberMapper.findProfileByEmail(email);
 	}
 
 	@Override
-	public int register(SignUpDTO dto) throws Exception {
-		List<MemberVO> duplicates = memberMapper.duplicateTest(dto.getNickname(), dto.getEmail());
+	public void register(SignUpDTO dto) throws Exception {
+		List<MemberProfileDTO> duplicates = memberMapper.duplicateTest(dto.getNickname(), dto.getEmail());
 		
 		if (duplicates.isEmpty()) { // 중복되는 닉네임, 이메일 없음
 			String encodedPassword = passwordEncoder.encode(dto.getPassword());
 			dto.setPassword(encodedPassword);
 			
-			return this.memberMapper.insertUser(dto);
+			// userAccount 테이블에 회원 정보 INSERT
+			this.memberMapper.insertUser(dto);
+			
+			// setting 테이블에 기본 설정 INSERT
+			SettingVO defaultSetting = new SettingVO();
+	        defaultSetting.setAcIdx(dto.getAcIdx());
+	        settingMapper.insertDefaultSetting(defaultSetting);
+	        
+	        // notification_settings 테이블에 모든 알림 종류의 기본값(ON)을 INSERT
+	        List<String> notificationTypes = Arrays.asList("LIKE", "COMMENT", "FOLLOW");
+	        if (!notificationTypes.isEmpty()) {
+	            settingMapper.insertDefaultNotificationSettings(defaultSetting.getSettingIdx(), notificationTypes);
+	        }
 			
         } else {
         	boolean nicknameDupl = false;
         	boolean emailDupl = false;
         	
-        	for (MemberVO memberVO : duplicates) {
+        	for (MemberProfileDTO memberVO : duplicates) {
 				if (memberVO.getNickname().equals(dto.getNickname())) {
 					nicknameDupl = true;
 				}
@@ -94,14 +86,13 @@ public class MemberServiceImpl implements MemberService{
         		throw new IllegalArgumentException("이미 가입한 정보가 존재하는 이메일입니다.");
         	}
         	
-        	return 0;
         } 
 	}
 
 	@Override
 	@Transactional
 	public void initiateReset(String email, String requestURL) throws SQLException {
-		if(this.memberMapper.findByEmail(email) == null) {
+		if(this.memberMapper.findByEmailForAuth(email) == null) {
 			 // 존재하지 않는 이메일이면, 보안을 위해 아무 작업도 하지 않고 조용히 종료.
             return;
 		};

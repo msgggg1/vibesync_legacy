@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vibesync.workspace.mapper.ScheduleMapper">
+
+	<resultMap id="scheduleResultMap" type="com.vibesync.workspace.domain.ScheduleVO">
+        <id property="scheduleIdx" column="schedule_idx"/>
+        <result property="title" column="title"/>
+        <result property="description" column="description"/>
+        <result property="startTime" column="start_time"/>
+        <result property="endTime" column="end_time"/>
+        <result property="color" column="color"/>
+        <result property="acIdx" column="ac_idx"/>
+    </resultMap>
+
+    <select id="findSchedulesByRange" resultMap="scheduleResultMap">
+        <![CDATA[
+        SELECT schedule_idx, title, description, start_time, end_time, color, ac_idx
+        FROM schedule
+        WHERE ac_idx = #{acIdx} AND start_time < #{end} AND end_time > #{start}
+        ORDER BY start_time ASC
+        ]]>
+    </select>
+
+    <select id="findSchedulesByDate" resultMap="scheduleResultMap">
+        <![CDATA[
+        SELECT schedule_idx, title, description, start_time, end_time, color, ac_idx
+        FROM schedule
+        WHERE ac_idx = #{acIdx} AND TRUNC(start_time) = TO_DATE(#{date}, 'YYYY-MM-DD')
+        ORDER BY start_time ASC
+        ]]>
+    </select>
+
+    <insert id="addSchedule" parameterType="com.vibesync.workspace.domain.ScheduleVO">
+        <selectKey keyProperty="scheduleIdx" resultType="int" order="BEFORE">
+            SELECT schedule_seq.NEXTVAL FROM DUAL
+        </selectKey>
+        INSERT INTO schedule (schedule_idx, title, description, start_time, end_time, color, ac_idx)
+        VALUES (#{scheduleIdx}, #{title}, #{description}, #{startTime, jdbcType=TIMESTAMP}, #{endTime, jdbcType=TIMESTAMP}, #{color}, #{acIdx})
+    </insert>
+
+    <update id="updateSchedule" parameterType="com.vibesync.workspace.domain.ScheduleVO">
+        UPDATE schedule
+        SET
+            title = #{title},
+            description = #{description},
+            start_time = #{startTime, jdbcType=TIMESTAMP},
+            end_time = #{endTime, jdbcType=TIMESTAMP},
+            color = #{color}
+        WHERE
+            schedule_idx = #{scheduleIdx}
+    </update>
+
+    <delete id="deleteSchedule" parameterType="int">
+        DELETE FROM schedule WHERE schedule_idx = #{scheduleIdx}
+    </delete>
+
+</mapper>

@@ -43,7 +43,6 @@
 			<version>${org.springframework-version}</version>
 		</dependency>
 
-
 		<!-- AspectJ -->
 		<dependency>
 			<groupId>org.aspectj</groupId>
@@ -230,11 +229,11 @@
 			<version>2.9.5</version>
 		</dependency>
 
-		<dependency>
+<!-- 		<dependency>
 			<groupId>com.fasterxml.jackson.dataformat</groupId>
 			<artifactId>jackson-dataformat-xml</artifactId>
 			<version>2.9.5</version>
-		</dependency>
+		</dependency> -->
 
 
 		<!-- https://mvnrepository.com/artifact/org.quartz-scheduler/quartz -->

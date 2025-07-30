@@ -1,0 +1,17 @@
+{
+  "env": {
+    "browser": true,
+    "es6": true,
+    "jquery": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 2018,
+    "sourceType": "script"
+  },
+  "globals": {
+    "contextPath": "readonly",
+    "calendar": "writable",
+    "FullCalendar": "readonly",
+    "Chart": "readonly"
+  }
+} 

@@ -20,7 +20,7 @@ public class SidebarControllerAdvice {
     private SidebarService sidebarService;
 
     // "sidebar"라는 이름으로 모든 Model에 이 메서드의 반환값을 추가
-    @ModelAttribute("sidebar") 
+    @ModelAttribute("sidebar")
     public SidebarDTO addSidebarData(@AuthenticationPrincipal CustomUser user) {
     	
     	 if (user == null) { // 익명 사용자 등 인증되지 않은 경우 user가 null일 수 있음

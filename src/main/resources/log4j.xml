@@ -19,6 +19,8 @@
 		<level value="info" />
 	</logger>
 
+	<logger name="org.springframework.security" level="DEBUG"/>
+
 	<!-- Root Logger -->
 	<root>
 		<priority value="warn" />

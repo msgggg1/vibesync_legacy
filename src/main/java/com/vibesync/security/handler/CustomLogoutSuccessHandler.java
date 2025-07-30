@@ -14,13 +14,7 @@ public class CustomLogoutSuccessHandler implements LogoutSuccessHandler {
 
     @Override
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
-            throws IOException, ServletException {
-        
-        // 자동 로그인 쿠키 삭제
-        Cookie autoLoginCookie = new Cookie("autoLoginUserEmail", null);
-        autoLoginCookie.setMaxAge(0);
-        autoLoginCookie.setPath("/"); // ✨ 중요: 생성 시와 동일한 경로를 명시
-        response.addCookie(autoLoginCookie);
+            throws IOException, ServletException { 
 
         // 사용자 인덱스 쿠키 삭제
         Cookie userIdxCookie = new Cookie("login_user_idx", null);

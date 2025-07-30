@@ -1,0 +1,288 @@
+/* 위치: /resources/css/note/note.css */
+@charset "UTF-8";
+
+.editor-readonly {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 4px;             /* 화살표와 셀렉트 사이 기본 간격을 20→4px 로 */
+}
+
+.back_icon {
+  margin-right: 0;
+  margin-bottom: 0;
+}
+.back_icon:hover{
+	cursor: pointer;
+}
+
+.back_icon img {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+}
+
+.category-selector {
+  margin-left: -2px;    /* 살짝만 당겨서 딱 붙어 보이게 */
+}
+
+/* 전체 에디터 컨테이너 */
+.note-editor-container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+/* 상단 헤더 */
+.note-editor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.back-link img {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+}
+
+.category-selector select {
+    background-color: transparent;
+    color: var(--font-color);
+    border: 1px solid var(--border-color);
+    padding: 5px 10px;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.note-category-select {
+	cursor: pointer;
+}
+
+#save-btn, #list-btn, #delete-btn {
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#list-btn{
+	background-color: #91BFD9;
+}
+
+#save-btn{
+	background-color: #B0D19F;
+	display: none;
+}
+
+#delete-btn{
+	background-color: #DE9486;
+	display: none;
+}
+
+#save-btn:hover, #list-btn:hover, #delete-btn:hover {
+    filter: brightness(0.85);
+    color: white;
+}
+
+/* 콘텐츠 영역 */
+.note-editor-container {
+  display: grid;
+  grid-template-columns: 1fr 300px;      /* 좌: 에디터, 우: 사이드바 */
+  grid-template-rows: auto 1fr;         /* 첫 행은 헤더, 둘째 행은 컨텐츠 */
+  grid-template-areas:
+    "header  header"
+    "main    sidebar";
+  
+  max-width: 1100px;
+  margin: 40px auto;
+  padding: 0 20px;
+  gap: 40px;
+}
+
+/* 2) 각 섹션에 영역 이름을 배정 */
+.note-editor-header {
+  grid-area: header;
+}
+
+.note-editor-content {
+  grid-area: main;
+}
+
+.child-notes-section {
+  grid-area: sidebar;
+  /* 기존 스타일 유지 */
+  background-color: #FAFAFA;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  position: sticky;
+  top: 80px;
+  height: fit-content;
+}
+
+/* (선택) 컨텐츠 영역에도 약간 마진 추가로 여백 확보 */
+.note-editor-content {
+  /* 예: 패딩 추가 */
+  padding-right: 10px;
+}
+
+/* 2) 왼쪽 에디터 콘텐츠는 기존 스타일 유지,
+      오른쪽 child-notes-section 스타일 추가 */
+.child-notes-section {
+  background-color: #FAFAFA;            /* 부드러운 연회색 배경 */
+  border-radius: 12px;                  /* 둥글둥글 */
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  position: sticky;
+  top: 80px;                             /* 스크롤 시에도 고정 */
+  height: fit-content;
+}
+
+.child-notes-section h3 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-size: 1.3rem;
+  color: #333;
+  border-bottom: 2px solid #DE9486;     /* 삭제 버튼 코랄핑크 계열 */
+  padding-bottom: 15px;
+}
+
+.child-notes-section ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.child-notes-section li {
+  margin-bottom: 8px;
+}
+
+.child-notes-section a {
+  display: block;
+  text-decoration: none;
+  color: #555;                          /* 부드러운 다크그레이 */
+  padding: 6px 8px;
+  border-radius: 6px;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.child-notes-section a:hover {
+  background-color: #DE9486;            /* 삭제 버튼 코랄핑크 계열 */
+  color: white;
+}
+
+/* 3) “+ Add a page inside” 버튼 감성 맞추기 */
+#add-child-note-btn {
+  display: block;
+  width: 100%;
+  margin-top: 16px;
+  background-color: #91BFD9;            /* 목록 버튼 스카이블루 계열 */
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+#add-child-note-btn:hover {
+  background-color: #7BA2B8;            /* hover는 더 진한 스카이블루 */
+}
+
+#note-title {
+    width: 100%;
+    border: none;
+    background: transparent;
+    color: var(--font-color);
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+    padding: 10px 0;
+}
+
+#note-title:focus {
+    outline: none;
+}
+
+/* Editor.js 스타일 */
+#editorjs {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    padding: 5px;
+}
+
+.ce-toolbar {
+    left: -3rem !important;
+    transform: translateX(0) !important;
+}
+
+.ce-block__content {
+    margin-left: 0 !important;
+    max-width: 100%;
+}
+
+.cdx-simple-image__caption {
+    display: none !important;
+}
+
+/* 링크 블록 전체 스타일 */
+.link-tool__content.link-tool__content--rendered {
+    display: block;
+    padding: 5px;
+    padding-bottom: 5px;
+    padding-left: 10px;
+    margin: 0;
+    text-decoration: none;
+    transition: background-color 0.2s;
+    background-color: transparent;
+    border: 0;
+    box-shadow: none !important;
+}
+
+.link-tool__content.link-tool__content--rendered:hover {
+    display: block;
+    border: none;
+    background-color: #D3D1CB;
+    padding: 5px;
+    padding-bottom: 5px;
+    padding-left: 10px;
+    margin: 0;
+}
+
+/* 링크 블록 제목 */
+.link-tool__title {
+    font-weight: 450;
+    font-size: 1em;
+    color: var(--font-color);
+    text-decoration: underline silver;
+    margin-bottom: 0;
+}
+
+/* 링크 블록 설명 (URL) */
+.link-tool__anchor {
+    display: none;
+    font-size: 0.9em;
+    color: #888;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

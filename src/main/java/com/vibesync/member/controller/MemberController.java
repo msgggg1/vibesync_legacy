@@ -18,8 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.vibesync.listener.DuplicateLoginPreventer;
-import com.vibesync.member.domain.MemberVO;
+import com.vibesync.member.domain.MemberProfileDTO;
 import com.vibesync.member.domain.SignUpDTO;
 import com.vibesync.member.service.MemberService;
 import com.vibesync.member.util.Config;
@@ -46,20 +45,6 @@ public class MemberController {
         response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
         response.setHeader("Pragma", "no-cache");
         response.setDateHeader("Expires", 0);
-
-        // 2. 자동 로그인 쿠키 확인
-        if (!"logout".equals(from)&&autoLoginEmail != null) {
-            MemberVO memberInfo = null;
-			try {
-				memberInfo = memberService.autoLogin(autoLoginEmail);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-            if (memberInfo != null) {
-                // 자동 로그인 성공 시, 공통 로그인 처리 후 리다이렉트
-                return processSuccessfulLogin(request, response, session, memberInfo, false, false);
-            }
-        }
 
         // 3. 이메일 기억하기 쿠키가 있으면 모델에 추가
         if (rememberedEmail != null) {
@@ -113,7 +98,7 @@ public class MemberController {
         	memberService.register(newGoogleUser);
             session.removeAttribute("newGoogleUser");
             
-            MemberVO newMemberInfo = memberService.getUserByEmail(newGoogleUser.getEmail());
+            MemberProfileDTO newMemberInfo = memberService.getUserByEmail(newGoogleUser.getEmail());
             if (newMemberInfo != null) {
                 System.out.println("Google 신규 회원 가입 성공, 즉시 로그인");
                 // 구글 회원가입 성공 시, 자동 로그인을 위해 쿠키는 true로 설정
@@ -183,22 +168,8 @@ public class MemberController {
      * (중복 로그인 방지, 쿠키 설정, 세션 설정, 페이지 리다이렉트)
      */
     private String processSuccessfulLogin(HttpServletRequest request, HttpServletResponse response, HttpSession session,
-                                          MemberVO memberInfo, boolean rememberEmail, boolean autoLogin) throws IOException {
+                                          MemberProfileDTO memberInfo, boolean rememberEmail, boolean autoLogin) throws IOException {
         String memberEmail = memberInfo.getEmail();
-
-        // 1. 중복 로그인 방지 로직
-        if (DuplicateLoginPreventer.loginUsers.containsKey(memberEmail)) {
-            HttpSession oldSession = DuplicateLoginPreventer.loginUsers.get(memberEmail);
-            if (oldSession != null && !oldSession.getId().equals(session.getId())) {
-                System.out.println("[UserController] 중복 로그인 감지! 기존 세션 강제 종료: " + memberEmail);
-                try {
-                    oldSession.invalidate(); // 기존 세션 무효화
-                } catch (IllegalStateException e) {
-                    System.err.println("이미 무효화된 세션에 접근: " + e.getMessage());
-                }
-            }
-        }
-        DuplicateLoginPreventer.loginUsers.put(memberEmail, session);
 
         // 2. '이메일 기억하기', '자동 로그인' 쿠키 처리
         handleLoginCookies(response, memberEmail, rememberEmail, autoLogin);
@@ -241,7 +212,7 @@ public class MemberController {
         if (referer != null && !referer.isEmpty() && !referer.contains("/member/login")) {
             return "redirect:" + referer;
         } else {
-            return "redirect:/page/main";
+            return "redirect:/mainpage";
         }
     }
 }
