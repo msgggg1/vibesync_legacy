@@ -56,17 +56,19 @@ class PageTool {
             success: (response) => {
                 // 성공 시, 현재 블록을 LinkTool 블록으로 교체
                 const $xml = $(response);
-    
+    			
 			    // find()를 사용해 XML 태그 안의 텍스트를 가져옵니다.
 			    const nId = $xml.find('noteIdx').text();
 			    const nTitle = $xml.find('title').text();
+			    console.log('> noteIdx : ', noteIdx);
+			    console.log('> title : ', title);
                 self.api.blocks.delete(currentIndex);
                 this.api.blocks.insert(
                     'linkTool',
                     {
-                        link: `${window.path + '/note/' + nId}`,
+                        link: `${window.path + '/note/' + response.noteIdx}`,
                         meta: {
-                            title: nTitle
+                            title: title
                         }
                     },
                     {},

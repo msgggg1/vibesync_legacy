@@ -20,6 +20,7 @@ DROP TABLE wa_sync;
 DROP TABLE wa_comment;
 DROP TABLE watchParty;
 DROP TABLE custom_category;
+DROP TABLE persistent_logins;
 
 -- 부모 테이블
 DROP TABLE userAccount;
@@ -389,8 +390,7 @@ CREATE TABLE persistent_logins (
     last_used TIMESTAMP NOT NULL
 );
 
-
-
+COMMIT;
 
 -------------------
 -- 생성된 테이블 조회

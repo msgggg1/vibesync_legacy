@@ -52,7 +52,6 @@ public class NoteServiceImpl implements NoteService {
             } else {
             	isAuthor = true;
             }
-            
             // isLiking = likeMapper.checkLike(currentUserId, noteIdx) > 0;
         }
         

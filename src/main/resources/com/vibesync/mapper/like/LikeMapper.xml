@@ -4,10 +4,36 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.vibesync.like.mapper.LikeMapper">
 
-<!-- 팔로우 : 팔로우 데이터 추가 -->
-<!-- public int insertFollow(FollowVO follow); -->
-
+<!-- 좋아요 추가 -->
+<!-- int addLike(int acIdx, int noteIdx) throws SQLException; -->
+	<insert id="addLike">
+		INSERT INTO likes (
+			likes_idx, note_idx, ac_idx, created_at
+		)
+		VALUES (
+			likes_seq.NEXTVAL, #{noteIdx}, #{acIdx}, SYSDATE
+		)
+	</insert>
 <!-- // -->
 
+<!-- 좋아요 제거 -->
+<!-- int removeLike(int acIdx, int noteIdx) throws SQLException; -->
+	<delete id="removeLike">
+		DELETE FROM likes
+		WHERE ac_idx = #{acIdx} AND note_idx = #{noteIdx}
+	</delete>
+<!-- // -->
+
+<!-- 특정 사용자가 특정 게시글을 좋아했는지 확인 -->
+<!-- int isLiked(int acIdx, int noteIdx) throws SQLException; -->
+	<select id="isLiked">
+		SELECT
+			COUNT(*)
+		FROM
+			likes
+		WHERE
+			ac_idx = #{acIdx} AND note_idx = #{noteIdx}
+	</select>
+<!-- // -->
     
  </mapper>

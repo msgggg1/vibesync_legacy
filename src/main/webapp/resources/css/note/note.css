@@ -20,12 +20,6 @@
 	cursor: pointer;
 }
 
-.back_icon img {
-    width: 24px;
-    height: 24px;
-    cursor: pointer;
-}
-
 .category-selector {
   margin-left: -2px;    /* 살짝만 당겨서 딱 붙어 보이게 */
 }
@@ -53,7 +47,7 @@
     gap: 20px;
 }
 
-.back-link img {
+.back_icon img {
     width: 24px;
     height: 24px;
     cursor: pointer;

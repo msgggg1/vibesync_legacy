@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.vibesync.follow.domain.FollowVO;
 import com.vibesync.follow.domain.FollowerInfoDTO;
 import com.vibesync.follow.mapper.FollowMapper;
+import com.vibesync.member.mapper.MemberMapper;
 
 import lombok.extern.log4j.Log4j;
 
@@ -18,6 +19,9 @@ public class FollowServiceImpl implements FollowService {
 	
 	@Autowired
 	private FollowMapper followMapper;
+	
+	@Autowired
+	private MemberMapper memberMapper;
 
 	@Transactional
 	@Override
@@ -32,10 +36,14 @@ public class FollowServiceImpl implements FollowService {
 		if (this.isFollowing(followerAcIdx, targetUserAcIdx)) {
 			// 언팔로우
 			this.followMapper.deleteFollow(follow);
+			this.memberMapper.decreaseFollowingCount(followerAcIdx);
+			this.memberMapper.decreaseFollowerCount(targetUserAcIdx);
 			return false;
 		} else {
 			// 팔로우
 			this.followMapper.insertFollow(follow);
+			this.memberMapper.increaseFollowingCount(followerAcIdx);
+			this.memberMapper.increaseFollowerCount(targetUserAcIdx);
 			return true;
 		}
 	}
