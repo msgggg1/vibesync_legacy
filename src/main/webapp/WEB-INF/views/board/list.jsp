@@ -99,7 +99,7 @@
 			event.preventDefault();
 			let noteIdx = $(this).attr("href");
 			actionForm
-			  .attr("action", `/vibesync/note/\${noteIdx}`)
+			  .attr("action", `${pageContext.request.contextPath}/note/\${noteIdx}`)
 			  .submit();
 		}); // $("a.move").on("click", function() {
 		

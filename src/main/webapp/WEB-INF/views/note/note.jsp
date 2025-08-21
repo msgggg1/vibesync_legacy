@@ -4,41 +4,6 @@
 <c:set var="noteIdForJs" value="${noteIdx ne null ? noteIdx : 0}" />
 <c:set var="parentIdForJs" value="${parentNoteIdx ne null ? parentNoteIdx : 0}" />
 
-	<div class="writer_info">
-		<div class="writer">
-			<img id="writer_profileImg" src="${path}/sources/default/default_user.jpg" alt="writer_profile">
-			<a id="writer_userpage" href="userpage/${boardViewDTO.noteDetail.member.acIdx}">${boardViewDTO.noteDetail.member.nickname}</a>
-			<c:if test="${boardViewDTO.userAcIdx != boardViewDTO.noteDetail.upacIdx}">
-				<form id="followForm" style="display: inline; margin: 0; padding: 0;">
-					<button id="followBtn" type="button"
-							style="background: #99bc85; border-radius: 5px; border: none; cursor: pointer; padding: 5px 10px;">
-						${boardViewDTO.following ? "Unfollow" : "Follow"}
-					</button>
-				</form>
-			</c:if>
-		</div>
-		<div class="like_share">
-			<div>
-				<p>
-					<span>view : </span><span>${boardViewDTO.noteDetail.note.viewCount}</span>
-				</p>
-			</div>
-			<form id="likeForm" style="display: inline; margin: 0; padding: 0;">
-				<button id="likeBtn" type="submit" data-user-idx="${boardViewDTO.userAcIdx}"
-					data-note-idx="${boardViewDTO.noteDetail.note.noteIdx}"
-					style="border: none; background: none; cursor: pointer; filter: var(- -icon-filter);">
-					<c:set var="fillHeartIcon" value="${pageContext.request.contextPath}/resources/images/icons/fill_heart.png" />
-					<c:set var="emptyHeartIcon" value="${pageContext.request.contextPath}/resources/images/icons/heart.svg" />
-					<img id="likeImg" src="${boardViewDTO.liking ? fillHeartIcon : emptyHeartIcon}" alt="heart"
-						style="vertical-align: middle; width: 2rem; height: 2rem;">
-						<span id="likeCount" style="vertical-align: middle;">
-							${boardViewDTO.noteDetail.likeNum}
-						</span>
-				</button>
-			</form>
-		</div>
-	</div>
-
 <div class="note-editor-container">
 	<%-- 상단 기능 헤더 --%>
 	<div class="note-editor-header">
@@ -90,7 +55,7 @@
 	const path = '<c:out value="${path}"/>';
 	let noteIdx = ${noteIdForJs};
 	const parentNoteIdx = ${parentIdForJs};
-	const listLink = '<c:out value="${path}/board/list${criteria.listLink}"/>';
+	const listLink = `<c:out value="${path}/board/list${criteria.listLink}"/>`;
 	const myHolder = document.querySelector("#editorjs");
 	console.log('▶ 내부 path:', path, 'noteIdx:', noteIdx);
 </script>
@@ -277,22 +242,6 @@ $(document).ready(function() {
         }
     });
 
-
-$.ajax({
-    type: 'GET',
-    url: '${path}/api/follows/followerCount',
-    cache: 'no-store',
-    data: {followedAcIdx: loggedInUserAcIdx},
-    dataType: 'json',
-    success: function(followerCount) {
-        $("#follower-btn").find(".accountDataValue").text(followerCount);
-    },
-    error: function(xhr, status, error) {
-        console.error('AJAX Error:', error);
-    }
-});
-
-
 	editor.isReady.then(() => {
 		console.log('Editor.js is ready.');
 		new DragDrop(editor);
@@ -324,7 +273,6 @@ $.ajax({
 					} else {
 						$('#save-btn').show();
 						$('#delete-btn').show();
-						$('#editorjs').on('change', triggerAutoSave);
 						$('#editorjs').on('input', triggerAutoSave);
 					}
 					
@@ -332,12 +280,8 @@ $.ajax({
 	            },
 	            error: () => alert('게시글 로딩 실패')
 	        });
-	    } else {
-			$('#save-btn').show();
-			$('#delete-btn').show();
-		}
-		$('#editorjs').on('change', triggerAutoSave);
-		$('#editorjs').on('input', triggerAutoSave);
+	    }
+		
 	}).catch(error => {
         console.error("Editor.js 초기화 또는 준비 과정에서 에러 발생:", error);
     });
